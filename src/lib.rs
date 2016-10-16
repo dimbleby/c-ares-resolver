@@ -1,7 +1,6 @@
 extern crate c_ares;
 extern crate futures;
 extern crate mio;
-extern crate tokio_core;
 
 mod error;
 mod eventloop;
