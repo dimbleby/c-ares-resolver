@@ -122,17 +122,9 @@ impl EventLoop {
 
     // Process messages incoming on the channel.
     fn handle_messages(&mut self) {
-        loop {
-            match self.rx_msg_channel.try_recv() {
-                Ok(Message::ShutDown) => {
-                    // Instruction to shut down.
-                    self.quit = true;
-                    break
-                },
-
-                // No more instructions.
-                Err(_) => break,
-            }
+        // The only possible message is an instruction to shut down.
+        if let Ok(Message::ShutDown) = self.rx_msg_channel.try_recv() {
+            self.quit = true;
         }
     }
 }
