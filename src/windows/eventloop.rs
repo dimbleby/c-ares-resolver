@@ -9,7 +9,6 @@ use std::time::Duration;
 
 use winapi::winsock2::{
     fd_set,
-    FD_SETSIZE,
     SOCKET_ERROR,
     timeval,
     WSADATA,
@@ -85,17 +84,13 @@ impl EventLoop {
             tv_usec: 200000,
         };
         let duration = Duration::from_millis(200);
+        let mut read_fds: fd_set = unsafe { mem::uninitialized() };
+        let mut write_fds: fd_set = unsafe { mem::uninitialized() };
 
         // Loop round, asking c-ares what it cares about and doing as asked.
         loop {
-            let mut read_fds = fd_set {
-                fd_count: 0,
-                fd_array: [c_ares::SOCKET_BAD; FD_SETSIZE],
-            };
-            let mut write_fds = fd_set {
-                fd_count: 0,
-                fd_array: [c_ares::SOCKET_BAD; FD_SETSIZE],
-            };
+            read_fds.fd_count = 0;
+            write_fds.fd_count = 0;
             let count = self.ares_channel.lock().unwrap()
                 .fds(&mut read_fds, &mut write_fds);
 
