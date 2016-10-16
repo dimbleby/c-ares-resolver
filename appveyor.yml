@@ -1,0 +1,27 @@
+branches:
+    only:
+      - master
+
+environment:
+  VisualStudioVersion: 12.0
+  matrix:
+  - target: x86_64-pc-windows-msvc
+    channel: stable
+  - target: i686-pc-windows-msvc
+    channel: stable
+  - target: x86_64-pc-windows-msvc
+    channel: beta
+  - target: i686-pc-windows-msvc
+    channel: beta
+  - target: x86_64-pc-windows-msvc
+    channel: nightly
+  - target: i686-pc-windows-msvc
+    channel: nightly
+
+install:
+  - ps: .\install-rust.ps1
+
+build: false
+
+test_script:
+  - cargo test

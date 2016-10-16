@@ -1,0 +1,15 @@
+[package]
+name = "tokio-c-ares"
+license = "MIT"
+version = "0.1.0"
+authors = ["David Hotham"]
+description = """
+An asynchronous DNS client using futures, backed by c-ares.
+"""
+homepage = "https://github.com/dimbleby/tokio-c-ares"
+repository = "https://github.com/dimbleby/tokio-c-ares"
+documentation = "https://dimbleby.github.io/tokio-c-ares"
+readme = "README.md"
+keywords = ["DNS", "c-ares", "futures", "tokio"]
+
+[dependencies]

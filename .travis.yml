@@ -1,0 +1,23 @@
+language: rust
+cache: cargo
+sudo: false
+os:
+- linux
+- osx
+rust:
+- nightly
+- beta
+- stable
+script:
+- cargo test
+- cargo doc --no-deps -p tokio-c-ares
+branches:
+  only:
+    master
+install:
+- pip install ghp-import --user $USER
+after_success: |
+  [ "$TRAVIS_PULL_REQUEST" == "false" ] &&
+  [ "$TRAVIS_RUST_VERSION" == "stable" ] &&
+  [ "$TRAVIS_OS_NAME" == "linux" ] &&
+  bash ./publish-docs.sh
