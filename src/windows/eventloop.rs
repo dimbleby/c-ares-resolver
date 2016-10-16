@@ -94,12 +94,10 @@ impl EventLoop {
             let count = self.ares_channel.lock().unwrap()
                 .fds(&mut read_fds, &mut write_fds);
 
-            // Wait for something to happen.
-            let results = unsafe {
-                if count == 0 {
-                    thread::sleep(duration);
-                    0
-                } else {
+            if count == 0 {
+                thread::sleep(duration);
+            } else {
+                let results = unsafe {
                     select(
                         0,
                         &mut read_fds,
@@ -107,17 +105,17 @@ impl EventLoop {
                         ptr::null_mut(),
                         &timeout
                     )
-                }
-            };
+                };
 
-            // Process whatever happened.
-            match results {
-                SOCKET_ERROR => panic!("Socket error"),
-                _ => self.ares_channel.lock().unwrap()
-                    .process(&mut read_fds, &mut write_fds),
+                // Process whatever happened.
+                match results {
+                    SOCKET_ERROR => panic!("Socket error"),
+                    _ => self.ares_channel.lock().unwrap()
+                        .process(&mut read_fds, &mut write_fds),
+                }
             }
 
-            // Check whether we're asked to quit.
+            // Check whether we've been asked to quit.
             self.handle_messages();
             if self.quit { break }
         }
