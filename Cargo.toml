@@ -17,6 +17,10 @@ c-ares = "0.20.0"
 futures = "0.1.2"
 mio = "0.6.0"
 
+[target.'cfg(windows)'.dependencies]
+winapi = "0.2.8"
+ws2_32-sys = "0.2.1"
+
 [dev-dependencies]
 tokio-core = "0.1"
 

@@ -1,10 +1,18 @@
 use std::thread;
 
 use mio;
+
+#[cfg(unix)]
 use unix::eventloop::Message;
 
 #[cfg(unix)]
 pub use unix::eventloop::EventLoop;
+
+#[cfg(windows)]
+use windows::eventloop::Message;
+
+#[cfg(windows)]
+pub use windows::eventloop::EventLoop;
 
 pub struct EventLoopHandle {
     handle: Option<thread::JoinHandle<()>>,
