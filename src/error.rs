@@ -7,7 +7,7 @@ use c_ares;
 #[derive(Debug)]
 pub enum ResolverError {
     Io(io::Error),
-    Ares(c_ares::AresError),
+    Ares(c_ares::Error),
 }
 
 impl fmt::Display for ResolverError {
@@ -41,8 +41,8 @@ impl From<io::Error> for ResolverError {
     }
 }
 
-impl From<c_ares::AresError> for ResolverError {
-    fn from(err: c_ares::AresError) -> ResolverError {
+impl From<c_ares::Error> for ResolverError {
+    fn from(err: c_ares::Error) -> ResolverError {
         ResolverError::Ares(err)
     }
 }

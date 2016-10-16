@@ -49,34 +49,34 @@ impl Resolver {
     }
 
     pub fn query_cname(&self, name: &str)
-        -> futures::BoxFuture<c_ares::CNameResults, c_ares::AresError> {
+        -> futures::BoxFuture<c_ares::CNameResults, c_ares::Error> {
         let (c, p) = futures::oneshot();
         self.ares_channel.lock().unwrap().query_cname(name, move |result| {
             c.complete(result);
         });
-        p.map_err(|_| c_ares::AresError::ECANCELLED)
+        p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
             .boxed()
     }
 
     pub fn query_mx(&self, name: &str)
-        -> futures::BoxFuture<c_ares::MXResults, c_ares::AresError> {
+        -> futures::BoxFuture<c_ares::MXResults, c_ares::Error> {
         let (c, p) = futures::oneshot();
         self.ares_channel.lock().unwrap().query_mx(name, move |result| {
             c.complete(result);
         });
-        p.map_err(|_| c_ares::AresError::ECANCELLED)
+        p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
             .boxed()
     }
 
     pub fn query_naptr(&self, name: &str)
-        -> futures::BoxFuture<c_ares::NAPTRResults, c_ares::AresError> {
+        -> futures::BoxFuture<c_ares::NAPTRResults, c_ares::Error> {
         let (c, p) = futures::oneshot();
         self.ares_channel.lock().unwrap().query_naptr(name, move |result| {
             c.complete(result);
         });
-        p.map_err(|_| c_ares::AresError::ECANCELLED)
+        p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
             .boxed()
     }

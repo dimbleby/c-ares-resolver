@@ -9,7 +9,7 @@ use tokio_c_ares::{
     Resolver
 };
 
-fn print_mx_results(result: &Result<c_ares::MXResults, c_ares::AresError>) {
+fn print_mx_results(result: &Result<c_ares::MXResults, c_ares::Error>) {
     match *result {
         Err(ref e) => {
             println!("MX lookup failed with error '{}'", e.description());
