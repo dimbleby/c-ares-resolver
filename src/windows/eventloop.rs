@@ -96,7 +96,8 @@ impl EventLoop {
                 fd_count: 0,
                 fd_array: [c_ares::SOCKET_BAD; FD_SETSIZE],
             };
-            let count = self.ares_channel.lock().unwrap().fds(&mut read_fds, &mut write_fds);
+            let count = self.ares_channel.lock().unwrap()
+                .fds(&mut read_fds, &mut write_fds);
 
             // Wait for something to happen.
             let results = unsafe {
@@ -104,14 +105,21 @@ impl EventLoop {
                     thread::sleep(duration);
                     0
                 } else {
-                    select(0, &mut read_fds, &mut write_fds, ptr::null_mut(), &timeout)
+                    select(
+                        0,
+                        &mut read_fds,
+                        &mut write_fds,
+                        ptr::null_mut(),
+                        &timeout
+                    )
                 }
             };
 
             // Process whatever happened.
             match results {
                 SOCKET_ERROR => panic!("Socket error"),
-                _ => self.ares_channel.lock().unwrap().process(&mut read_fds, &mut write_fds),
+                _ => self.ares_channel.lock().unwrap()
+                    .process(&mut read_fds, &mut write_fds),
             }
 
             // Check whether we're asked to quit.
