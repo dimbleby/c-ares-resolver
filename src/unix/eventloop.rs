@@ -94,7 +94,7 @@ impl EventLoop {
 
     // Run the event loop.
     pub fn run(self) -> EventLoopHandle {
-        let tx_clone = self.tx_msg_channel.clone(); 
+        let tx_clone = self.tx_msg_channel.clone();
         let join_handle = thread::spawn(|| self.event_loop_thread());
         EventLoopHandle::new(join_handle, tx_clone)
     }
@@ -104,7 +104,7 @@ impl EventLoop {
         let mut events = mio::Events::with_capacity(16);
         loop {
             // Wait for something to happen.
-            let timeout = Duration::from_millis(200);
+            let timeout = Duration::from_millis(100);
             let results = self.poll
                 .poll(&mut events, Some(timeout))
                 .expect("poll failed");
