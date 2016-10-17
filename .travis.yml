@@ -10,7 +10,7 @@ rust:
 - stable
 script:
 - cargo test
-- cargo doc --no-deps -p tokio-c-ares
+- cargo doc --no-deps -p c-ares-resolver
 branches:
   only:
     master
