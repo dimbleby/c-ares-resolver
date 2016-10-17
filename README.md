@@ -3,7 +3,7 @@
 A convenient futures-based API around [`c-ares`](https://dimbleby/rust-c-ares/), for asynchronous DNS requests.
 
 [![Build Status](https://travis-ci.org/dimbleby/c-ares-resolver.svg?branch=master)](https://travis-ci.org/dimbleby/c-ares-resolver)
-[![Build status](https://ci.appveyor.com/api/projects/status/me4646je4dhpeks7/branch/master?svg=true)](https://ci.appveyor.com/project/dimbleby/c-ares-resolver/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/m9o3f4u6wuofq8k9/branch/master?svg=true)](https://ci.appveyor.com/project/dimbleby/c-ares-resolver/branch/master)
 [![crates.io](http://meritbadge.herokuapp.com/c-ares-resolver)](https://crates.io/crates/c-ares-resolver)
 
 ## Documentation ##
