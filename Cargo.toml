@@ -4,7 +4,7 @@ license = "MIT"
 version = "0.1.0"
 authors = ["David Hotham"]
 description = """
-An asynchronous DNS client using futures, backed by c-ares.
+An asynchronous DNS resolver, backed by c-ares.
 """
 homepage = "https://github.com/dimbleby/c-ares-resolver"
 repository = "https://github.com/dimbleby/c-ares-resolver"
