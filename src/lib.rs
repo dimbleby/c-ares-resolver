@@ -10,8 +10,8 @@
 //! more straightforward.  Simply create a `Resolver`, and make your query -
 //! providing a callback to be called when the query completes.
 //!
-//! This crate also provides a `FutureResolver`.  Queries on this object don't
-//! take callbacks, and return `futures::Future` objects.
+//! This crate also provides a `FutureResolver`.  Queries on this object
+//! return `futures::Future` objects, and don't use callbacks.
 //!
 //! (The API on the `FutureResolver` isn't _quite_ as complete as on the
 //! `Resolver`.  For some types of query, the values returned by `c-ares` do
