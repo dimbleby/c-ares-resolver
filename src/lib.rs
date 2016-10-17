@@ -6,14 +6,14 @@
 //! `c-ares` demands, which likely involves writing something close to a
 //! full-blown event loop.
 //!
-//! This crate does that work so that the presented API is much more
-//! straightforward.  Simply create a `Resolver`, and make your query.
+//! This crate does that hard work for you so that the presented API is much
+//! more straightforward.  Simply create a `Resolver`, and make your query.
 //!
 //! In most cases, the returned value is a `futures::Future`.
 //!
 //! In some exceptional cases, the value returned by the `c-ares` library lives
 //! on the stack, so that its lifetime does not allow it to be returned via a
-//! `Future`.  In these cases our API takes a callback.
+//! `Future`.  In such cases this crate's API takes a callback.
 //!
 //! Complete examples showing how to use the library can be found
 //! [here](https://github.com/dimbleby/tokio-c-ares/tree/master/examples).
