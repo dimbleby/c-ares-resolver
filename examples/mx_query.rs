@@ -1,10 +1,10 @@
 extern crate c_ares;
-extern crate tokio_c_ares;
+extern crate c_ares_resolver;
 extern crate tokio_core;
 
 use std::error::Error;
 
-use tokio_c_ares::{
+use c_ares_resolver::{
     Options,
     FutureResolver
 };

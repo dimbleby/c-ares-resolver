@@ -1,29 +1,29 @@
-# tokio-c-ares #
+# c-ares-resolver #
 
 A convenient futures-based API around [`c-ares`](https://dimbleby/rust-c-ares/), for asynchronous DNS requests.
 
-[![Build Status](https://travis-ci.org/dimbleby/tokio-c-ares.svg?branch=master)](https://travis-ci.org/dimbleby/tokio-c-ares)
-[![Build status](https://ci.appveyor.com/api/projects/status/me4646je4dhpeks7/branch/master?svg=true)](https://ci.appveyor.com/project/dimbleby/tokio-c-ares/branch/master)
-[![crates.io](http://meritbadge.herokuapp.com/tokio-c-ares)](https://crates.io/crates/tokio-c-ares)
+[![Build Status](https://travis-ci.org/dimbleby/c-ares-resolver.svg?branch=master)](https://travis-ci.org/dimbleby/c-ares-resolver)
+[![Build status](https://ci.appveyor.com/api/projects/status/me4646je4dhpeks7/branch/master?svg=true)](https://ci.appveyor.com/project/dimbleby/c-ares-resolver/branch/master)
+[![crates.io](http://meritbadge.herokuapp.com/c-ares-resolver)](https://crates.io/crates/c-ares-resolver)
 
 ## Documentation ##
 
-- API documentation is [here](http://dimbleby.github.io/tokio-c-ares).
-- There are some example programs [here](https://github.com/dimbleby/tokio-c-ares/tree/master/examples).
+- API documentation is [here](http://dimbleby.github.io/c-ares-resolver).
+- There are some example programs [here](https://github.com/dimbleby/c-ares-resolver/tree/master/examples).
 
 ## Installation ##
 
-To use `tokio-c-ares`, add this to your `Cargo.toml`:
+To use `c-ares-resolver`, add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-tokio-c-ares = "*"
+c-ares-resolver = "*"
 ```
 
 And add this to your crate root:
 
 ```rust
-extern crate tokio_c_ares;
+extern crate c_ares_resolver;
 ```
 
 ## Contributing ##

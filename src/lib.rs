@@ -19,7 +19,7 @@
 //! functions are not supported by the `FutureResolver`.)
 //!
 //! Complete examples showing how to use the library can be found
-//! [here](https://github.com/dimbleby/tokio-c-ares/tree/master/examples).
+//! [here](https://github.com/dimbleby/c-ares-resolver/tree/master/examples).
 extern crate c_ares;
 extern crate futures;
 extern crate mio;
