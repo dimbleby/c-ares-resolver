@@ -1,3 +1,4 @@
+// This example demonstrates use of the `FutureResolver`.
 extern crate c_ares;
 extern crate c_ares_resolver;
 extern crate tokio_core;

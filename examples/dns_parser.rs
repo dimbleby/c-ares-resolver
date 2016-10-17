@@ -1,3 +1,6 @@
+// This example demonstrates use of the callback-based `Resolver`.  It uses
+// a third-party DNS parser to handle the response, rather than `c-ares`'s own
+// parser.
 extern crate c_ares;
 extern crate c_ares_resolver;
 extern crate dns_parser;
