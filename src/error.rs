@@ -4,9 +4,13 @@ use std::io;
 
 use c_ares;
 
-#[derive(Debug)]
+/// Error codes that the library might return.
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash, PartialOrd, Ord)]
 pub enum Error {
+    /// An `io::Error`.
     Io(io::Error),
+
+    /// A `c_ares::Error`.
     Ares(c_ares::Error),
 }
 
