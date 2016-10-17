@@ -29,6 +29,7 @@ extern crate ws2_32;
 
 mod error;
 mod eventloop;
+mod futureresolver;
 mod resolver;
 
 #[cfg(unix)]
@@ -38,6 +39,7 @@ mod unix;
 mod windows;
 
 pub use error::Error;
+pub use futureresolver::FutureResolver;
 pub use resolver::{
     Options,
     Resolver,

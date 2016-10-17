@@ -6,7 +6,7 @@ use std::error::Error;
 
 use tokio_c_ares::{
     Options,
-    Resolver
+    FutureResolver
 };
 
 fn print_mx_results(result: &Result<c_ares::MXResults, c_ares::Error>) {
@@ -29,7 +29,8 @@ fn print_mx_results(result: &Result<c_ares::MXResults, c_ares::Error>) {
 fn main() {
     // Create Resolver and make a query.
     let options = Options::new();
-    let resolver = Resolver::new(options).expect("Failed to create resolver");
+    let resolver = FutureResolver::new(options)
+        .expect("Failed to create resolver");
     let query = resolver.query_mx("gmail.com");
 
     // Run the query to completion and print the results.

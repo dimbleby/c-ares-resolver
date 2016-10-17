@@ -10,8 +10,6 @@ use std::sync::{
 };
 
 use c_ares;
-use futures;
-use futures::Future;
 
 use error::Error;
 use eventloop::{
@@ -176,123 +174,83 @@ impl Resolver {
     }
 
     /// Look up the A records associated with `name`.
-    pub fn query_a(&self, name: &str)
-        -> futures::BoxFuture<c_ares::AResults, c_ares::Error> {
-        let (c, p) = futures::oneshot();
-        self.ares_channel.lock().unwrap().query_a(name, move |result| {
-            c.complete(result);
-        });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+    ///
+    /// On completion, `handler` is called with the result.
+    pub fn query_a<F>(&self, name: &str, handler: F) where
+        F: FnOnce(Result<c_ares::AResults, c_ares::Error>) + Send + 'static {
+        self.ares_channel.lock().unwrap().query_a(name, handler)
     }
 
     /// Look up the AAAA records associated with `name`.
-    pub fn query_aaaa(&self, name: &str)
-        -> futures::BoxFuture<c_ares::AAAAResults, c_ares::Error> {
-        let (c, p) = futures::oneshot();
-        self.ares_channel.lock().unwrap().query_aaaa(name, move |result| {
-            c.complete(result);
-        });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+    ///
+    /// On completion, `handler` is called with the result.
+    pub fn query_aaaa<F>(&self, name: &str, handler: F) where
+        F: FnOnce(Result<c_ares::AAAAResults, c_ares::Error>) + Send + 'static {
+        self.ares_channel.lock().unwrap().query_aaaa(name, handler)
     }
 
     /// Look up the CNAME records associated with `name`.
-    pub fn query_cname(&self, name: &str)
-        -> futures::BoxFuture<c_ares::CNameResults, c_ares::Error> {
-        let (c, p) = futures::oneshot();
-        self.ares_channel.lock().unwrap().query_cname(name, move |result| {
-            c.complete(result);
-        });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+    ///
+    /// On completion, `handler` is called with the result.
+    pub fn query_cname<F>(&self, name: &str, handler: F) where
+        F: FnOnce(Result<c_ares::CNameResults, c_ares::Error>) + Send + 'static {
+        self.ares_channel.lock().unwrap().query_cname(name, handler)
     }
 
     /// Look up the MX records associated with `name`.
-    pub fn query_mx(&self, name: &str)
-        -> futures::BoxFuture<c_ares::MXResults, c_ares::Error> {
-        let (c, p) = futures::oneshot();
-        self.ares_channel.lock().unwrap().query_mx(name, move |result| {
-            c.complete(result);
-        });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+    ///
+    /// On completion, `handler` is called with the result.
+    pub fn query_mx<F>(&self, name: &str, handler: F) where
+        F: FnOnce(Result<c_ares::MXResults, c_ares::Error>) + Send + 'static {
+        self.ares_channel.lock().unwrap().query_mx(name, handler)
     }
 
     /// Look up the NAPTR records associated with `name`.
-    pub fn query_naptr(&self, name: &str)
-        -> futures::BoxFuture<c_ares::NAPTRResults, c_ares::Error> {
-        let (c, p) = futures::oneshot();
-        self.ares_channel.lock().unwrap().query_naptr(name, move |result| {
-            c.complete(result);
-        });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+    ///
+    /// On completion, `handler` is called with the result.
+    pub fn query_naptr<F>(&self, name: &str, handler: F) where
+        F: FnOnce(Result<c_ares::NAPTRResults, c_ares::Error>) + Send + 'static {
+        self.ares_channel.lock().unwrap().query_naptr(name, handler)
     }
 
     /// Look up the NS records associated with `name`.
-    pub fn query_ns(&self, name: &str)
-        -> futures::BoxFuture<c_ares::NSResults, c_ares::Error> {
-        let (c, p) = futures::oneshot();
-        self.ares_channel.lock().unwrap().query_ns(name, move |result| {
-            c.complete(result);
-        });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+    ///
+    /// On completion, `handler` is called with the result.
+    pub fn query_ns<F>(&self, name: &str, handler: F) where
+        F: FnOnce(Result<c_ares::NSResults, c_ares::Error>) + Send + 'static {
+        self.ares_channel.lock().unwrap().query_ns(name, handler)
     }
 
     /// Look up the PTR records associated with `name`.
-    pub fn query_ptr(&self, name: &str)
-        -> futures::BoxFuture<c_ares::PTRResults, c_ares::Error> {
-        let (c, p) = futures::oneshot();
-        self.ares_channel.lock().unwrap().query_ptr(name, move |result| {
-            c.complete(result);
-        });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+    ///
+    /// On completion, `handler` is called with the result.
+    pub fn query_ptr<F>(&self, name: &str, handler: F) where
+        F: FnOnce(Result<c_ares::PTRResults, c_ares::Error>) + Send + 'static {
+        self.ares_channel.lock().unwrap().query_ptr(name, handler)
+    }
+
+    /// Look up the SOA record associated with `name`.
+    ///
+    /// On completion, `handler` is called with the result.
+    pub fn query_soa<F>(&self, name: &str, handler: F) where
+        F: FnOnce(Result<c_ares::SOAResult, c_ares::Error>) + Send + 'static {
+        self.ares_channel.lock().unwrap().query_soa(name, handler)
     }
 
     /// Look up the SRV records associated with `name`.
-    pub fn query_srv(&self, name: &str)
-        -> futures::BoxFuture<c_ares::SRVResults, c_ares::Error> {
-        let (c, p) = futures::oneshot();
-        self.ares_channel.lock().unwrap().query_srv(name, move |result| {
-            c.complete(result);
-        });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+    ///
+    /// On completion, `handler` is called with the result.
+    pub fn query_srv<F>(&self, name: &str, handler: F) where
+        F: FnOnce(Result<c_ares::SRVResults, c_ares::Error>) + Send + 'static {
+        self.ares_channel.lock().unwrap().query_srv(name, handler)
     }
 
     /// Look up the TXT records associated with `name`.
-    pub fn query_txt(&self, name: &str)
-        -> futures::BoxFuture<c_ares::TXTResults, c_ares::Error> {
-        let (c, p) = futures::oneshot();
-        self.ares_channel.lock().unwrap().query_txt(name, move |result| {
-            c.complete(result);
-        });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
-    }
-
-    /// Look up the SOA records associated with `name`.
-    pub fn query_soa(&self, name: &str)
-        -> futures::BoxFuture<c_ares::SOAResult, c_ares::Error> {
-        let (c, p) = futures::oneshot();
-        self.ares_channel.lock().unwrap().query_soa(name, move |result| {
-            c.complete(result);
-        });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+    ///
+    /// On completion, `handler` is called with the result.
+    pub fn query_txt<F>(&self, name: &str, handler: F) where
+        F: FnOnce(Result<c_ares::TXTResults, c_ares::Error>) + Send + 'static {
+        self.ares_channel.lock().unwrap().query_txt(name, handler)
     }
 
     /// Perform a host query by address.
@@ -304,7 +262,7 @@ impl Resolver {
         handler: F
     ) where F: FnOnce(Result<c_ares::HostResults, c_ares::Error>) + Send + 'static {
          self.ares_channel.lock().unwrap()
-             .get_host_by_address(address, handler);
+             .get_host_by_address(address, handler)
     }
 
     /// Perform a host query by name.
