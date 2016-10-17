@@ -1,6 +1,8 @@
 use std::net::{
+    IpAddr,
     Ipv4Addr,
     Ipv6Addr,
+    SocketAddr,
 };
 use std::sync::{
     Arc,
@@ -291,6 +293,64 @@ impl Resolver {
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
             .boxed()
+    }
+
+    /// Perform a host query by address.
+    ///
+    /// On completion, `handler` is called with the result.
+    pub fn get_host_by_address<F>(
+        &self,
+        address: &IpAddr,
+        handler: F
+    ) where F: FnOnce(Result<c_ares::HostResults, c_ares::Error>) + Send + 'static {
+         self.ares_channel.lock().unwrap()
+             .get_host_by_address(address, handler);
+    }
+
+    /// Perform a host query by name.
+    ///
+    /// On completion, `handler` is called with the result.
+    pub fn get_host_by_name<F>(
+        &self,
+        name: &str,
+        family: c_ares::AddressFamily,
+        handler: F
+    ) where F: FnOnce(Result<c_ares::HostResults, c_ares::Error>) + Send + 'static {
+         self.ares_channel.lock().unwrap()
+             .get_host_by_name(name, family, handler);
+    }
+
+    /// Address-to-nodename translation in protocol-independent manner.
+    ///
+    /// On completion, `handler` is called with the result.
+    pub fn get_name_info<F>(
+        &self,
+        address: &SocketAddr,
+        flags: c_ares::ni_flags::NIFlags,
+        handler: F
+    ) where F: FnOnce(Result<c_ares::NameInfoResult, c_ares::Error>) + Send + 'static {
+        self.ares_channel.lock().unwrap()
+            .get_name_info(address, flags, handler)
+    }
+
+    /// Perform a DNS query for `name`.  The class and type of the query are
+    /// per the provided parameters, taking values as defined in
+    /// `arpa/nameser.h`.
+    ///
+    /// On completion, `handler` is called with the result.
+    ///
+    /// This method is provided so that users can query DNS types for which
+    /// `c-ares` does not provide a parser; or in case a third-party parser is
+    /// preferred.  Usually, if a suitable `query_xxx()` is available, that should be used.
+    pub fn query<F>(
+        &self,
+        name: &str,
+        dns_class: u16,
+        query_type: u16,
+        handler: F
+    ) where F: FnOnce(Result<&[u8], c_ares::Error>) + Send + 'static {
+        self.ares_channel.lock().unwrap()
+            .query(name, dns_class, query_type, handler);
     }
 
     /// Cancel all requests made on this `Channel`.
