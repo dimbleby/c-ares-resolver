@@ -18,7 +18,7 @@ mod unix;
 #[cfg(windows)]
 mod windows;
 
-pub use error::ResolverError;
+pub use error::Error;
 pub use resolver::{
     Options,
     Resolver,

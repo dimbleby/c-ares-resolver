@@ -7,7 +7,7 @@ use c_ares;
 use futures;
 use futures::Future;
 
-use error::ResolverError;
+use error::Error;
 use eventloop::{
     EventLoop,
     EventLoopHandle
@@ -34,7 +34,7 @@ pub struct Resolver {
 
 impl Resolver {
     /// Create a new Resolver.
-    pub fn new(options: Options) -> Result<Resolver, ResolverError> {
+    pub fn new(options: Options) -> Result<Resolver, Error> {
         // Create and run the event loop.
         let event_loop = try!(EventLoop::new(options.inner));
         let channel = event_loop.ares_channel.clone();

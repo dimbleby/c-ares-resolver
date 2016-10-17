@@ -22,7 +22,7 @@ use ws2_32::{
 use c_ares;
 use mio;
 
-use error::ResolverError;
+use error::Error;
 use eventloop::EventLoopHandle;
 
 // The EventLoop will use select() to check on the status of file descriptors
@@ -46,7 +46,7 @@ pub enum Message {
 
 impl EventLoop {
     // Create a new event loop.
-    pub fn new(options: c_ares::Options) -> Result<EventLoop, ResolverError> {
+    pub fn new(options: c_ares::Options) -> Result<EventLoop, Error> {
         // Initialize sockets.
         unsafe {
             let mut wsadata: WSADATA = mem::uninitialized();

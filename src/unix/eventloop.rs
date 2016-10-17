@@ -9,7 +9,7 @@ use std::time::Duration;
 use c_ares;
 use mio;
 
-use error::ResolverError;
+use error::Error;
 use eventloop::EventLoopHandle;
 
 // The EventLoop will set up a mio::Poll and use it to wait for the following:
@@ -52,7 +52,7 @@ const CHANNEL: mio::Token = mio::Token(0);
 
 impl EventLoop {
     // Create a new event loop.
-    pub fn new(mut options: c_ares::Options) -> Result<EventLoop, ResolverError> {
+    pub fn new(mut options: c_ares::Options) -> Result<EventLoop, Error> {
         // Create a mio::Poll on which to wait for events, and register a
         // channel with it.
         let poll = try!(mio::Poll::new());

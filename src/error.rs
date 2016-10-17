@@ -1,48 +1,48 @@
-use std::error::Error;
+use std::error;
 use std::fmt;
 use std::io;
 
 use c_ares;
 
 #[derive(Debug)]
-pub enum ResolverError {
+pub enum Error {
     Io(io::Error),
     Ares(c_ares::Error),
 }
 
-impl fmt::Display for ResolverError {
+impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            ResolverError::Io(ref err) => err.fmt(f),
-            ResolverError::Ares(ref err) => err.fmt(f),
+            Error::Io(ref err) => err.fmt(f),
+            Error::Ares(ref err) => err.fmt(f),
         }
     }
 }
 
-impl Error for ResolverError {
+impl error::Error for Error {
     fn description(&self) -> &str {
         match *self {
-            ResolverError::Io(ref err) => err.description(),
-            ResolverError::Ares(ref err) => err.description(),
+            Error::Io(ref err) => err.description(),
+            Error::Ares(ref err) => err.description(),
         }
     }
 
-    fn cause(&self) -> Option<&Error> {
+    fn cause(&self) -> Option<&error::Error> {
         match *self {
-            ResolverError::Io(ref err) => Some(err),
-            ResolverError::Ares(ref err) => Some(err),
+            Error::Io(ref err) => Some(err),
+            Error::Ares(ref err) => Some(err),
         }
     }
 }
 
-impl From<io::Error> for ResolverError {
-    fn from(err: io::Error) -> ResolverError {
-        ResolverError::Io(err)
+impl From<io::Error> for Error {
+    fn from(err: io::Error) -> Error {
+        Error::Io(err)
     }
 }
 
-impl From<c_ares::Error> for ResolverError {
-    fn from(err: c_ares::Error) -> ResolverError {
-        ResolverError::Ares(err)
+impl From<c_ares::Error> for Error {
+    fn from(err: c_ares::Error) -> Error {
+        Error::Ares(err)
     }
 }
