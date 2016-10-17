@@ -92,7 +92,7 @@ impl EventLoop {
             if count == 0 {
                 thread::sleep(Duration::from_millis(100));
             } else {
-                let select_timeout = timeval {
+                let timeout = timeval {
                     tv_sec: 0,
                     tv_usec: 100000,
                 };
@@ -102,7 +102,7 @@ impl EventLoop {
                         &mut read_fds,
                         &mut write_fds,
                         ptr::null_mut(),
-                        &select_timeout
+                        &timeout
                     )
                 };
 
