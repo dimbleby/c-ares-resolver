@@ -312,7 +312,7 @@ impl Resolver {
             .query(name, dns_class, query_type, handler);
     }
 
-    /// Cancel all requests made on this `Channel`.
+    /// Cancel all requests made on this `Resolver`.
     pub fn cancel(&mut self) {
         self.ares_channel.lock().unwrap().cancel();
     }

@@ -178,7 +178,7 @@ impl FutureResolver {
             .boxed()
     }
 
-    /// Cancel all requests made on this `Channel`.
+    /// Cancel all requests made on this `FutureResolver`.
     pub fn cancel(&mut self) {
         self.inner.cancel();
     }
