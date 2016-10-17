@@ -1,16 +1,39 @@
+extern crate c_ares;
 extern crate c_ares_resolver;
 extern crate dns_parser;
 extern crate tokio_core;
 
 use std::error::Error;
-use std::thread;
-use std::time::Duration;
+use std::sync::mpsc;
 
 use c_ares_resolver::{
     Options,
     Resolver
 };
 use dns_parser::Packet;
+
+fn handle_result(result: Result<&[u8], c_ares::Error>) {
+    match result {
+        Err(e) => {
+            println!("Query failed with error '{}'", e.description());
+        },
+        Ok(bytes) => {
+            match Packet::parse(bytes) {
+                Err(e) => {
+                    println!(
+                        "Parser failed with error '{}'",
+                        e.description()
+                    );
+                },
+                Ok(packet) => {
+                    for answer in &packet.answers {
+                        println!("{:?}", answer.data);
+                    }
+                },
+            }
+        },
+    }
+}
 
 fn main() {
     // Create Resolver.
@@ -19,32 +42,18 @@ fn main() {
         .expect("Failed to create resolver");
 
     // Make an A-query, but use a third-party DNS parser to handle the result.
+    let (tx, rx) = mpsc::channel();
     resolver.query(
         "apple.com",
         1,  // internet
         1,  // Host address
-        |result| {
-            match result {
-                Err(e) => {
-                    println!("Query failed with error '{}'", e.description());
-                },
-                Ok(bytes) => {
-                    match Packet::parse(bytes) {
-                        Err(e) => {
-                            println!(
-                                "Parser failed with error '{}'",
-                                e.description()
-                            );
-                        },
-                        Ok(packet) => {
-                            for answer in &packet.answers {
-                                println!("{:?}", answer.data);
-                            }
-                        },
-                    }
-                },
-            }
+        move |result| {
+            handle_result(result);
+            tx.send(()).expect("failed to send on channel!");
         }
     );
-    thread::sleep(Duration::from_millis(100));
+
+    // If we allowed the resolver to be dropped, we'd shut down c-ares and the
+    // query would fail.  Wait for the handler to signal that it is done.
+    rx.recv().expect("query did not complete!");
 }
