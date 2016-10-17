@@ -5,7 +5,7 @@ use std::io;
 use c_ares;
 
 /// Error codes that the library might return.
-#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash, PartialOrd, Ord)]
+#[derive(Debug)]
 pub enum Error {
     /// An `io::Error`.
     Io(io::Error),
