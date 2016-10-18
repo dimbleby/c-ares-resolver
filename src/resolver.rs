@@ -29,8 +29,7 @@ impl Options {
         Self::default()
     }
 
-    /// Set flags controlling the behaviour of the resolver.  The available
-    /// flags are documented [here](flags/index.html).
+    /// Set flags controlling the behaviour of the resolver.
     pub fn set_flags(&mut self, flags: c_ares::flags::Flags) -> &mut Self {
         self.inner.set_flags(flags);
         self
