@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cargo doc -p c-ares
+cargo doc -p c-ares-resolver
 echo "<meta http-equiv=refresh content=0;url=c_ares_resolver/index.html>" > target/doc/index.html
 
 git config user.name "Travis CI"
