@@ -21,7 +21,8 @@ fn print_mx_results(result: &Result<c_ares::MXResults, c_ares::Error>) {
                 println!(
                     "host {}, priority {}",
                     mx_result.host(),
-                    mx_result.priority());
+                    mx_result.priority()
+                );
             }
         }
     }

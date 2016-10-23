@@ -180,6 +180,6 @@ impl FutureResolver {
 
     /// Cancel all requests made on this `FutureResolver`.
     pub fn cancel(&mut self) {
-        self.inner.cancel();
+        self.inner.cancel()
     }
 }

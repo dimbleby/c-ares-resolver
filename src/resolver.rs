@@ -149,7 +149,8 @@ impl Resolver {
     /// square brackets eg `[2001:4860:4860::8888]:53`.
     pub fn set_servers(
         &mut self,
-        servers: &[&str]) -> Result<&mut Self, c_ares::Error> {
+        servers: &[&str]
+    ) -> Result<&mut Self, c_ares::Error> {
         try!(self.ares_channel.lock().unwrap().set_servers(servers));
         Ok(self)
     }
