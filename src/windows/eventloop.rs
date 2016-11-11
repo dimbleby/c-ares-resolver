@@ -57,7 +57,7 @@ impl EventLoop {
         let (tx, rx) = mio::channel::channel();
 
         // Create the c-ares channel.
-        let ares_channel = try!(c_ares::Channel::new(options));
+        let ares_channel = c_ares::Channel::new(options)?;
         let locked_channel = Arc::new(Mutex::new(ares_channel));
 
         // Create and return the event loop.

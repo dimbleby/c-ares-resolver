@@ -130,7 +130,7 @@ impl Resolver {
     /// Create a new Resolver.
     pub fn new(options: Options) -> Result<Resolver, Error> {
         // Create and run the event loop.
-        let event_loop = try!(EventLoop::new(options.inner));
+        let event_loop = EventLoop::new(options.inner)?;
         let channel = event_loop.ares_channel.clone();
         let handle = event_loop.run();
 
@@ -151,7 +151,7 @@ impl Resolver {
         &mut self,
         servers: &[&str]
     ) -> Result<&mut Self, c_ares::Error> {
-        try!(self.ares_channel.lock().unwrap().set_servers(servers));
+        self.ares_channel.lock().unwrap().set_servers(servers)?;
         Ok(self)
     }
 

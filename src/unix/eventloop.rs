@@ -55,16 +55,14 @@ impl EventLoop {
     pub fn new(mut options: c_ares::Options) -> Result<EventLoop, Error> {
         // Create a mio::Poll on which to wait for events, and register a
         // channel with it.
-        let poll = try!(mio::Poll::new());
+        let poll = mio::Poll::new()?;
         let (tx, rx) = mio::channel::channel();
-        try!(
-            poll.register(
-                &rx,
-                CHANNEL,
-                mio::Ready::readable(),
-                mio::PollOpt::edge()
-             )
-        );
+        poll.register(
+            &rx,
+            CHANNEL,
+            mio::Ready::readable(),
+            mio::PollOpt::edge()
+        )?;
 
         // Whenever c-ares tells us what to do with a file descriptor, we'll
         // send that request along, through the channel we just created.
@@ -77,7 +75,7 @@ impl EventLoop {
         options.set_socket_state_callback(sock_callback);
 
         // Create the c-ares channel.
-        let ares_channel = try!(c_ares::Channel::new(options));
+        let ares_channel = c_ares::Channel::new(options)?;
         let locked_channel = Arc::new(Mutex::new(ares_channel));
 
         // Create and return the event loop.

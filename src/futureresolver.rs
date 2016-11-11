@@ -21,7 +21,7 @@ pub struct FutureResolver {
 impl FutureResolver {
     /// Create a new Resolver.
     pub fn new(options: Options) -> Result<FutureResolver, Error> {
-        let inner = try!(Resolver::new(options));
+        let inner = Resolver::new(options)?;
         let resolver = FutureResolver {
             inner: inner,
         };
@@ -36,7 +36,7 @@ impl FutureResolver {
     pub fn set_servers(
         &mut self,
         servers: &[&str]) -> Result<&mut Self, c_ares::Error> {
-        try!(self.inner.set_servers(servers));
+        self.inner.set_servers(servers)?;
         Ok(self)
     }
 
