@@ -13,8 +13,6 @@ script:
 branches:
   only:
     master
-install:
-  - pip install ghp-import --user
 after_success: |
   [ "$TRAVIS_PULL_REQUEST" == "false" ] &&
   [ "$TRAVIS_RUST_VERSION" == "stable" ] &&

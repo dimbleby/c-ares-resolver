@@ -1,9 +1,11 @@
 #!/bin/bash
+set -e
 
 cargo doc -p c-ares-resolver
 echo "<meta http-equiv=refresh content=0;url=c_ares_resolver/index.html>" > target/doc/index.html
 
 git config user.name "Travis CI"
+pip install --user ghp-import
 ~/.local/bin/ghp-import -n target/doc
 
 openssl aes-256-cbc -K "$encrypted_25079192cbe2_key" -iv "$encrypted_25079192cbe2_iv" -in publish-key.enc -out ~/.ssh/publish-key -d
