@@ -17,6 +17,17 @@
 //! `Resolver`.  For some types of query, the values returned by `c-ares` do
 //! not have a long enough lifetime to be returned in a `Future`.  The relevant
 //! functions are not supported by the `FutureResolver`.)
+//! 
+//! On both resolvers:
+//! 
+//! -  methods like `query_xxx` correspond to the c-ares
+//! function `ares_query`, which "initiates a single-question DNS query"
+//! 
+//! -  methods like `search_xxx` correspond to the c-ares function
+//! `ares_search`, which "initiates a series of single-question DNS queries".
+//! 
+//! See [c-ares documentation](https://c-ares.haxx.se/docs.html) for more
+//! details.
 //!
 //! Complete examples showing how to use the library can be found
 //! [here](https://github.com/dimbleby/c-ares-resolver/tree/master/examples).
