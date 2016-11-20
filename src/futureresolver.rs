@@ -70,11 +70,35 @@ impl FutureResolver {
             .boxed()
     }
 
+    /// Search for the A records associated with `name`.
+    pub fn search_a(&self, name: &str)
+        -> futures::BoxFuture<c_ares::AResults, c_ares::Error> {
+        let (c, p) = futures::oneshot();
+        self.inner.search_a(name, move |result| {
+            c.complete(result);
+        });
+        p.map_err(|_| c_ares::Error::ECANCELLED)
+            .and_then(futures::done)
+            .boxed()
+    }
+
     /// Look up the AAAA records associated with `name`.
     pub fn query_aaaa(&self, name: &str)
         -> futures::BoxFuture<c_ares::AAAAResults, c_ares::Error> {
         let (c, p) = futures::oneshot();
         self.inner.query_aaaa(name, move |result| {
+            c.complete(result);
+        });
+        p.map_err(|_| c_ares::Error::ECANCELLED)
+            .and_then(futures::done)
+            .boxed()
+    }
+
+    /// Search for the AAAA records associated with `name`.
+    pub fn search_aaaa(&self, name: &str)
+        -> futures::BoxFuture<c_ares::AAAAResults, c_ares::Error> {
+        let (c, p) = futures::oneshot();
+        self.inner.search_aaaa(name, move |result| {
             c.complete(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
@@ -94,11 +118,35 @@ impl FutureResolver {
             .boxed()
     }
 
+    /// Search for the CNAME records associated with `name`.
+    pub fn search_cname(&self, name: &str)
+        -> futures::BoxFuture<c_ares::CNameResults, c_ares::Error> {
+        let (c, p) = futures::oneshot();
+        self.inner.search_cname(name, move |result| {
+            c.complete(result);
+        });
+        p.map_err(|_| c_ares::Error::ECANCELLED)
+            .and_then(futures::done)
+            .boxed()
+    }
+
     /// Look up the MX records associated with `name`.
     pub fn query_mx(&self, name: &str)
         -> futures::BoxFuture<c_ares::MXResults, c_ares::Error> {
         let (c, p) = futures::oneshot();
         self.inner.query_mx(name, move |result| {
+            c.complete(result);
+        });
+        p.map_err(|_| c_ares::Error::ECANCELLED)
+            .and_then(futures::done)
+            .boxed()
+    }
+
+    /// Search for the MX records associated with `name`.
+    pub fn search_mx(&self, name: &str)
+        -> futures::BoxFuture<c_ares::MXResults, c_ares::Error> {
+        let (c, p) = futures::oneshot();
+        self.inner.search_mx(name, move |result| {
             c.complete(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
@@ -118,11 +166,35 @@ impl FutureResolver {
             .boxed()
     }
 
+    /// Search for the NAPTR records associated with `name`.
+    pub fn search_naptr(&self, name: &str)
+        -> futures::BoxFuture<c_ares::NAPTRResults, c_ares::Error> {
+        let (c, p) = futures::oneshot();
+        self.inner.search_naptr(name, move |result| {
+            c.complete(result);
+        });
+        p.map_err(|_| c_ares::Error::ECANCELLED)
+            .and_then(futures::done)
+            .boxed()
+    }
+
     /// Look up the NS records associated with `name`.
     pub fn query_ns(&self, name: &str)
         -> futures::BoxFuture<c_ares::NSResults, c_ares::Error> {
         let (c, p) = futures::oneshot();
         self.inner.query_ns(name, move |result| {
+            c.complete(result);
+        });
+        p.map_err(|_| c_ares::Error::ECANCELLED)
+            .and_then(futures::done)
+            .boxed()
+    }
+
+    /// Search for the NS records associated with `name`.
+    pub fn search_ns(&self, name: &str)
+        -> futures::BoxFuture<c_ares::NSResults, c_ares::Error> {
+        let (c, p) = futures::oneshot();
+        self.inner.search_ns(name, move |result| {
             c.complete(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
@@ -142,11 +214,35 @@ impl FutureResolver {
             .boxed()
     }
 
+    /// Search for the PTR records associated with `name`.
+    pub fn search_ptr(&self, name: &str)
+        -> futures::BoxFuture<c_ares::PTRResults, c_ares::Error> {
+        let (c, p) = futures::oneshot();
+        self.inner.search_ptr(name, move |result| {
+            c.complete(result);
+        });
+        p.map_err(|_| c_ares::Error::ECANCELLED)
+            .and_then(futures::done)
+            .boxed()
+    }
+
     /// Look up the SOA records associated with `name`.
     pub fn query_soa(&self, name: &str)
         -> futures::BoxFuture<c_ares::SOAResult, c_ares::Error> {
         let (c, p) = futures::oneshot();
         self.inner.query_soa(name, move |result| {
+            c.complete(result);
+        });
+        p.map_err(|_| c_ares::Error::ECANCELLED)
+            .and_then(futures::done)
+            .boxed()
+    }
+
+    /// Search for the SOA records associated with `name`.
+    pub fn search_soa(&self, name: &str)
+        -> futures::BoxFuture<c_ares::SOAResult, c_ares::Error> {
+        let (c, p) = futures::oneshot();
+        self.inner.search_soa(name, move |result| {
             c.complete(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
@@ -166,11 +262,35 @@ impl FutureResolver {
             .boxed()
     }
 
+    /// Search for the SRV records associated with `name`.
+    pub fn search_srv(&self, name: &str)
+        -> futures::BoxFuture<c_ares::SRVResults, c_ares::Error> {
+        let (c, p) = futures::oneshot();
+        self.inner.search_srv(name, move |result| {
+            c.complete(result);
+        });
+        p.map_err(|_| c_ares::Error::ECANCELLED)
+            .and_then(futures::done)
+            .boxed()
+    }
+
     /// Look up the TXT records associated with `name`.
     pub fn query_txt(&self, name: &str)
         -> futures::BoxFuture<c_ares::TXTResults, c_ares::Error> {
         let (c, p) = futures::oneshot();
         self.inner.query_txt(name, move |result| {
+            c.complete(result);
+        });
+        p.map_err(|_| c_ares::Error::ECANCELLED)
+            .and_then(futures::done)
+            .boxed()
+    }
+
+    /// Search for the TXT records associated with `name`.
+    pub fn search_txt(&self, name: &str)
+        -> futures::BoxFuture<c_ares::TXTResults, c_ares::Error> {
+        let (c, p) = futures::oneshot();
+        self.inner.search_txt(name, move |result| {
             c.complete(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
