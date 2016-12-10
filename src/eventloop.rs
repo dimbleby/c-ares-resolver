@@ -15,7 +15,7 @@ use windows::eventloop::Message;
 pub use windows::eventloop::EventLoop;
 
 pub struct EventLoopHandle {
-    handle: Option<thread::JoinHandle<()>>,
+    handle: thread::JoinHandle<()>,
     tx_msg_channel: mio::channel::Sender<Message>,
 }
 
@@ -24,17 +24,15 @@ impl EventLoopHandle {
         handle: thread::JoinHandle<()>,
         tx_msg_channel: mio::channel::Sender<Message>) -> EventLoopHandle {
         EventLoopHandle {
-            handle: Some(handle),
+            handle: handle,
             tx_msg_channel: tx_msg_channel,
         }
     }
 
-    pub fn shutdown(&mut self) {
+    pub fn shutdown(self) {
         self.tx_msg_channel
             .send(Message::ShutDown)
             .expect("failed to request event loop to shut down");
-        if let Some(handle) = self.handle.take() {
-            handle.join().expect("failed to shut down event loop");
-        }
+        self.handle.join().expect("failed to shut down event loop");
     }
 }

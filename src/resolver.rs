@@ -123,7 +123,7 @@ impl Options {
 /// An asynchronous DNS resolver.
 pub struct Resolver {
     ares_channel: Arc<Mutex<c_ares::Channel>>,
-    event_loop_handle: EventLoopHandle,
+    event_loop_handle: Option<EventLoopHandle>,
 }
 
 impl Resolver {
@@ -137,7 +137,7 @@ impl Resolver {
         // Return the Resolver.
         let resolver = Resolver {
             ares_channel: channel,
-            event_loop_handle: handle,
+            event_loop_handle: Some(handle),
         };
         Ok(resolver)
     }
@@ -421,7 +421,8 @@ impl Resolver {
 
 impl Drop for Resolver {
     fn drop(&mut self) {
-        // Shut down the event loop.
-        self.event_loop_handle.shutdown();
+        if let Some(handle) = self.event_loop_handle.take() {
+            handle.shutdown()
+        }
     }
 }
