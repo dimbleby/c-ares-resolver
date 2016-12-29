@@ -11,6 +11,29 @@ A more convenient API around [`c-ares`](https://github.com/dimbleby/rust-c-ares/
 - API documentation is [here](http://dimbleby.github.io/c-ares-resolver).
 - There are some example programs [here](https://github.com/dimbleby/c-ares-resolver/tree/master/examples).
 
+## Example ##
+
+```rust
+extern crate c_ares;
+extern crate c_ares_resolver;
+
+use std::sync::mpsc;
+use c_ares_resolver::Resolver;
+
+fn main() {
+    let resolver = Resolver::new().unwrap();
+    let (tx, rx) = mpsc::channel();
+    resolver.query_a(
+        "google.com",
+        move |result| {
+            println!("{}", result.unwrap());
+            tx.send(()).unwrap();
+        }
+    );
+    rx.recv().unwrap();
+}
+```
+
 ## Installation ##
 
 To use `c-ares-resolver`, add this to your `Cargo.toml`:
