@@ -127,8 +127,14 @@ pub struct Resolver {
 }
 
 impl Resolver {
-    /// Create a new Resolver.
-    pub fn new(options: Options) -> Result<Resolver, Error> {
+    /// Create a new Resolver, using default `Options`.
+    pub fn new() -> Result<Resolver, Error> {
+        let options = Options::default();
+        Self::with_options(options)
+    }
+
+    /// Create a new Resolver, with the given `Options`.
+    pub fn with_options(options: Options) -> Result<Resolver, Error> {
         // Create and run the event loop.
         let event_loop = EventLoop::new(options.inner)?;
         let channel = event_loop.ares_channel.clone();

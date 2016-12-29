@@ -5,10 +5,7 @@ extern crate tokio_core;
 
 use std::error::Error;
 
-use c_ares_resolver::{
-    Options,
-    FutureResolver
-};
+use c_ares_resolver::FutureResolver;
 
 fn print_mx_results(result: &Result<c_ares::MXResults, c_ares::Error>) {
     match *result {
@@ -30,9 +27,7 @@ fn print_mx_results(result: &Result<c_ares::MXResults, c_ares::Error>) {
 
 fn main() {
     // Create Resolver and make a query.
-    let options = Options::new();
-    let resolver = FutureResolver::new(options)
-        .expect("Failed to create resolver");
+    let resolver = FutureResolver::new().expect("Failed to create resolver");
     let query = resolver.query_mx("gmail.com");
 
     // Run the query to completion and print the results.

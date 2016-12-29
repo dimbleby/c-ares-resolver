@@ -19,9 +19,15 @@ pub struct FutureResolver {
 }
 
 impl FutureResolver {
-    /// Create a new Resolver.
-    pub fn new(options: Options) -> Result<FutureResolver, Error> {
-        let inner = Resolver::new(options)?;
+    /// Create a new Resolver, using default `Options`.
+    pub fn new() -> Result<FutureResolver, Error> {
+        let options = Options::default();
+        Self::with_options(options)
+    }
+
+    /// Create a new Resolver, with the given `Options`.
+    pub fn with_options(options: Options) -> Result<FutureResolver, Error> {
+        let inner = Resolver::with_options(options)?;
         let resolver = FutureResolver {
             inner: inner,
         };

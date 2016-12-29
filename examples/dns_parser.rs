@@ -9,10 +9,7 @@ extern crate tokio_core;
 use std::error::Error;
 use std::sync::mpsc;
 
-use c_ares_resolver::{
-    Options,
-    Resolver
-};
+use c_ares_resolver:: Resolver;
 use dns_parser::Packet;
 
 fn handle_result(result: Result<&[u8], c_ares::Error>) {
@@ -40,9 +37,7 @@ fn handle_result(result: Result<&[u8], c_ares::Error>) {
 
 fn main() {
     // Create Resolver.
-    let options = Options::new();
-    let resolver = Resolver::new(options)
-        .expect("Failed to create resolver");
+    let resolver = Resolver::new().expect("Failed to create resolver");
 
     // Make an A-query, but use a third-party DNS parser to handle the result.
     let (tx, rx) = mpsc::channel();
