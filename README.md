@@ -8,10 +8,9 @@ A more convenient API around [`c-ares`](https://github.com/dimbleby/rust-c-ares/
 
 ## Documentation ##
 
-- API documentation is [here](http://dimbleby.github.io/c-ares-resolver).
-- There are some example programs [here](https://github.com/dimbleby/c-ares-resolver/tree/master/examples).
+API documentation is [here](http://dimbleby.github.io/c-ares-resolver).
 
-## Example ##
+## Examples ##
 
 ```rust
 extern crate c_ares;
@@ -33,6 +32,8 @@ fn main() {
     rx.recv().unwrap();
 }
 ```
+
+Further example programs can be found [here](https://github.com/dimbleby/c-ares-resolver/tree/master/examples).
 
 ## Installation ##
 
