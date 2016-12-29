@@ -32,7 +32,6 @@
 //! # Example
 //!
 //! ```rust
-//! extern crate c_ares;
 //! extern crate c_ares_resolver;
 //!
 //! use std::sync::mpsc;

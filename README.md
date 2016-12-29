@@ -13,7 +13,6 @@ API documentation is [here](http://dimbleby.github.io/c-ares-resolver).
 ## Examples ##
 
 ```rust
-extern crate c_ares;
 extern crate c_ares_resolver;
 
 use std::sync::mpsc;
