@@ -172,14 +172,14 @@ impl EventLoop {
                                 &efd,
                                 token,
                                 interest,
-                                mio::PollOpt::edge()
+                                mio::PollOpt::level()
                             )
                         } else {
                             self.poll.register(
                                 &efd,
                                 token,
                                 interest,
-                                mio::PollOpt::edge()
+                                mio::PollOpt::level()
                             )
                         };
                         register_result.expect("failed to register interest");
