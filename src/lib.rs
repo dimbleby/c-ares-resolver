@@ -33,21 +33,14 @@
 //!
 //! ```rust
 //! extern crate c_ares_resolver;
-//!
-//! use std::sync::mpsc;
-//! use c_ares_resolver::Resolver;
+//! extern crate tokio_core;
 //!
 //! fn main() {
-//!     let resolver = Resolver::new().unwrap();
-//!     let (tx, rx) = mpsc::channel();
-//!     resolver.query_a(
-//!         "google.com",
-//!         move |result| {
-//!             println!("{}", result.unwrap());
-//!             tx.send(()).unwrap();
-//!         }
-//!     );
-//!     rx.recv().unwrap();
+//!     let resolver = c_ares_resolver::FutureResolver::new().unwrap();
+//!     let query = resolver.query_a("google.com");
+//!     let mut event_loop = tokio_core::reactor::Core::new().unwrap();
+//!     let result = event_loop.run(query).unwrap();
+//!     println!("{}", result);
 //! }
 //! ```
 //!
