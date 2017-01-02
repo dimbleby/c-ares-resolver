@@ -68,7 +68,10 @@ mod unix;
 mod windows;
 
 pub use error::Error;
-pub use futureresolver::FutureResolver;
+pub use futureresolver::{
+    CAresFuture,
+    FutureResolver
+};
 pub use resolver::{
     Options,
     Resolver,

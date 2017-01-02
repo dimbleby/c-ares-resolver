@@ -12,6 +12,8 @@ use resolver::{
     Resolver,
 };
 
+pub type CAresFuture<T> = Box<Future<Item=T, Error=c_ares::Error>>;
+
 /// An asynchronous DNS resolver, which returns results as
 /// `futures::Future`s.
 pub struct FutureResolver {
@@ -65,8 +67,7 @@ impl FutureResolver {
     }
 
     /// Look up the A records associated with `name`.
-    pub fn query_a(&self, name: &str)
-        -> futures::BoxFuture<c_ares::AResults, c_ares::Error> {
+    pub fn query_a(&self, name: &str) -> CAresFuture<c_ares::AResults> {
         let (c, p) = futures::oneshot();
         self.inner.query_a(name, move |result| {
             c.complete(result);
@@ -77,8 +78,7 @@ impl FutureResolver {
     }
 
     /// Search for the A records associated with `name`.
-    pub fn search_a(&self, name: &str)
-        -> futures::BoxFuture<c_ares::AResults, c_ares::Error> {
+    pub fn search_a(&self, name: &str) -> CAresFuture<c_ares::AResults> {
         let (c, p) = futures::oneshot();
         self.inner.search_a(name, move |result| {
             c.complete(result);
@@ -89,8 +89,7 @@ impl FutureResolver {
     }
 
     /// Look up the AAAA records associated with `name`.
-    pub fn query_aaaa(&self, name: &str)
-        -> futures::BoxFuture<c_ares::AAAAResults, c_ares::Error> {
+    pub fn query_aaaa(&self, name: &str)  -> CAresFuture<c_ares::AAAAResults> {
         let (c, p) = futures::oneshot();
         self.inner.query_aaaa(name, move |result| {
             c.complete(result);
@@ -101,8 +100,7 @@ impl FutureResolver {
     }
 
     /// Search for the AAAA records associated with `name`.
-    pub fn search_aaaa(&self, name: &str)
-        -> futures::BoxFuture<c_ares::AAAAResults, c_ares::Error> {
+    pub fn search_aaaa(&self, name: &str) -> CAresFuture<c_ares::AAAAResults> {
         let (c, p) = futures::oneshot();
         self.inner.search_aaaa(name, move |result| {
             c.complete(result);
@@ -114,7 +112,7 @@ impl FutureResolver {
 
     /// Look up the CNAME records associated with `name`.
     pub fn query_cname(&self, name: &str)
-        -> futures::BoxFuture<c_ares::CNameResults, c_ares::Error> {
+        -> CAresFuture<c_ares::CNameResults> {
         let (c, p) = futures::oneshot();
         self.inner.query_cname(name, move |result| {
             c.complete(result);
@@ -126,7 +124,7 @@ impl FutureResolver {
 
     /// Search for the CNAME records associated with `name`.
     pub fn search_cname(&self, name: &str)
-        -> futures::BoxFuture<c_ares::CNameResults, c_ares::Error> {
+        -> CAresFuture<c_ares::CNameResults> {
         let (c, p) = futures::oneshot();
         self.inner.search_cname(name, move |result| {
             c.complete(result);
@@ -137,8 +135,7 @@ impl FutureResolver {
     }
 
     /// Look up the MX records associated with `name`.
-    pub fn query_mx(&self, name: &str)
-        -> futures::BoxFuture<c_ares::MXResults, c_ares::Error> {
+    pub fn query_mx(&self, name: &str) -> CAresFuture<c_ares::MXResults> {
         let (c, p) = futures::oneshot();
         self.inner.query_mx(name, move |result| {
             c.complete(result);
@@ -149,8 +146,7 @@ impl FutureResolver {
     }
 
     /// Search for the MX records associated with `name`.
-    pub fn search_mx(&self, name: &str)
-        -> futures::BoxFuture<c_ares::MXResults, c_ares::Error> {
+    pub fn search_mx(&self, name: &str) -> CAresFuture<c_ares::MXResults> {
         let (c, p) = futures::oneshot();
         self.inner.search_mx(name, move |result| {
             c.complete(result);
@@ -162,7 +158,7 @@ impl FutureResolver {
 
     /// Look up the NAPTR records associated with `name`.
     pub fn query_naptr(&self, name: &str)
-        -> futures::BoxFuture<c_ares::NAPTRResults, c_ares::Error> {
+        -> CAresFuture<c_ares::NAPTRResults> {
         let (c, p) = futures::oneshot();
         self.inner.query_naptr(name, move |result| {
             c.complete(result);
@@ -174,7 +170,7 @@ impl FutureResolver {
 
     /// Search for the NAPTR records associated with `name`.
     pub fn search_naptr(&self, name: &str)
-        -> futures::BoxFuture<c_ares::NAPTRResults, c_ares::Error> {
+        -> CAresFuture<c_ares::NAPTRResults> {
         let (c, p) = futures::oneshot();
         self.inner.search_naptr(name, move |result| {
             c.complete(result);
@@ -185,8 +181,7 @@ impl FutureResolver {
     }
 
     /// Look up the NS records associated with `name`.
-    pub fn query_ns(&self, name: &str)
-        -> futures::BoxFuture<c_ares::NSResults, c_ares::Error> {
+    pub fn query_ns(&self, name: &str) -> CAresFuture<c_ares::NSResults> {
         let (c, p) = futures::oneshot();
         self.inner.query_ns(name, move |result| {
             c.complete(result);
@@ -197,8 +192,7 @@ impl FutureResolver {
     }
 
     /// Search for the NS records associated with `name`.
-    pub fn search_ns(&self, name: &str)
-        -> futures::BoxFuture<c_ares::NSResults, c_ares::Error> {
+    pub fn search_ns(&self, name: &str) -> CAresFuture<c_ares::NSResults> {
         let (c, p) = futures::oneshot();
         self.inner.search_ns(name, move |result| {
             c.complete(result);
@@ -209,8 +203,7 @@ impl FutureResolver {
     }
 
     /// Look up the PTR records associated with `name`.
-    pub fn query_ptr(&self, name: &str)
-        -> futures::BoxFuture<c_ares::PTRResults, c_ares::Error> {
+    pub fn query_ptr(&self, name: &str) -> CAresFuture<c_ares::PTRResults> {
         let (c, p) = futures::oneshot();
         self.inner.query_ptr(name, move |result| {
             c.complete(result);
@@ -221,8 +214,7 @@ impl FutureResolver {
     }
 
     /// Search for the PTR records associated with `name`.
-    pub fn search_ptr(&self, name: &str)
-        -> futures::BoxFuture<c_ares::PTRResults, c_ares::Error> {
+    pub fn search_ptr(&self, name: &str) -> CAresFuture<c_ares::PTRResults> {
         let (c, p) = futures::oneshot();
         self.inner.search_ptr(name, move |result| {
             c.complete(result);
@@ -233,8 +225,7 @@ impl FutureResolver {
     }
 
     /// Look up the SOA records associated with `name`.
-    pub fn query_soa(&self, name: &str)
-        -> futures::BoxFuture<c_ares::SOAResult, c_ares::Error> {
+    pub fn query_soa(&self, name: &str) -> CAresFuture<c_ares::SOAResult> {
         let (c, p) = futures::oneshot();
         self.inner.query_soa(name, move |result| {
             c.complete(result);
@@ -245,8 +236,7 @@ impl FutureResolver {
     }
 
     /// Search for the SOA records associated with `name`.
-    pub fn search_soa(&self, name: &str)
-        -> futures::BoxFuture<c_ares::SOAResult, c_ares::Error> {
+    pub fn search_soa(&self, name: &str) -> CAresFuture<c_ares::SOAResult> {
         let (c, p) = futures::oneshot();
         self.inner.search_soa(name, move |result| {
             c.complete(result);
@@ -257,8 +247,7 @@ impl FutureResolver {
     }
 
     /// Look up the SRV records associated with `name`.
-    pub fn query_srv(&self, name: &str)
-        -> futures::BoxFuture<c_ares::SRVResults, c_ares::Error> {
+    pub fn query_srv(&self, name: &str) -> CAresFuture<c_ares::SRVResults> {
         let (c, p) = futures::oneshot();
         self.inner.query_srv(name, move |result| {
             c.complete(result);
@@ -269,8 +258,7 @@ impl FutureResolver {
     }
 
     /// Search for the SRV records associated with `name`.
-    pub fn search_srv(&self, name: &str)
-        -> futures::BoxFuture<c_ares::SRVResults, c_ares::Error> {
+    pub fn search_srv(&self, name: &str) -> CAresFuture<c_ares::SRVResults> {
         let (c, p) = futures::oneshot();
         self.inner.search_srv(name, move |result| {
             c.complete(result);
@@ -281,8 +269,7 @@ impl FutureResolver {
     }
 
     /// Look up the TXT records associated with `name`.
-    pub fn query_txt(&self, name: &str)
-        -> futures::BoxFuture<c_ares::TXTResults, c_ares::Error> {
+    pub fn query_txt(&self, name: &str) -> CAresFuture<c_ares::TXTResults> {
         let (c, p) = futures::oneshot();
         self.inner.query_txt(name, move |result| {
             c.complete(result);
@@ -293,8 +280,7 @@ impl FutureResolver {
     }
 
     /// Search for the TXT records associated with `name`.
-    pub fn search_txt(&self, name: &str)
-        -> futures::BoxFuture<c_ares::TXTResults, c_ares::Error> {
+    pub fn search_txt(&self, name: &str) -> CAresFuture<c_ares::TXTResults> {
         let (c, p) = futures::oneshot();
         self.inner.search_txt(name, move |result| {
             c.complete(result);
