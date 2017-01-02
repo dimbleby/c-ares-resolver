@@ -13,7 +13,7 @@ readme = "README.md"
 keywords = ["DNS", "c-ares", "futures"]
 
 [dependencies]
-c-ares = "1"
+c-ares = "1.1"
 futures = "0.1"
 mio = "0.6"
 

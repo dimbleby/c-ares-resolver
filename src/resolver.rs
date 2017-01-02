@@ -156,7 +156,7 @@ impl Resolver {
     pub fn set_servers(
         &mut self,
         servers: &[&str]
-    ) -> Result<&mut Self, c_ares::Error> {
+    ) -> c_ares::Result<&mut Self> {
         self.ares_channel.lock().unwrap().set_servers(servers)?;
         Ok(self)
     }
@@ -183,7 +183,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn query_a<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::AResults, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::AResults>) + Send + 'static {
         self.ares_channel.lock().unwrap().query_a(name, handler)
     }
 
@@ -191,7 +191,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn search_a<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::AResults, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::AResults>) + Send + 'static {
         self.ares_channel.lock().unwrap().search_a(name, handler)
     }
 
@@ -199,7 +199,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn query_aaaa<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::AAAAResults, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::AAAAResults>) + Send + 'static {
         self.ares_channel.lock().unwrap().query_aaaa(name, handler)
     }
 
@@ -207,7 +207,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn search_aaaa<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::AAAAResults, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::AAAAResults>) + Send + 'static {
         self.ares_channel.lock().unwrap().search_aaaa(name, handler)
     }
 
@@ -215,7 +215,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn query_cname<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::CNameResults, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::CNameResults>) + Send + 'static {
         self.ares_channel.lock().unwrap().query_cname(name, handler)
     }
 
@@ -223,7 +223,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn search_cname<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::CNameResults, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::CNameResults>) + Send + 'static {
         self.ares_channel.lock().unwrap().search_cname(name, handler)
     }
 
@@ -231,7 +231,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn query_mx<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::MXResults, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::MXResults>) + Send + 'static {
         self.ares_channel.lock().unwrap().query_mx(name, handler)
     }
 
@@ -239,7 +239,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn search_mx<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::MXResults, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::MXResults>) + Send + 'static {
         self.ares_channel.lock().unwrap().search_mx(name, handler)
     }
 
@@ -247,7 +247,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn query_naptr<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::NAPTRResults, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::NAPTRResults>) + Send + 'static {
         self.ares_channel.lock().unwrap().query_naptr(name, handler)
     }
 
@@ -255,7 +255,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn search_naptr<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::NAPTRResults, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::NAPTRResults>) + Send + 'static {
         self.ares_channel.lock().unwrap().search_naptr(name, handler)
     }
 
@@ -263,7 +263,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn query_ns<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::NSResults, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::NSResults>) + Send + 'static {
         self.ares_channel.lock().unwrap().query_ns(name, handler)
     }
 
@@ -271,7 +271,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn search_ns<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::NSResults, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::NSResults>) + Send + 'static {
         self.ares_channel.lock().unwrap().search_ns(name, handler)
     }
 
@@ -279,7 +279,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn query_ptr<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::PTRResults, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::PTRResults>) + Send + 'static {
         self.ares_channel.lock().unwrap().query_ptr(name, handler)
     }
 
@@ -287,7 +287,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn search_ptr<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::PTRResults, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::PTRResults>) + Send + 'static {
         self.ares_channel.lock().unwrap().search_ptr(name, handler)
     }
 
@@ -295,7 +295,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn query_soa<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::SOAResult, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::SOAResult>) + Send + 'static {
         self.ares_channel.lock().unwrap().query_soa(name, handler)
     }
 
@@ -303,7 +303,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn search_soa<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::SOAResult, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::SOAResult>) + Send + 'static {
         self.ares_channel.lock().unwrap().search_soa(name, handler)
     }
 
@@ -311,7 +311,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn query_srv<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::SRVResults, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::SRVResults>) + Send + 'static {
         self.ares_channel.lock().unwrap().query_srv(name, handler)
     }
 
@@ -319,7 +319,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn search_srv<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::SRVResults, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::SRVResults>) + Send + 'static {
         self.ares_channel.lock().unwrap().search_srv(name, handler)
     }
 
@@ -327,7 +327,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn query_txt<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::TXTResults, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::TXTResults>) + Send + 'static {
         self.ares_channel.lock().unwrap().query_txt(name, handler)
     }
 
@@ -335,7 +335,7 @@ impl Resolver {
     ///
     /// On completion, `handler` is called with the result.
     pub fn search_txt<F>(&self, name: &str, handler: F) where
-        F: FnOnce(Result<c_ares::TXTResults, c_ares::Error>) + Send + 'static {
+        F: FnOnce(c_ares::Result<c_ares::TXTResults>) + Send + 'static {
         self.ares_channel.lock().unwrap().search_txt(name, handler)
     }
 
@@ -346,7 +346,7 @@ impl Resolver {
         &self,
         address: &IpAddr,
         handler: F
-    ) where F: FnOnce(Result<c_ares::HostResults, c_ares::Error>) + Send + 'static {
+    ) where F: FnOnce(c_ares::Result<c_ares::HostResults>) + Send + 'static {
          self.ares_channel.lock().unwrap()
              .get_host_by_address(address, handler)
     }
@@ -359,7 +359,7 @@ impl Resolver {
         name: &str,
         family: c_ares::AddressFamily,
         handler: F
-    ) where F: FnOnce(Result<c_ares::HostResults, c_ares::Error>) + Send + 'static {
+    ) where F: FnOnce(c_ares::Result<c_ares::HostResults>) + Send + 'static {
          self.ares_channel.lock().unwrap()
              .get_host_by_name(name, family, handler);
     }
@@ -372,7 +372,7 @@ impl Resolver {
         address: &SocketAddr,
         flags: c_ares::ni_flags::NIFlags,
         handler: F
-    ) where F: FnOnce(Result<c_ares::NameInfoResult, c_ares::Error>) + Send + 'static {
+    ) where F: FnOnce(c_ares::Result<c_ares::NameInfoResult>) + Send + 'static {
         self.ares_channel.lock().unwrap()
             .get_name_info(address, flags, handler)
     }
@@ -393,7 +393,7 @@ impl Resolver {
         dns_class: u16,
         query_type: u16,
         handler: F
-    ) where F: FnOnce(Result<&[u8], c_ares::Error>) + Send + 'static {
+    ) where F: FnOnce(c_ares::Result<&[u8]>) + Send + 'static {
         self.ares_channel.lock().unwrap()
             .query(name, dns_class, query_type, handler);
     }
@@ -414,7 +414,7 @@ impl Resolver {
         dns_class: u16,
         query_type: u16,
         handler: F
-    ) where F: FnOnce(Result<&[u8], c_ares::Error>) + Send + 'static {
+    ) where F: FnOnce(c_ares::Result<&[u8]>) + Send + 'static {
         self.ares_channel.lock().unwrap()
             .search(name, dns_class, query_type, handler);
     }
