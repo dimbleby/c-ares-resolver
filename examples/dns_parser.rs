@@ -4,12 +4,11 @@
 extern crate c_ares;
 extern crate c_ares_resolver;
 extern crate dns_parser;
-extern crate tokio_core;
 
 use std::error::Error;
 use std::sync::mpsc;
 
-use c_ares_resolver:: Resolver;
+use c_ares_resolver::Resolver;
 use dns_parser::Packet;
 
 fn handle_result(result: Result<&[u8], c_ares::Error>) {
