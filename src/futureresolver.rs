@@ -13,7 +13,7 @@ use resolver::{
 };
 
 /// The type of future returned by methods on the `FutureResolver`.
-pub type CAresFuture<T> = Box<Future<Item=T, Error=c_ares::Error>>;
+pub type CAresFuture<T> = futures::BoxFuture<T, c_ares::Error>;
 
 /// An asynchronous DNS resolver, which returns results as
 /// `futures::Future`s.
