@@ -1,7 +1,7 @@
 [package]
 name = "c-ares-resolver"
 license = "MIT"
-version = "0.4.0"
+version = "0.4.1"
 authors = ["David Hotham"]
 description = """
 An asynchronous DNS resolver, backed by c-ares.
@@ -11,6 +11,7 @@ repository = "https://github.com/dimbleby/c-ares-resolver"
 documentation = "https://dimbleby.github.io/c-ares-resolver"
 readme = "README.md"
 keywords = ["DNS", "c-ares", "futures"]
+categories = ["asynchronous", "network-programming"]
 
 [dependencies]
 c-ares = "1.1"
