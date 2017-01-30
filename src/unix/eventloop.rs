@@ -156,13 +156,14 @@ impl EventLoop {
     fn handle_messages(&mut self) {
         loop {
             match self.rx_msg_channel.try_recv() {
+                // Instruction to do something with a file descriptor.
                 Ok(Message::RegisterInterest(fd, readable, writable)) => {
-                    // Instruction to do something with a file descriptor.
                     let efd = mio::unix::EventedFd(&fd);
                     if !readable && !writable {
                         self.tracked_fds.remove(&fd);
                         let _ = self.poll.deregister(&efd);
                     } else {
+                        assert!(fd != 0);
                         let token = mio::Token(fd as usize);
                         let mut interest = mio::Ready::none();
                         if readable { interest.insert(mio::Ready::readable()) }
@@ -186,8 +187,8 @@ impl EventLoop {
                     }
                 },
 
+                // Instruction to shut down.
                 Ok(Message::ShutDown) => {
-                    // Instruction to shut down.
                     self.quit = true;
                     break
                 },
