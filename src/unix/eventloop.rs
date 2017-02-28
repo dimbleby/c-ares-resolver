@@ -163,7 +163,7 @@ impl EventLoop {
                         self.tracked_fds.remove(&fd);
                         let _ = self.poll.deregister(&efd);
                     } else {
-                        assert!(fd != 0);
+                        assert_ne!(fd, 0);
                         let token = mio::Token(fd as usize);
                         let mut interest = mio::Ready::none();
                         if readable { interest.insert(mio::Ready::readable()) }
