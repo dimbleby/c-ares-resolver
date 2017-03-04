@@ -6,7 +6,6 @@ authors = ["David Hotham"]
 description = """
 An asynchronous DNS resolver, backed by c-ares.
 """
-homepage = "https://github.com/dimbleby/c-ares-resolver"
 repository = "https://github.com/dimbleby/c-ares-resolver"
 documentation = "https://dimbleby.github.io/c-ares-resolver"
 readme = "README.md"
