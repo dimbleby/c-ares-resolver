@@ -137,12 +137,12 @@ impl EventLoop {
 
             mio::Token(fd) => {
                 // Sockets became readable or writable - tell c-ares.
-                let rfd = if event.kind().is_readable() {
+                let rfd = if event.readiness().is_readable() {
                     fd as c_ares::Socket
                 } else {
                     c_ares::SOCKET_BAD
                 };
-                let wfd = if event.kind().is_writable() {
+                let wfd = if event.readiness().is_writable() {
                     fd as c_ares::Socket
                 } else {
                     c_ares::SOCKET_BAD
@@ -165,7 +165,7 @@ impl EventLoop {
                     } else {
                         assert_ne!(fd, 0);
                         let token = mio::Token(fd as usize);
-                        let mut interest = mio::Ready::none();
+                        let mut interest = mio::Ready::empty();
                         if readable { interest.insert(mio::Ready::readable()) }
                         if writable { interest.insert(mio::Ready::writable()) }
                         let register_result = if !self.tracked_fds.insert(fd) {

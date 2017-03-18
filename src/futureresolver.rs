@@ -71,7 +71,7 @@ impl FutureResolver {
     pub fn query_a(&self, name: &str) -> CAresFuture<c_ares::AResults> {
         let (c, p) = futures::oneshot();
         self.inner.query_a(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -82,7 +82,7 @@ impl FutureResolver {
     pub fn search_a(&self, name: &str) -> CAresFuture<c_ares::AResults> {
         let (c, p) = futures::oneshot();
         self.inner.search_a(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -93,7 +93,7 @@ impl FutureResolver {
     pub fn query_aaaa(&self, name: &str)  -> CAresFuture<c_ares::AAAAResults> {
         let (c, p) = futures::oneshot();
         self.inner.query_aaaa(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -104,7 +104,7 @@ impl FutureResolver {
     pub fn search_aaaa(&self, name: &str) -> CAresFuture<c_ares::AAAAResults> {
         let (c, p) = futures::oneshot();
         self.inner.search_aaaa(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -116,7 +116,7 @@ impl FutureResolver {
         -> CAresFuture<c_ares::CNameResults> {
         let (c, p) = futures::oneshot();
         self.inner.query_cname(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -128,7 +128,7 @@ impl FutureResolver {
         -> CAresFuture<c_ares::CNameResults> {
         let (c, p) = futures::oneshot();
         self.inner.search_cname(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -139,7 +139,7 @@ impl FutureResolver {
     pub fn query_mx(&self, name: &str) -> CAresFuture<c_ares::MXResults> {
         let (c, p) = futures::oneshot();
         self.inner.query_mx(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -150,7 +150,7 @@ impl FutureResolver {
     pub fn search_mx(&self, name: &str) -> CAresFuture<c_ares::MXResults> {
         let (c, p) = futures::oneshot();
         self.inner.search_mx(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -162,7 +162,7 @@ impl FutureResolver {
         -> CAresFuture<c_ares::NAPTRResults> {
         let (c, p) = futures::oneshot();
         self.inner.query_naptr(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -174,7 +174,7 @@ impl FutureResolver {
         -> CAresFuture<c_ares::NAPTRResults> {
         let (c, p) = futures::oneshot();
         self.inner.search_naptr(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -185,7 +185,7 @@ impl FutureResolver {
     pub fn query_ns(&self, name: &str) -> CAresFuture<c_ares::NSResults> {
         let (c, p) = futures::oneshot();
         self.inner.query_ns(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -196,7 +196,7 @@ impl FutureResolver {
     pub fn search_ns(&self, name: &str) -> CAresFuture<c_ares::NSResults> {
         let (c, p) = futures::oneshot();
         self.inner.search_ns(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -207,7 +207,7 @@ impl FutureResolver {
     pub fn query_ptr(&self, name: &str) -> CAresFuture<c_ares::PTRResults> {
         let (c, p) = futures::oneshot();
         self.inner.query_ptr(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -218,7 +218,7 @@ impl FutureResolver {
     pub fn search_ptr(&self, name: &str) -> CAresFuture<c_ares::PTRResults> {
         let (c, p) = futures::oneshot();
         self.inner.search_ptr(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -229,7 +229,7 @@ impl FutureResolver {
     pub fn query_soa(&self, name: &str) -> CAresFuture<c_ares::SOAResult> {
         let (c, p) = futures::oneshot();
         self.inner.query_soa(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -240,7 +240,7 @@ impl FutureResolver {
     pub fn search_soa(&self, name: &str) -> CAresFuture<c_ares::SOAResult> {
         let (c, p) = futures::oneshot();
         self.inner.search_soa(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -251,7 +251,7 @@ impl FutureResolver {
     pub fn query_srv(&self, name: &str) -> CAresFuture<c_ares::SRVResults> {
         let (c, p) = futures::oneshot();
         self.inner.query_srv(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -262,7 +262,7 @@ impl FutureResolver {
     pub fn search_srv(&self, name: &str) -> CAresFuture<c_ares::SRVResults> {
         let (c, p) = futures::oneshot();
         self.inner.search_srv(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -273,7 +273,7 @@ impl FutureResolver {
     pub fn query_txt(&self, name: &str) -> CAresFuture<c_ares::TXTResults> {
         let (c, p) = futures::oneshot();
         self.inner.query_txt(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
@@ -284,7 +284,7 @@ impl FutureResolver {
     pub fn search_txt(&self, name: &str) -> CAresFuture<c_ares::TXTResults> {
         let (c, p) = futures::oneshot();
         self.inner.search_txt(name, move |result| {
-            c.complete(result);
+            let _ = c.send(result);
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
