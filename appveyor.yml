@@ -1,6 +1,7 @@
 branches:
     only:
       - master
+
 environment:
   VisualStudioVersion: 12.0
   matrix:
@@ -22,6 +23,7 @@ environment:
   - target: i686-pc-windows-msvc
     VCVARS: '"c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat"'
     channel: nightly
+
 install:
   - ps: .\install-rust.ps1
   - call %VCVARS%
@@ -30,3 +32,7 @@ build: false
 
 test_script:
   - cargo test
+
+matrix:
+  allow_failures:
+  - channel: nightly
