@@ -3,25 +3,25 @@ branches:
       - master
 
 environment:
-  VisualStudioVersion: 12.0
+  VisualStudioVersion: 14.0
   matrix:
   - target: x86_64-pc-windows-msvc
-    VCVARS: '"c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\amd64\vcvars64.bat"'
+    VCVARS: '"c:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat"'
     channel: stable
   - target: i686-pc-windows-msvc
-    VCVARS: '"c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat"'
+    VCVARS: '"c:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\vcvars32.bat"'
     channel: stable
   - target: x86_64-pc-windows-msvc
-    VCVARS: '"c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\amd64\vcvars64.bat"'
+    VCVARS: '"c:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat"'
     channel: beta
   - target: i686-pc-windows-msvc
-    VCVARS: '"c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat"'
+    VCVARS: '"c:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\vcvars32.bat"'
     channel: beta
   - target: x86_64-pc-windows-msvc
-    VCVARS: '"c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\amd64\vcvars64.bat"'
+    VCVARS: '"c:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat"'
     channel: nightly
   - target: i686-pc-windows-msvc
-    VCVARS: '"c:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\vcvars32.bat"'
+    VCVARS: '"c:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\vcvars32.bat"'
     channel: nightly
 
 install:
