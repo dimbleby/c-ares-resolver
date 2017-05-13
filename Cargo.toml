@@ -22,7 +22,7 @@ winapi = "0.2"
 ws2_32-sys = "0.2"
 
 [dev-dependencies]
-dns-parser = "0.6"
+dns-parser = "0.7"
 tokio-core = "0.1"
 
 
