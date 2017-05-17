@@ -13,11 +13,6 @@
 //! This crate also provides a `FutureResolver`.  Queries on this object
 //! return `futures::Future` objects, and don't use callbacks.
 //!
-//! (The API on the `FutureResolver` isn't _quite_ as complete as on the
-//! `Resolver`.  For some types of query, the values returned by `c-ares` do
-//! not have a long enough lifetime to be returned in a `Future`.  The relevant
-//! functions are not supported by the `FutureResolver`.)
-//!
 //! On both resolvers:
 //!
 //! -  methods like `query_xxx` correspond to the c-ares
@@ -59,6 +54,7 @@ extern crate ws2_32;
 mod error;
 mod eventloop;
 mod futureresolver;
+mod host;
 mod resolver;
 
 #[cfg(unix)]
@@ -72,6 +68,7 @@ pub use futureresolver::{
     CAresFuture,
     FutureResolver
 };
+pub use host::HostResults;
 pub use resolver::{
     Options,
     Resolver,

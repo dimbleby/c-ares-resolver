@@ -1,4 +1,5 @@
 use std::net::{
+    IpAddr,
     Ipv4Addr,
     Ipv6Addr,
 };
@@ -7,6 +8,7 @@ use futures;
 use futures::Future;
 
 use error::Error;
+use host::HostResults;
 use resolver::{
     Options,
     Resolver,
@@ -285,6 +287,40 @@ impl FutureResolver {
         let (c, p) = futures::oneshot();
         self.inner.search_txt(name, move |result| {
             let _ = c.send(result);
+        });
+        p.map_err(|_| c_ares::Error::ECANCELLED)
+            .and_then(futures::done)
+            .boxed()
+    }
+
+    /// Perform a host query by address.
+    ///
+    /// This method is one of the very few places where this library performs
+    /// strictly more allocation than the underlying `c-ares` code.  If this is
+    /// a problem for you, you should prefer to use the analogous method on the
+    /// `Resolver`.
+    pub fn get_host_by_address(&self, address: &IpAddr)
+        -> CAresFuture<HostResults> {
+        let (c, p) = futures::oneshot();
+        self.inner.get_host_by_address(address, move |result| {
+            let _ = c.send(result.map(|h| h.into()));
+        });
+        p.map_err(|_| c_ares::Error::ECANCELLED)
+            .and_then(futures::done)
+            .boxed()
+    }
+
+    /// Perform a host query by name.
+    ///
+    /// This method is one of the very few places where this library performs
+    /// strictly more allocation than the underlying `c-ares` code.  If this is
+    /// a problem for you, you should prefer to use the analogous method on the
+    /// `Resolver`.
+    pub fn get_host_by_name(&self, name: &str, family: c_ares::AddressFamily)
+        -> CAresFuture<HostResults> {
+        let (c, p) = futures::oneshot();
+        self.inner.get_host_by_name(name, family, move |result| {
+            let _ = c.send(result.map(|h| h.into()));
         });
         p.map_err(|_| c_ares::Error::ECANCELLED)
             .and_then(futures::done)
