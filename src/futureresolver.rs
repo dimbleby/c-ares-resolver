@@ -329,7 +329,7 @@ impl FutureResolver {
         -> CAresFuture<Vec<u8>> {
         let (c, p) = futures::oneshot();
         self.inner.query(name, dns_class, query_type, move |result| {
-            let _ = c.send(result.map(|h| h.to_owned()));
+            let _ = c.send(result.map(|bs| bs.to_owned()));
         });
         CAresFuture::new(p)
     }
@@ -351,7 +351,7 @@ impl FutureResolver {
         -> CAresFuture<Vec<u8>> {
         let (c, p) = futures::oneshot();
         self.inner.search(name, dns_class, query_type, move |result| {
-            let _ = c.send(result.map(|h| h.to_owned()));
+            let _ = c.send(result.map(|bs| bs.to_owned()));
         });
         CAresFuture::new(p)
     }
