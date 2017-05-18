@@ -44,7 +44,8 @@ pub enum Message {
     ShutDown,
 }
 
-// A token identifying that the message channel has become available for reading.
+// A token identifying that the message channel has become available for
+// reading.
 //
 // We use Token(fd) for file descriptors, so this relies on zero not being a
 // valid file descriptor for c-ares to use.  Zero is stdin, so that's true.
@@ -117,7 +118,8 @@ impl EventLoop {
                     );
                 },
                 _ => {
-                    // Process events.  One of them might have asked us to quit.
+                    // Process events.  One of them might have asked us to
+                    // quit.
                     for event in &events {
                         self.handle_event(&event);
                         if self.quit { return }

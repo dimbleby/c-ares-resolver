@@ -372,7 +372,8 @@ impl Resolver {
         address: &SocketAddr,
         flags: c_ares::ni_flags::NIFlags,
         handler: F
-    ) where F: FnOnce(c_ares::Result<c_ares::NameInfoResult>) + Send + 'static {
+    ) where F: FnOnce(c_ares::Result<c_ares::NameInfoResult>) + Send + 'static
+    {
         self.ares_channel.lock().unwrap()
             .get_name_info(address, flags, handler)
     }

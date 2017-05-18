@@ -20,7 +20,8 @@ pub struct CAresFuture<T> {
 }
 
 impl<T> CAresFuture<T> {
-    fn new(p: futures::sync::oneshot::Receiver<Result<T, c_ares::Error>>) -> Self {
+    fn new(p: futures::sync::oneshot::Receiver<Result<T, c_ares::Error>>)
+        -> Self {
         CAresFuture {
             inner: p,
         }
