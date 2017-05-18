@@ -362,7 +362,7 @@ impl FutureResolver {
     ///
     /// This method is provided so that users can query DNS types for which
     /// `c-ares` does not provide a parser; or in case a third-party parser is
-    /// preferred.  Usually, if a suitable `query_xxx()` is available, that
+    /// preferred.  Usually, if a suitable `search_xxx()` is available, that
     /// should be used.
     pub fn search(&self, name: &str, dns_class: u16, query_type: u16)
         -> CAresFuture<Vec<u8>> {
