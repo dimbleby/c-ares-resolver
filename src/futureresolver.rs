@@ -311,6 +311,54 @@ impl FutureResolver {
         CAresFuture::new(p)
     }
 
+    /// Initiate a single-question DNS query for `name`.  The class and type of
+    /// the query are per the provided parameters, taking values as defined in
+    /// `arpa/nameser.h`.
+    ///
+    /// This method is one of the very few places where this library performs
+    /// strictly more allocation than the underlying `c-ares` code.  If this is
+    /// a problem for you, you should prefer to use the analogous method on the
+    /// `Resolver`.
+    ///
+    /// This method is provided so that users can query DNS types for which
+    /// `c-ares` does not provide a parser; or in case a third-party parser is
+    /// preferred.  Usually, if a suitable `query_xxx()` is available, that
+    /// should be used.
+    pub fn query(&self, name: &str, dns_class: u16, query_type: u16)
+        -> CAresFuture<Vec<u8>> {
+        let (c, p) = futures::oneshot();
+        self.inner.query(name, dns_class, query_type, move |result| {
+            let _ = c.send(result.map(|h| h.to_owned()));
+        });
+        p.map_err(|_| c_ares::Error::ECANCELLED)
+            .and_then(futures::done)
+            .boxed()
+    }
+
+    /// Initiate a series of single-question DNS queries for `name`.  The
+    /// class and type of the query are per the provided parameters, taking
+    /// values as defined in `arpa/nameser.h`.
+    ///
+    /// This method is one of the very few places where this library performs
+    /// strictly more allocation than the underlying `c-ares` code.  If this is
+    /// a problem for you, you should prefer to use the analogous method on the
+    /// `Resolver`.
+    ///
+    /// This method is provided so that users can query DNS types for which
+    /// `c-ares` does not provide a parser; or in case a third-party parser is
+    /// preferred.  Usually, if a suitable `query_xxx()` is available, that
+    /// should be used.
+    pub fn search(&self, name: &str, dns_class: u16, query_type: u16)
+        -> CAresFuture<Vec<u8>> {
+        let (c, p) = futures::oneshot();
+        self.inner.search(name, dns_class, query_type, move |result| {
+            let _ = c.send(result.map(|h| h.to_owned()));
+        });
+        p.map_err(|_| c_ares::Error::ECANCELLED)
+            .and_then(futures::done)
+            .boxed()
+    }
+
     /// Cancel all requests made on this `FutureResolver`.
     pub fn cancel(&mut self) {
         self.inner.cancel()
