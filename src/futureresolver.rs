@@ -15,7 +15,35 @@ use resolver::{
 };
 
 /// The type of future returned by methods on the `FutureResolver`.
-pub type CAresFuture<T> = futures::BoxFuture<T, c_ares::Error>;
+pub struct CAresFuture<T> {
+    inner: futures::sync::oneshot::Receiver<Result<T, c_ares::Error>>,
+}
+
+impl<T> CAresFuture<T> {
+    fn new(p: futures::sync::oneshot::Receiver<Result<T, c_ares::Error>>) -> Self {
+        CAresFuture {
+            inner: p,
+        }
+    }
+}
+
+impl<T> Future for CAresFuture<T> {
+    type Item = T;
+    type Error = c_ares::Error;
+
+    fn poll(&mut self) -> futures::Poll<Self::Item, Self::Error> {
+        match self.inner.poll() {
+            Ok(futures::Async::NotReady) => Ok(futures::Async::NotReady),
+            Err(_) => Err(c_ares::Error::ECANCELLED),
+            Ok(futures::Async::Ready(res)) => {
+                match res {
+                    Ok(r) => Ok(futures::Async::Ready(r)),
+                    Err(e) => Err(e),
+                }
+            }
+        }
+    }
+}
 
 /// An asynchronous DNS resolver, which returns results as
 /// `futures::Future`s.
@@ -75,9 +103,7 @@ impl FutureResolver {
         self.inner.query_a(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Search for the A records associated with `name`.
@@ -86,9 +112,7 @@ impl FutureResolver {
         self.inner.search_a(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Look up the AAAA records associated with `name`.
@@ -97,9 +121,7 @@ impl FutureResolver {
         self.inner.query_aaaa(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Search for the AAAA records associated with `name`.
@@ -108,9 +130,7 @@ impl FutureResolver {
         self.inner.search_aaaa(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Look up the CNAME records associated with `name`.
@@ -120,9 +140,7 @@ impl FutureResolver {
         self.inner.query_cname(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Search for the CNAME records associated with `name`.
@@ -132,9 +150,7 @@ impl FutureResolver {
         self.inner.search_cname(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Look up the MX records associated with `name`.
@@ -143,9 +159,7 @@ impl FutureResolver {
         self.inner.query_mx(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Search for the MX records associated with `name`.
@@ -154,9 +168,7 @@ impl FutureResolver {
         self.inner.search_mx(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Look up the NAPTR records associated with `name`.
@@ -166,9 +178,7 @@ impl FutureResolver {
         self.inner.query_naptr(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Search for the NAPTR records associated with `name`.
@@ -178,9 +188,7 @@ impl FutureResolver {
         self.inner.search_naptr(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Look up the NS records associated with `name`.
@@ -189,9 +197,7 @@ impl FutureResolver {
         self.inner.query_ns(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Search for the NS records associated with `name`.
@@ -200,9 +206,7 @@ impl FutureResolver {
         self.inner.search_ns(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Look up the PTR records associated with `name`.
@@ -211,9 +215,7 @@ impl FutureResolver {
         self.inner.query_ptr(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Search for the PTR records associated with `name`.
@@ -222,9 +224,7 @@ impl FutureResolver {
         self.inner.search_ptr(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Look up the SOA records associated with `name`.
@@ -233,9 +233,7 @@ impl FutureResolver {
         self.inner.query_soa(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Search for the SOA records associated with `name`.
@@ -244,9 +242,7 @@ impl FutureResolver {
         self.inner.search_soa(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Look up the SRV records associated with `name`.
@@ -255,9 +251,7 @@ impl FutureResolver {
         self.inner.query_srv(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Search for the SRV records associated with `name`.
@@ -266,9 +260,7 @@ impl FutureResolver {
         self.inner.search_srv(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Look up the TXT records associated with `name`.
@@ -277,9 +269,7 @@ impl FutureResolver {
         self.inner.query_txt(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Search for the TXT records associated with `name`.
@@ -288,9 +278,7 @@ impl FutureResolver {
         self.inner.search_txt(name, move |result| {
             let _ = c.send(result);
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Perform a host query by address.
@@ -305,9 +293,7 @@ impl FutureResolver {
         self.inner.get_host_by_address(address, move |result| {
             let _ = c.send(result.map(|h| h.into()));
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Perform a host query by name.
@@ -322,9 +308,7 @@ impl FutureResolver {
         self.inner.get_host_by_name(name, family, move |result| {
             let _ = c.send(result.map(|h| h.into()));
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Initiate a single-question DNS query for `name`.  The class and type of
@@ -346,9 +330,7 @@ impl FutureResolver {
         self.inner.query(name, dns_class, query_type, move |result| {
             let _ = c.send(result.map(|h| h.to_owned()));
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Initiate a series of single-question DNS queries for `name`.  The
@@ -370,9 +352,7 @@ impl FutureResolver {
         self.inner.search(name, dns_class, query_type, move |result| {
             let _ = c.send(result.map(|h| h.to_owned()));
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Cancel all requests made on this `FutureResolver`.
