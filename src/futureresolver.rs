@@ -330,9 +330,7 @@ impl FutureResolver {
         self.inner.query(name, dns_class, query_type, move |result| {
             let _ = c.send(result.map(|h| h.to_owned()));
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Initiate a series of single-question DNS queries for `name`.  The
@@ -354,9 +352,7 @@ impl FutureResolver {
         self.inner.search(name, dns_class, query_type, move |result| {
             let _ = c.send(result.map(|h| h.to_owned()));
         });
-        p.map_err(|_| c_ares::Error::ECANCELLED)
-            .and_then(futures::done)
-            .boxed()
+        CAresFuture::new(p)
     }
 
     /// Cancel all requests made on this `FutureResolver`.
