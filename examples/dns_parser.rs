@@ -11,12 +11,12 @@ use std::sync::mpsc;
 use c_ares_resolver::Resolver;
 use dns_parser::Packet;
 
-fn handle_result(result: Result<&[u8], c_ares::Error>) {
-    match result {
-        Err(e) => {
+fn handle_result(result: &Result<&[u8], c_ares::Error>) {
+    match *result {
+        Err(ref e) => {
             println!("Query failed with error '{}'", e.description());
         },
-        Ok(bytes) => {
+        Ok(ref bytes) => {
             match Packet::parse(bytes) {
                 Err(e) => {
                     println!(
@@ -45,7 +45,7 @@ fn main() {
         1,  // internet
         1,  // Host address
         move |result| {
-            handle_result(result);
+            handle_result(&result);
             tx.send(()).expect("failed to send on channel!");
         }
     );
