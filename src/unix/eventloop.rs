@@ -76,7 +76,7 @@ impl EventLoop {
         options.set_socket_state_callback(sock_callback);
 
         // Create the c-ares channel.
-        let ares_channel = c_ares::Channel::new(options)?;
+        let ares_channel = c_ares::Channel::with_options(options)?;
         let locked_channel = Arc::new(Mutex::new(ares_channel));
 
         // Create and return the event loop.
