@@ -16,7 +16,7 @@ fn handle_result(result: &Result<&[u8], c_ares::Error>) {
         Err(ref e) => {
             println!("Query failed with error '{}'", e.description());
         },
-        Ok(ref bytes) => {
+        Ok(bytes) => {
             match Packet::parse(bytes) {
                 Err(e) => {
                     println!(
