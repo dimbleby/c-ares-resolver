@@ -2,6 +2,7 @@ use std::net::{
     IpAddr,
     Ipv4Addr,
     Ipv6Addr,
+    SocketAddr,
 };
 use c_ares;
 use futures;
@@ -9,6 +10,7 @@ use futures::Future;
 
 use error::Error;
 use host::HostResults;
+use nameinfo::NameInfoResult;
 use resolver::{
     Options,
     Resolver,
@@ -308,6 +310,24 @@ impl FutureResolver {
         let (c, p) = futures::oneshot();
         self.inner.get_host_by_name(name, family, move |result| {
             let _ = c.send(result.map(|h| h.into()));
+        });
+        CAresFuture::new(p)
+    }
+
+    /// Address-to-nodename translation in protocol-independent manner.
+    ///
+    /// This method is one of the very few places where this library performs
+    /// strictly more allocation than the underlying `c-ares` code.  If this is
+    /// a problem for you, you should prefer to use the analogous method on the
+    /// `Resolver`.
+    pub fn get_name_info<F>(
+        &self,
+        address: &SocketAddr,
+        flags: c_ares::ni_flags::NIFlags)
+        -> CAresFuture<NameInfoResult> {
+        let (c, p) = futures::oneshot();
+        self.inner.get_name_info(address, flags, move |result| {
+            let _ = c.send(result.map(|n| n.into()));
         });
         CAresFuture::new(p)
     }

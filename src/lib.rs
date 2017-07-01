@@ -55,6 +55,7 @@ mod error;
 mod eventloop;
 mod futureresolver;
 mod host;
+mod nameinfo;
 mod resolver;
 
 #[cfg(unix)]
