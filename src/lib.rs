@@ -41,6 +41,7 @@
 //!
 //! Further examples showing how to use the library can be found
 //! [here](https://github.com/dimbleby/c-ares-resolver/tree/master/examples).
+#![deny(missing_docs)]
 extern crate c_ares;
 extern crate futures;
 extern crate mio;
