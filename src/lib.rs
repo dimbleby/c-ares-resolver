@@ -71,6 +71,7 @@ pub use futureresolver::{
     FutureResolver
 };
 pub use host::HostResults;
+pub use nameinfo::NameInfoResult;
 pub use resolver::{
     Options,
     Resolver,
