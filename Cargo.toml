@@ -15,8 +15,10 @@ categories = ["asynchronous", "network-programming"]
 [dependencies]
 c-ares = "2"
 futures = "0.1"
-mio = "0.6"
 mio-more = "0.1"
+
+[target.'cfg(unix)'.dependencies]
+mio = "0.6"
 
 [target.'cfg(windows)'.dependencies]
 winapi = "0.2"
