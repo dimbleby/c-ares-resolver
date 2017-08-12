@@ -20,7 +20,6 @@ use ws2_32::{
 };
 
 use c_ares;
-use mio;
 use mio_more;
 
 use error::Error;
