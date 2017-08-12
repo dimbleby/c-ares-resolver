@@ -21,6 +21,7 @@ use ws2_32::{
 
 use c_ares;
 use mio;
+use mio_more;
 
 use error::Error;
 use eventloop::EventLoopHandle;
@@ -31,8 +32,8 @@ use eventloop::EventLoopHandle;
 // It also waits for a message telling it to shut down.  We use a mio channel
 // here only for consistency with the unix interface.
 pub struct EventLoop {
-    tx_msg_channel: mio::channel::Sender<Message>,
-    rx_msg_channel: mio::channel::Receiver<Message>,
+    tx_msg_channel: mio_more::channel::Sender<Message>,
+    rx_msg_channel: mio_more::channel::Receiver<Message>,
     pub ares_channel: Arc<Mutex<c_ares::Channel>>,
     quit: bool,
 }
@@ -54,7 +55,7 @@ impl EventLoop {
         }
 
         // Create the message channel.
-        let (tx, rx) = mio::channel::channel();
+        let (tx, rx) = mio_more::channel::channel();
 
         // Create the c-ares channel.
         let ares_channel = c_ares::Channel::with_options(options)?;
