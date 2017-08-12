@@ -44,8 +44,10 @@
 #![deny(missing_docs)]
 extern crate c_ares;
 extern crate futures;
-extern crate mio;
 extern crate mio_more;
+
+#[cfg(unix)]
+extern crate mio;
 
 #[cfg(windows)]
 extern crate winapi;
