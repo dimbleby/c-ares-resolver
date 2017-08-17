@@ -30,9 +30,8 @@ impl EventLoopHandle {
     }
 
     pub fn shutdown(self) {
-        self.tx_msg_channel
-            .send(Message::ShutDown)
-            .expect("failed to request event loop to shut down");
-        self.handle.join().expect("failed to shut down event loop");
+        if self.tx_msg_channel.send(Message::ShutDown).is_ok() {
+            let _ = self.handle.join();
+        }
     }
 }
