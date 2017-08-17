@@ -13,7 +13,7 @@ keywords = ["DNS", "c-ares", "futures"]
 categories = ["asynchronous", "network-programming"]
 
 [dependencies]
-c-ares = "2"
+c-ares = "2.1"
 futures = "0.1"
 mio-more = "0.1"
 
