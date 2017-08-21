@@ -27,21 +27,6 @@ fn main() {
 
 Further example programs can be found [here](https://github.com/dimbleby/c-ares-resolver/tree/master/examples).
 
-## Installation ##
-
-To use `c-ares-resolver`, add this to your `Cargo.toml`:
-
-```toml
-[dependencies]
-c-ares-resolver = "*"
-```
-
-And add this to your crate root:
-
-```rust
-extern crate c_ares_resolver;
-```
-
 ## Contributing ##
 
 Contributions are welcome.  Please send pull requests!
