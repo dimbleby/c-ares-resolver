@@ -170,12 +170,12 @@ impl EventLoop {
                     } else {
                         assert_ne!(fd, 0);
                         let token = mio::Token(fd as usize);
-                        let mut interest = mio::Ready::empty();
+                        let mut interest = mio::Ready::from(
+                            mio::unix::UnixReady::error() |
+                                mio::unix::UnixReady::hup()
+                        );
                         if readable { interest.insert(mio::Ready::readable()) }
                         if writable { interest.insert(mio::Ready::writable()) }
-                        interest.insert(
-                            mio::unix::UnixReady::error() | mio::unix::UnixReady::hup()
-                        );
                         let register_result = if !self.tracked_fds.insert(fd) {
                             self.poll.reregister(
                                 &efd,
