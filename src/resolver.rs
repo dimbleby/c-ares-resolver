@@ -137,7 +137,7 @@ impl Resolver {
     pub fn with_options(options: Options) -> Result<Resolver, Error> {
         // Create and run the event loop.
         let event_loop = EventLoop::new(options.inner)?;
-        let channel = event_loop.ares_channel.clone();
+        let channel = Arc::clone(&event_loop.ares_channel);
         let handle = event_loop.run();
 
         // Return the Resolver.
