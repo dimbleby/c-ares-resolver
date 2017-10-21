@@ -23,7 +23,8 @@
 //! a single-question DNS query"
 //!
 //! -  methods like `search_xxx` correspond to the `c-ares` function `ares_search`, which
-//! "initiates a series of single-question DNS queries".
+//! "initiates a series of single-question DNS queries ... using the channel's search domains as
+//! well as a host alias file given by the HOSTALIAS environment variable".
 //!
 //! See [`c-ares` documentation](https://c-ares.haxx.se/docs.html) for more details.
 //!
