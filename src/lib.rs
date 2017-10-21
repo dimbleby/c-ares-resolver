@@ -19,14 +19,13 @@
 //!
 //! On all resolvers:
 //!
-//! -  methods like `query_xxx` correspond to the c-ares
-//! function `ares_query`, which "initiates a single-question DNS query"
+//! -  methods like `query_xxx` correspond to the `c-ares` function `ares_query`, which "initiates
+//! a single-question DNS query"
 //!
-//! -  methods like `search_xxx` correspond to the c-ares function
-//! `ares_search`, which "initiates a series of single-question DNS queries".
+//! -  methods like `search_xxx` correspond to the `c-ares` function `ares_search`, which
+//! "initiates a series of single-question DNS queries".
 //!
-//! See [c-ares documentation](https://c-ares.haxx.se/docs.html) for more
-//! details.
+//! See [`c-ares` documentation](https://c-ares.haxx.se/docs.html) for more details.
 //!
 //! # Example
 //!
