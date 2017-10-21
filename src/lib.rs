@@ -12,7 +12,7 @@
 //! This crate also provides a `FutureResolver`.  Queries on this object return `futures::Future`
 //! objects, and don't use callbacks.
 //!
-//! Additionally, this crate provides a `BlockingResolver`.  Usually if you're using c-ares, it's
+//! Additionally, this crate provides a `BlockingResolver`.  Usually if you're using `c-ares`, it's
 //! because you care about high-performance, asynchronous code.  But sometimes you'd just like to
 //! make a query with as little ceremony as possible, and you're willing to have your code block
 //! while you do it.  In such cases the `BlockingResolver` is the most convenient option.
