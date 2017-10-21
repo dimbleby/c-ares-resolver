@@ -1,19 +1,23 @@
 //! A convenient wrapper for the [`c-ares`](http://c-ares.haxx.se) library.
 //!
-//! The [`c-ares` crate](https://crates.io/crates/c-ares) provides a safe
-//! wrapper around the underlying C library, but it's relatively hard work to
-//! use: the user needs to drive the polling of file descriptors according to
-//! `c-ares` demands, which likely involves writing something close to a
-//! full-blown event loop.
+//! The [`c-ares` crate](https://crates.io/crates/c-ares) provides a safe wrapper around the
+//! underlying C library, but it's relatively hard work to use: the user needs to drive the polling
+//! of file descriptors according to `c-ares` demands, which likely involves writing something
+//! close to a full-blown event loop.
 //!
-//! This crate does that hard work for you so that the presented API is much
-//! more straightforward.  Simply create a `Resolver`, and make your query -
-//! providing a callback to be called when the query completes.
+//! This crate does that hard work for you so that the presented API is much more straightforward.
+//! Simply create a `Resolver`, and make your query - providing a callback to be called when the
+//! query completes.
 //!
-//! This crate also provides a `FutureResolver`.  Queries on this object
-//! return `futures::Future` objects, and don't use callbacks.
+//! This crate also provides a `FutureResolver`.  Queries on this object return `futures::Future`
+//! objects, and don't use callbacks.
 //!
-//! On both resolvers:
+//! Additionally, this crate provides a `BlockingResolver`.  Usually if you're using c-ares, it's
+//! because you care about high-performance, asynchronous code.  But sometimes you'd just like to
+//! make a query with as little ceremony as possible, and you're willing to have your code block
+//! while you do it.  In such cases the `BlockingResolver` is the most convenient option.
+//!
+//! On all resolvers:
 //!
 //! -  methods like `query_xxx` correspond to the c-ares
 //! function `ares_query`, which "initiates a single-question DNS query"
@@ -55,6 +59,7 @@ extern crate winapi;
 #[cfg(windows)]
 extern crate ws2_32;
 
+mod blockingresolver;
 mod error;
 mod eventloop;
 mod futureresolver;
@@ -68,6 +73,7 @@ mod unix;
 #[cfg(windows)]
 mod windows;
 
+pub use blockingresolver::BlockingResolver;
 pub use error::Error;
 pub use futureresolver::{
     CAresFuture,
