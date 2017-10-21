@@ -120,7 +120,7 @@ impl Options {
     }
 }
 
-/// An asynchronous DNS resolver.
+/// An asynchronous DNS resolver, which returns results via callbacks.
 pub struct Resolver {
     ares_channel: Arc<Mutex<c_ares::Channel>>,
     event_loop_handle: Option<EventLoopHandle>,
