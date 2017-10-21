@@ -289,7 +289,7 @@ impl BlockingResolver {
     pub fn get_name_info<F>(
         &self,
         address: &SocketAddr,
-        flags: c_ares::ni_flags::NIFlags)
+        flags: c_ares::NIFlags)
         -> c_ares::Result<NameInfoResult> {
         let (tx, rx) = mpsc::channel();
         self.inner.get_name_info(address, flags, move |result| {

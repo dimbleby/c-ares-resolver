@@ -323,7 +323,7 @@ impl FutureResolver {
     pub fn get_name_info<F>(
         &self,
         address: &SocketAddr,
-        flags: c_ares::ni_flags::NIFlags)
+        flags: c_ares::NIFlags)
         -> CAresFuture<NameInfoResult> {
         let (c, p) = futures::oneshot();
         self.inner.get_name_info(address, flags, move |result| {

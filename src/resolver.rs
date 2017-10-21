@@ -30,7 +30,7 @@ impl Options {
     }
 
     /// Set flags controlling the behaviour of the resolver.
-    pub fn set_flags(&mut self, flags: c_ares::flags::Flags) -> &mut Self {
+    pub fn set_flags(&mut self, flags: c_ares::Flags) -> &mut Self {
         self.inner.set_flags(flags);
         self
     }
@@ -370,7 +370,7 @@ impl Resolver {
     pub fn get_name_info<F>(
         &self,
         address: &SocketAddr,
-        flags: c_ares::ni_flags::NIFlags,
+        flags: c_ares::NIFlags,
         handler: F
     ) where F: FnOnce(c_ares::Result<c_ares::NameInfoResult>) + Send + 'static
     {
