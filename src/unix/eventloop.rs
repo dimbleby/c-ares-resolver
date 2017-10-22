@@ -168,8 +168,8 @@ impl EventLoop {
                         self.tracked_fds.remove(&fd);
                         let _ = self.poll.deregister(&efd);
                     } else {
-                        assert_ne!(fd, 0);
                         let token = mio::Token(fd as usize);
+                        assert_ne!(token, CHANNEL);
                         let mut interest = mio::Ready::from(
                             mio::unix::UnixReady::error() |
                                 mio::unix::UnixReady::hup()
