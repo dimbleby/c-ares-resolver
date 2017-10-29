@@ -35,9 +35,8 @@ install:
 build: false
 
 test_script:
-  - set RUST_LOG=rustup_cli=info,cargo::util::job
   - cargo build
-  - cargo test
+  - cargo test -j1
 
 matrix:
   allow_failures:
