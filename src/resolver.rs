@@ -1,3 +1,4 @@
+use std::mem;
 use std::net::{
     IpAddr,
     Ipv4Addr,
@@ -123,7 +124,7 @@ impl Options {
 /// An asynchronous DNS resolver, which returns results via callbacks.
 pub struct Resolver {
     ares_channel: Arc<Mutex<c_ares::Channel>>,
-    event_loop_handle: Option<EventLoopHandle>,
+    event_loop_handle: Arc<Mutex<EventLoopHandle>>,
 }
 
 impl Resolver {
@@ -143,7 +144,7 @@ impl Resolver {
         // Return the Resolver.
         let resolver = Resolver {
             ares_channel: channel,
-            event_loop_handle: Some(handle),
+            event_loop_handle: Arc::new(Mutex::new(handle)),
         };
         Ok(resolver)
     }
@@ -232,7 +233,9 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn query_mx<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::MXResults>) + Send + 'static {
-        self.ares_channel.lock().unwrap().query_mx(name, handler)
+        let clone = Arc::clone(&self.event_loop_handle);
+        let f = move |result| { mem::drop(clone); handler(result) };
+        self.ares_channel.lock().unwrap().query_mx(name, f)
     }
 
     /// Search for the MX records associated with `name`.
@@ -423,13 +426,5 @@ impl Resolver {
     /// Cancel all requests made on this `Resolver`.
     pub fn cancel(&mut self) {
         self.ares_channel.lock().unwrap().cancel();
-    }
-}
-
-impl Drop for Resolver {
-    fn drop(&mut self) {
-        if let Some(handle) = self.event_loop_handle.take() {
-            handle.shutdown()
-        }
     }
 }
