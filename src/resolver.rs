@@ -127,6 +127,28 @@ pub struct Resolver {
     event_loop_handle: Arc<Mutex<EventLoopHandle>>,
 }
 
+// For each outstanding query, we want to make sure that the event-loop stays
+// alive.  Do this by wrapping user-provided callbacks so that they hold a
+// reference to the event-loop-handle.
+macro_rules! wrap_handler {
+    ($resolver:ident, $handler:ident) => {
+        {
+            let handle = Arc::clone(&$resolver.event_loop_handle);
+            move |result| { mem::drop(handle); $handler(result) }
+        }
+    };
+    // Type inference for closures is not great and the compiler sometimes
+    // needs some help.
+    ($resolver:ident, $handler:ident, $type:ty) => {
+        {
+            let handle = Arc::clone(&$resolver.event_loop_handle);
+            move |result: c_ares::Result<$type>| {
+                mem::drop(handle); $handler(result)
+            }
+        }
+    }
+}
+
 impl Resolver {
     /// Create a new `Resolver`, using default `Options`.
     pub fn new() -> Result<Resolver, Error> {
@@ -185,6 +207,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn query_a<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::AResults>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().query_a(name, handler)
     }
 
@@ -193,6 +216,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn search_a<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::AResults>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().search_a(name, handler)
     }
 
@@ -201,6 +225,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn query_aaaa<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::AAAAResults>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().query_aaaa(name, handler)
     }
 
@@ -209,6 +234,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn search_aaaa<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::AAAAResults>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().search_aaaa(name, handler)
     }
 
@@ -217,6 +243,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn query_cname<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::CNameResults>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().query_cname(name, handler)
     }
 
@@ -225,6 +252,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn search_cname<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::CNameResults>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().search_cname(name, handler)
     }
 
@@ -233,9 +261,8 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn query_mx<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::MXResults>) + Send + 'static {
-        let clone = Arc::clone(&self.event_loop_handle);
-        let f = move |result| { mem::drop(clone); handler(result) };
-        self.ares_channel.lock().unwrap().query_mx(name, f)
+        let handler = wrap_handler!(self, handler);
+        self.ares_channel.lock().unwrap().query_mx(name, handler)
     }
 
     /// Search for the MX records associated with `name`.
@@ -243,6 +270,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn search_mx<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::MXResults>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().search_mx(name, handler)
     }
 
@@ -251,6 +279,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn query_naptr<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::NAPTRResults>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().query_naptr(name, handler)
     }
 
@@ -259,6 +288,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn search_naptr<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::NAPTRResults>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().search_naptr(name, handler)
     }
 
@@ -267,6 +297,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn query_ns<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::NSResults>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().query_ns(name, handler)
     }
 
@@ -275,6 +306,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn search_ns<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::NSResults>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().search_ns(name, handler)
     }
 
@@ -283,6 +315,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn query_ptr<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::PTRResults>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().query_ptr(name, handler)
     }
 
@@ -291,6 +324,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn search_ptr<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::PTRResults>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().search_ptr(name, handler)
     }
 
@@ -299,6 +333,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn query_soa<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::SOAResult>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().query_soa(name, handler)
     }
 
@@ -307,6 +342,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn search_soa<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::SOAResult>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().search_soa(name, handler)
     }
 
@@ -315,6 +351,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn query_srv<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::SRVResults>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().query_srv(name, handler)
     }
 
@@ -323,6 +360,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn search_srv<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::SRVResults>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().search_srv(name, handler)
     }
 
@@ -331,6 +369,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn query_txt<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::TXTResults>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().query_txt(name, handler)
     }
 
@@ -339,6 +378,7 @@ impl Resolver {
     /// On completion, `handler` is called with the result.
     pub fn search_txt<F>(&self, name: &str, handler: F) where
         F: FnOnce(c_ares::Result<c_ares::TXTResults>) + Send + 'static {
+        let handler = wrap_handler!(self, handler);
         self.ares_channel.lock().unwrap().search_txt(name, handler)
     }
 
@@ -350,8 +390,8 @@ impl Resolver {
         address: &IpAddr,
         handler: F
     ) where F: FnOnce(c_ares::Result<c_ares::HostResults>) + Send + 'static {
-         self.ares_channel.lock().unwrap()
-             .get_host_by_address(address, handler)
+        let handler = wrap_handler!(self, handler, c_ares::HostResults);
+        self.ares_channel.lock().unwrap().get_host_by_address(address, handler)
     }
 
     /// Perform a host query by name.
@@ -363,7 +403,8 @@ impl Resolver {
         family: c_ares::AddressFamily,
         handler: F
     ) where F: FnOnce(c_ares::Result<c_ares::HostResults>) + Send + 'static {
-         self.ares_channel.lock().unwrap()
+        let handler = wrap_handler!(self, handler, c_ares::HostResults);
+        self.ares_channel.lock().unwrap()
              .get_host_by_name(name, family, handler);
     }
 
@@ -377,6 +418,7 @@ impl Resolver {
         handler: F
     ) where F: FnOnce(c_ares::Result<c_ares::NameInfoResult>) + Send + 'static
     {
+        let handler = wrap_handler!(self, handler, c_ares::NameInfoResult);
         self.ares_channel.lock().unwrap()
             .get_name_info(address, flags, handler)
     }
@@ -398,6 +440,7 @@ impl Resolver {
         query_type: u16,
         handler: F
     ) where F: FnOnce(c_ares::Result<&[u8]>) + Send + 'static {
+        let handler = wrap_handler!(self, handler, &[u8]);
         self.ares_channel.lock().unwrap()
             .query(name, dns_class, query_type, handler);
     }
@@ -419,6 +462,7 @@ impl Resolver {
         query_type: u16,
         handler: F
     ) where F: FnOnce(c_ares::Result<&[u8]>) + Send + 'static {
+        let handler = wrap_handler!(self, handler, &[u8]);
         self.ares_channel.lock().unwrap()
             .search(name, dns_class, query_type, handler);
     }

@@ -50,7 +50,7 @@ fn main() {
         }
     );
 
-    // If we allowed the resolver to be dropped, we'd shut down c-ares and the
-    // query would fail.  Wait for the handler to signal that it is done.
+    // Don't allow the main thread to exit before the query completes - wait
+    // for the handler to signal that it is done.
     rx.recv().expect("query did not complete!");
 }
