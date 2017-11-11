@@ -24,7 +24,6 @@ use ws2_32::{
 };
 
 use c_ares;
-use mio_more;
 
 use error::Error;
 use eventloop::EventLoopHandle;
@@ -59,9 +58,9 @@ impl EventLoop {
 
     // Run the event loop.
     pub fn run(self) -> EventLoopHandle {
-        let tx_clone = self.tx_msg_channel.clone();
+        let quit = Arc::clone(&self.quit);
         let join_handle = thread::spawn(|| self.event_loop_thread());
-        EventLoopHandle::new(join_handle, tx_clone)
+        EventLoopHandle::new(join_handle, quit)
     }
 
     // Event loop thread - waits for events, and handles them.
