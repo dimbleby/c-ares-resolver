@@ -64,7 +64,7 @@ impl EventLoop {
     }
 
     // Event loop thread - waits for events, and handles them.
-    fn event_loop_thread(mut self) {
+    fn event_loop_thread(self) {
         let mut read_fds: fd_set = unsafe { mem::uninitialized() };
         let mut write_fds: fd_set = unsafe { mem::uninitialized() };
 
