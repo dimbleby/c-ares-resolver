@@ -20,6 +20,20 @@ pub struct BlockingResolver {
     inner: Resolver,
 }
 
+// Most query implementations follow the same pattern: call through to the
+// `Resolver`, arranging that the callback sends the result down a channel.
+macro_rules! blockify {
+    ($resolver:expr, $query:ident, $question:expr) => {
+        {
+            let (tx, rx) = mpsc::channel();
+            $resolver.$query($question, move |result| {
+                tx.send(result).unwrap()
+            });
+            rx.recv().unwrap()
+        }
+    }
+}
+
 impl BlockingResolver {
     /// Create a new `BlockingResolver`, using default `Options`.
     pub fn new() -> Result<BlockingResolver, Error> {
@@ -68,186 +82,119 @@ impl BlockingResolver {
 
     /// Look up the A records associated with `name`.
     pub fn query_a(&self, name: &str) -> c_ares::Result<c_ares::AResults> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.query_a(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+        blockify!(self.inner, query_a, name)
     }
 
     /// Search for the A records associated with `name`.
     pub fn search_a(&self, name: &str) -> c_ares::Result<c_ares::AResults> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.search_a(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+        blockify!(self.inner, search_a, name)
     }
 
     /// Look up the AAAA records associated with `name`.
-    pub fn query_aaaa(&self, name: &str)  -> c_ares::Result<c_ares::AAAAResults> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.query_aaaa(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+    pub fn query_aaaa(&self, name: &str)
+        -> c_ares::Result<c_ares::AAAAResults>
+    {
+        blockify!(self.inner, query_aaaa, name)
     }
 
     /// Search for the AAAA records associated with `name`.
-    pub fn search_aaaa(&self, name: &str) -> c_ares::Result<c_ares::AAAAResults> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.search_aaaa(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+    pub fn search_aaaa(&self, name: &str)
+        -> c_ares::Result<c_ares::AAAAResults> {
+        blockify!(self.inner, search_aaaa, name)
     }
 
     /// Look up the CNAME records associated with `name`.
     pub fn query_cname(&self, name: &str)
-        -> c_ares::Result<c_ares::CNameResults> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.query_cname(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+        -> c_ares::Result<c_ares::CNameResults>
+    {
+        blockify!(self.inner, query_cname, name)
     }
 
     /// Search for the CNAME records associated with `name`.
     pub fn search_cname(&self, name: &str)
-        -> c_ares::Result<c_ares::CNameResults> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.search_cname(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+        -> c_ares::Result<c_ares::CNameResults>
+    {
+        blockify!(self.inner, search_cname, name)
     }
 
     /// Look up the MX records associated with `name`.
     pub fn query_mx(&self, name: &str) -> c_ares::Result<c_ares::MXResults> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.query_mx(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+        blockify!(self.inner, query_mx, name)
     }
 
     /// Search for the MX records associated with `name`.
     pub fn search_mx(&self, name: &str) -> c_ares::Result<c_ares::MXResults> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.search_mx(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+        blockify!(self.inner, search_mx, name)
     }
 
     /// Look up the NAPTR records associated with `name`.
     pub fn query_naptr(&self, name: &str)
-        -> c_ares::Result<c_ares::NAPTRResults> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.query_naptr(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+        -> c_ares::Result<c_ares::NAPTRResults>
+    {
+        blockify!(self.inner, query_naptr, name)
     }
 
     /// Search for the NAPTR records associated with `name`.
     pub fn search_naptr(&self, name: &str)
-        -> c_ares::Result<c_ares::NAPTRResults> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.search_naptr(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+        -> c_ares::Result<c_ares::NAPTRResults>
+    {
+        blockify!(self.inner, search_naptr, name)
     }
 
     /// Look up the NS records associated with `name`.
     pub fn query_ns(&self, name: &str) -> c_ares::Result<c_ares::NSResults> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.query_ns(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+        blockify!(self.inner, query_ns, name)
     }
 
     /// Search for the NS records associated with `name`.
     pub fn search_ns(&self, name: &str) -> c_ares::Result<c_ares::NSResults> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.search_ns(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+        blockify!(self.inner, search_ns, name)
     }
 
     /// Look up the PTR records associated with `name`.
     pub fn query_ptr(&self, name: &str) -> c_ares::Result<c_ares::PTRResults> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.query_ptr(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+        blockify!(self.inner, query_ptr, name)
     }
 
     /// Search for the PTR records associated with `name`.
-    pub fn search_ptr(&self, name: &str) -> c_ares::Result<c_ares::PTRResults> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.search_ptr(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+    pub fn search_ptr(&self, name: &str)
+        -> c_ares::Result<c_ares::PTRResults>
+    {
+        blockify!(self.inner, search_ptr, name)
     }
 
     /// Look up the SOA records associated with `name`.
     pub fn query_soa(&self, name: &str) -> c_ares::Result<c_ares::SOAResult> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.query_soa(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+        blockify!(self.inner, query_soa, name)
     }
 
     /// Search for the SOA records associated with `name`.
     pub fn search_soa(&self, name: &str) -> c_ares::Result<c_ares::SOAResult> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.search_soa(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+        blockify!(self.inner, search_soa, name)
     }
 
     /// Look up the SRV records associated with `name`.
     pub fn query_srv(&self, name: &str) -> c_ares::Result<c_ares::SRVResults> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.query_srv(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+        blockify!(self.inner, query_srv, name)
     }
 
     /// Search for the SRV records associated with `name`.
-    pub fn search_srv(&self, name: &str) -> c_ares::Result<c_ares::SRVResults> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.search_srv(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+    pub fn search_srv(&self, name: &str)
+        -> c_ares::Result<c_ares::SRVResults>
+    {
+        blockify!(self.inner, search_srv, name)
     }
 
     /// Look up the TXT records associated with `name`.
     pub fn query_txt(&self, name: &str) -> c_ares::Result<c_ares::TXTResults> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.query_txt(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+        blockify!(self.inner, query_txt, name)
     }
 
     /// Search for the TXT records associated with `name`.
-    pub fn search_txt(&self, name: &str) -> c_ares::Result<c_ares::TXTResults> {
-        let (tx, rx) = mpsc::channel();
-        self.inner.search_txt(name, move |result| {
-            tx.send(result).unwrap()
-        });
-        rx.recv().unwrap()
+    pub fn search_txt(&self, name: &str)
+        -> c_ares::Result<c_ares::TXTResults>
+    {
+        blockify!(self.inner, search_txt, name)
     }
 
     /// Perform a host query by address.
