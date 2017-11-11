@@ -4,6 +4,7 @@ use std::net::{
     Ipv6Addr,
     SocketAddr,
 };
+use std::sync::Arc;
 use c_ares;
 use futures;
 use futures::Future;
@@ -19,14 +20,18 @@ use resolver::{
 /// The type of future returned by methods on the `FutureResolver`.
 pub struct CAresFuture<T> {
     inner: futures::sync::oneshot::Receiver<c_ares::Result<T>>,
+    _resolver: Arc<Resolver>,
 }
 
 impl<T> CAresFuture<T> {
-    fn new(promise: futures::sync::oneshot::Receiver<c_ares::Result<T>>)
-        -> Self
+    fn new(
+        promise: futures::sync::oneshot::Receiver<c_ares::Result<T>>,
+        resolver: Arc<Resolver>
+    ) -> Self
     {
         CAresFuture {
             inner: promise,
+            _resolver: resolver,
         }
     }
 }
@@ -52,7 +57,7 @@ impl<T> Future for CAresFuture<T> {
 /// An asynchronous DNS resolver, which returns results as
 /// `futures::Future`s.
 pub struct FutureResolver {
-    inner: Resolver,
+    inner: Arc<Resolver>,
 }
 
 // Most query implementations follow the same pattern: call through to the
@@ -64,7 +69,8 @@ macro_rules! futurize {
             $resolver.$query($question, move |result| {
                 let _ = c.send(result);
             });
-            CAresFuture::new(p)
+            let resolver = Arc::clone(&$resolver);
+            CAresFuture::new(p, resolver)
         }
     }
 }
@@ -80,7 +86,7 @@ impl FutureResolver {
     pub fn with_options(options: Options) -> Result<FutureResolver, Error> {
         let inner = Resolver::with_options(options)?;
         let resolver = FutureResolver {
-            inner: inner,
+            inner: Arc::new(inner),
         };
         Ok(resolver)
     }
@@ -232,7 +238,8 @@ impl FutureResolver {
         self.inner.get_host_by_address(address, move |result| {
             let _ = c.send(result.map(|h| h.into()));
         });
-        CAresFuture::new(p)
+        let resolver = Arc::clone(&self.inner);
+        CAresFuture::new(p, resolver)
     }
 
     /// Perform a host query by name.
@@ -248,7 +255,8 @@ impl FutureResolver {
         self.inner.get_host_by_name(name, family, move |result| {
             let _ = c.send(result.map(|h| h.into()));
         });
-        CAresFuture::new(p)
+        let resolver = Arc::clone(&self.inner);
+        CAresFuture::new(p, resolver)
     }
 
     /// Address-to-nodename translation in protocol-independent manner.
@@ -260,14 +268,15 @@ impl FutureResolver {
     pub fn get_name_info<F>(
         &self,
         address: &SocketAddr,
-        flags: c_ares::NIFlags)
-        -> CAresFuture<NameInfoResult>
+        flags: c_ares::NIFlags
+    ) -> CAresFuture<NameInfoResult>
     {
         let (c, p) = futures::oneshot();
         self.inner.get_name_info(address, flags, move |result| {
             let _ = c.send(result.map(|n| n.into()));
         });
-        CAresFuture::new(p)
+        let resolver = Arc::clone(&self.inner);
+        CAresFuture::new(p, resolver)
     }
 
     /// Initiate a single-question DNS query for `name`.  The class and type of
@@ -290,7 +299,8 @@ impl FutureResolver {
         self.inner.query(name, dns_class, query_type, move |result| {
             let _ = c.send(result.map(|bs| bs.to_owned()));
         });
-        CAresFuture::new(p)
+        let resolver = Arc::clone(&self.inner);
+        CAresFuture::new(p, resolver)
     }
 
     /// Initiate a series of single-question DNS queries for `name`.  The
@@ -313,7 +323,8 @@ impl FutureResolver {
         self.inner.search(name, dns_class, query_type, move |result| {
             let _ = c.send(result.map(|bs| bs.to_owned()));
         });
-        CAresFuture::new(p)
+        let resolver = Arc::clone(&self.inner);
+        CAresFuture::new(p, resolver)
     }
 
     /// Cancel all requests made on this `FutureResolver`.
