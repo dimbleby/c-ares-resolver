@@ -1,19 +1,11 @@
-use std::net::{
-    IpAddr,
-    Ipv4Addr,
-    Ipv6Addr,
-    SocketAddr,
-};
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::sync::mpsc;
 use c_ares;
 
 use error::Error;
 use host::HostResults;
 use nameinfo::NameInfoResult;
-use resolver::{
-    Options,
-    Resolver,
-};
+use resolver::{Options, Resolver};
 
 /// A blocking DNS resolver.
 pub struct BlockingResolver {
@@ -44,9 +36,7 @@ impl BlockingResolver {
     /// Create a new `BlockingResolver`, with the given `Options`.
     pub fn with_options(options: Options) -> Result<BlockingResolver, Error> {
         let inner = Resolver::with_options(options)?;
-        let resolver = BlockingResolver {
-            inner: inner,
-        };
+        let resolver = BlockingResolver { inner: inner };
         Ok(resolver)
     }
 
@@ -55,9 +45,7 @@ impl BlockingResolver {
     ///
     /// String format is `host[:port]`.  IPv6 addresses with ports require
     /// square brackets eg `[2001:4860:4860::8888]:53`.
-    pub fn set_servers(
-        &self,
-        servers: &[&str]) -> Result<&Self, c_ares::Error> {
+    pub fn set_servers(&self, servers: &[&str]) -> Result<&Self, c_ares::Error> {
         self.inner.set_servers(servers)?;
         Ok(self)
     }
@@ -91,29 +79,22 @@ impl BlockingResolver {
     }
 
     /// Look up the AAAA records associated with `name`.
-    pub fn query_aaaa(&self, name: &str)
-        -> c_ares::Result<c_ares::AAAAResults>
-    {
+    pub fn query_aaaa(&self, name: &str) -> c_ares::Result<c_ares::AAAAResults> {
         blockify!(self.inner, query_aaaa, name)
     }
 
     /// Search for the AAAA records associated with `name`.
-    pub fn search_aaaa(&self, name: &str)
-        -> c_ares::Result<c_ares::AAAAResults> {
+    pub fn search_aaaa(&self, name: &str) -> c_ares::Result<c_ares::AAAAResults> {
         blockify!(self.inner, search_aaaa, name)
     }
 
     /// Look up the CNAME records associated with `name`.
-    pub fn query_cname(&self, name: &str)
-        -> c_ares::Result<c_ares::CNameResults>
-    {
+    pub fn query_cname(&self, name: &str) -> c_ares::Result<c_ares::CNameResults> {
         blockify!(self.inner, query_cname, name)
     }
 
     /// Search for the CNAME records associated with `name`.
-    pub fn search_cname(&self, name: &str)
-        -> c_ares::Result<c_ares::CNameResults>
-    {
+    pub fn search_cname(&self, name: &str) -> c_ares::Result<c_ares::CNameResults> {
         blockify!(self.inner, search_cname, name)
     }
 
@@ -128,16 +109,12 @@ impl BlockingResolver {
     }
 
     /// Look up the NAPTR records associated with `name`.
-    pub fn query_naptr(&self, name: &str)
-        -> c_ares::Result<c_ares::NAPTRResults>
-    {
+    pub fn query_naptr(&self, name: &str) -> c_ares::Result<c_ares::NAPTRResults> {
         blockify!(self.inner, query_naptr, name)
     }
 
     /// Search for the NAPTR records associated with `name`.
-    pub fn search_naptr(&self, name: &str)
-        -> c_ares::Result<c_ares::NAPTRResults>
-    {
+    pub fn search_naptr(&self, name: &str) -> c_ares::Result<c_ares::NAPTRResults> {
         blockify!(self.inner, search_naptr, name)
     }
 
@@ -157,9 +134,7 @@ impl BlockingResolver {
     }
 
     /// Search for the PTR records associated with `name`.
-    pub fn search_ptr(&self, name: &str)
-        -> c_ares::Result<c_ares::PTRResults>
-    {
+    pub fn search_ptr(&self, name: &str) -> c_ares::Result<c_ares::PTRResults> {
         blockify!(self.inner, search_ptr, name)
     }
 
@@ -179,9 +154,7 @@ impl BlockingResolver {
     }
 
     /// Search for the SRV records associated with `name`.
-    pub fn search_srv(&self, name: &str)
-        -> c_ares::Result<c_ares::SRVResults>
-    {
+    pub fn search_srv(&self, name: &str) -> c_ares::Result<c_ares::SRVResults> {
         blockify!(self.inner, search_srv, name)
     }
 
@@ -191,9 +164,7 @@ impl BlockingResolver {
     }
 
     /// Search for the TXT records associated with `name`.
-    pub fn search_txt(&self, name: &str)
-        -> c_ares::Result<c_ares::TXTResults>
-    {
+    pub fn search_txt(&self, name: &str) -> c_ares::Result<c_ares::TXTResults> {
         blockify!(self.inner, search_txt, name)
     }
 
@@ -203,8 +174,7 @@ impl BlockingResolver {
     /// strictly more allocation than the underlying `c-ares` code.  If this is
     /// a problem for you, you should prefer to use the analogous method on the
     /// `Resolver`.
-    pub fn get_host_by_address(&self, address: &IpAddr)
-        -> c_ares::Result<HostResults> {
+    pub fn get_host_by_address(&self, address: &IpAddr) -> c_ares::Result<HostResults> {
         let (tx, rx) = mpsc::channel();
         self.inner.get_host_by_address(address, move |result| {
             tx.send(result.map(|h| h.into())).unwrap()
@@ -218,8 +188,11 @@ impl BlockingResolver {
     /// strictly more allocation than the underlying `c-ares` code.  If this is
     /// a problem for you, you should prefer to use the analogous method on the
     /// `Resolver`.
-    pub fn get_host_by_name(&self, name: &str, family: c_ares::AddressFamily)
-        -> c_ares::Result<HostResults> {
+    pub fn get_host_by_name(
+        &self,
+        name: &str,
+        family: c_ares::AddressFamily,
+    ) -> c_ares::Result<HostResults> {
         let (tx, rx) = mpsc::channel();
         self.inner.get_host_by_name(name, family, move |result| {
             tx.send(result.map(|h| h.into())).unwrap()
@@ -236,8 +209,8 @@ impl BlockingResolver {
     pub fn get_name_info<F>(
         &self,
         address: &SocketAddr,
-        flags: c_ares::NIFlags)
-        -> c_ares::Result<NameInfoResult> {
+        flags: c_ares::NIFlags,
+    ) -> c_ares::Result<NameInfoResult> {
         let (tx, rx) = mpsc::channel();
         self.inner.get_name_info(address, flags, move |result| {
             tx.send(result.map(|n| n.into())).unwrap()
@@ -258,12 +231,12 @@ impl BlockingResolver {
     /// `c-ares` does not provide a parser; or in case a third-party parser is
     /// preferred.  Usually, if a suitable `query_xxx()` is available, that
     /// should be used.
-    pub fn query(&self, name: &str, dns_class: u16, query_type: u16)
-        -> c_ares::Result<Vec<u8>> {
+    pub fn query(&self, name: &str, dns_class: u16, query_type: u16) -> c_ares::Result<Vec<u8>> {
         let (tx, rx) = mpsc::channel();
-        self.inner.query(name, dns_class, query_type, move |result| {
-            tx.send(result.map(|bs| bs.to_owned())).unwrap()
-        });
+        self.inner
+            .query(name, dns_class, query_type, move |result| {
+                tx.send(result.map(|bs| bs.to_owned())).unwrap()
+            });
         rx.recv().unwrap()
     }
 
@@ -280,12 +253,12 @@ impl BlockingResolver {
     /// `c-ares` does not provide a parser; or in case a third-party parser is
     /// preferred.  Usually, if a suitable `search_xxx()` is available, that
     /// should be used.
-    pub fn search(&self, name: &str, dns_class: u16, query_type: u16)
-        -> c_ares::Result<Vec<u8>> {
+    pub fn search(&self, name: &str, dns_class: u16, query_type: u16) -> c_ares::Result<Vec<u8>> {
         let (tx, rx) = mpsc::channel();
-        self.inner.search(name, dns_class, query_type, move |result| {
-            tx.send(result.map(|bs| bs.to_owned())).unwrap()
-        });
+        self.inner
+            .search(name, dns_class, query_type, move |result| {
+                tx.send(result.map(|bs| bs.to_owned())).unwrap()
+            });
         rx.recv().unwrap()
     }
 }

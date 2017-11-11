@@ -1,27 +1,12 @@
 use std::mem;
 use std::ptr;
-use std::sync::{
-    Arc,
-    Mutex,
-};
-use std::sync::atomic::{
-    AtomicBool,
-    Ordering,
-};
+use std::sync::{Arc, Mutex};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::Duration;
 
-use winapi::winsock2::{
-    fd_set,
-    SOCKET_ERROR,
-    timeval,
-    WSADATA,
-};
-use ws2_32::{
-    select,
-    WSACleanup,
-    WSAStartup,
-};
+use winapi::winsock2::{fd_set, timeval, SOCKET_ERROR, WSADATA};
+use ws2_32::{select, WSACleanup, WSAStartup};
 
 use c_ares;
 
@@ -72,7 +57,9 @@ impl EventLoop {
         loop {
             read_fds.fd_count = 0;
             write_fds.fd_count = 0;
-            let count = self.ares_channel.lock().unwrap()
+            let count = self.ares_channel
+                .lock()
+                .unwrap()
                 .fds(&mut read_fds, &mut write_fds);
 
             if count == 0 {
@@ -82,30 +69,29 @@ impl EventLoop {
                     tv_sec: 0,
                     tv_usec: 100000,
                 };
-                let results = unsafe {
-                    select(
-                        0,
-                        &mut read_fds,
-                        &mut write_fds,
-                        ptr::null_mut(),
-                        &timeout
-                    )
-                };
+                let results =
+                    unsafe { select(0, &mut read_fds, &mut write_fds, ptr::null_mut(), &timeout) };
 
                 // Process whatever happened.
                 match results {
                     SOCKET_ERROR => panic!("Socket error"),
-                    _ => self.ares_channel.lock().unwrap()
+                    _ => self.ares_channel
+                        .lock()
+                        .unwrap()
                         .process(&mut read_fds, &mut write_fds),
                 }
             }
-            if self.quit.load(Ordering::Relaxed) { break }
+            if self.quit.load(Ordering::Relaxed) {
+                break;
+            }
         }
     }
 }
 
 impl Drop for EventLoop {
     fn drop(&mut self) {
-        unsafe { WSACleanup(); }
+        unsafe {
+            WSACleanup();
+        }
     }
 }

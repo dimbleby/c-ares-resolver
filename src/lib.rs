@@ -75,13 +75,7 @@ mod windows;
 
 pub use blockingresolver::BlockingResolver;
 pub use error::Error;
-pub use futureresolver::{
-    CAresFuture,
-    FutureResolver
-};
+pub use futureresolver::{CAresFuture, FutureResolver};
 pub use host::HostResults;
 pub use nameinfo::NameInfoResult;
-pub use resolver::{
-    Options,
-    Resolver,
-};
+pub use resolver::{Options, Resolver};

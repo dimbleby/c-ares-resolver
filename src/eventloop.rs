@@ -1,8 +1,5 @@
 use std::sync::Arc;
-use std::sync::atomic::{
-    AtomicBool,
-    Ordering,
-};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 
 #[cfg(unix)]
@@ -17,9 +14,7 @@ pub struct EventLoopHandle {
 }
 
 impl EventLoopHandle {
-    pub fn new(
-        handle: thread::JoinHandle<()>,
-        quit: Arc<AtomicBool>) -> EventLoopHandle {
+    pub fn new(handle: thread::JoinHandle<()>, quit: Arc<AtomicBool>) -> EventLoopHandle {
         EventLoopHandle {
             handle: Some(handle),
             quit: quit,

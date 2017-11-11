@@ -4,7 +4,7 @@ use c_ares;
 
 /// An owned version of `c_ares::HostResults`.
 #[derive(Clone, Eq, PartialEq, Debug, Hash, PartialOrd, Ord)]
-pub struct HostResults{
+pub struct HostResults {
     /// The hostname returned by the lookup.
     pub hostname: String,
 

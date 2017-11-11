@@ -1,21 +1,10 @@
-use std::net::{
-    IpAddr,
-    Ipv4Addr,
-    Ipv6Addr,
-    SocketAddr,
-};
-use std::sync::{
-    Arc,
-    Mutex,
-};
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
+use std::sync::{Arc, Mutex};
 
 use c_ares;
 
 use error::Error;
-use eventloop::{
-    EventLoop,
-    EventLoopHandle
-};
+use eventloop::{EventLoop, EventLoopHandle};
 
 /// Used to configure the behaviour of the resolver.
 #[derive(Default)]
@@ -184,198 +173,245 @@ impl Resolver {
     /// Look up the A records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn query_a<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::AResults>) + Send + 'static {
+    pub fn query_a<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::AResults>) + Send + 'static,
+    {
         self.ares_channel.lock().unwrap().query_a(name, handler)
     }
 
     /// Search for the A records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn search_a<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::AResults>) + Send + 'static {
+    pub fn search_a<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::AResults>) + Send + 'static,
+    {
         self.ares_channel.lock().unwrap().search_a(name, handler)
     }
 
     /// Look up the AAAA records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn query_aaaa<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::AAAAResults>) + Send + 'static {
+    pub fn query_aaaa<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::AAAAResults>) + Send + 'static,
+    {
         self.ares_channel.lock().unwrap().query_aaaa(name, handler)
     }
 
     /// Search for the AAAA records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn search_aaaa<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::AAAAResults>) + Send + 'static {
+    pub fn search_aaaa<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::AAAAResults>) + Send + 'static,
+    {
         self.ares_channel.lock().unwrap().search_aaaa(name, handler)
     }
 
     /// Look up the CNAME records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn query_cname<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::CNameResults>) + Send + 'static {
+    pub fn query_cname<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::CNameResults>) + Send + 'static,
+    {
         self.ares_channel.lock().unwrap().query_cname(name, handler)
     }
 
     /// Search for the CNAME records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn search_cname<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::CNameResults>) + Send + 'static {
-        self.ares_channel.lock().unwrap().search_cname(name, handler)
+    pub fn search_cname<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::CNameResults>) + Send + 'static,
+    {
+        self.ares_channel
+            .lock()
+            .unwrap()
+            .search_cname(name, handler)
     }
 
     /// Look up the MX records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn query_mx<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::MXResults>) + Send + 'static {
+    pub fn query_mx<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::MXResults>) + Send + 'static,
+    {
         self.ares_channel.lock().unwrap().query_mx(name, handler)
     }
 
     /// Search for the MX records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn search_mx<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::MXResults>) + Send + 'static {
+    pub fn search_mx<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::MXResults>) + Send + 'static,
+    {
         self.ares_channel.lock().unwrap().search_mx(name, handler)
     }
 
     /// Look up the NAPTR records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn query_naptr<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::NAPTRResults>) + Send + 'static {
+    pub fn query_naptr<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::NAPTRResults>) + Send + 'static,
+    {
         self.ares_channel.lock().unwrap().query_naptr(name, handler)
     }
 
     /// Search for the NAPTR records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn search_naptr<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::NAPTRResults>) + Send + 'static {
-        self.ares_channel.lock().unwrap().search_naptr(name, handler)
+    pub fn search_naptr<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::NAPTRResults>) + Send + 'static,
+    {
+        self.ares_channel
+            .lock()
+            .unwrap()
+            .search_naptr(name, handler)
     }
 
     /// Look up the NS records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn query_ns<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::NSResults>) + Send + 'static {
+    pub fn query_ns<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::NSResults>) + Send + 'static,
+    {
         self.ares_channel.lock().unwrap().query_ns(name, handler)
     }
 
     /// Search for the NS records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn search_ns<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::NSResults>) + Send + 'static {
+    pub fn search_ns<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::NSResults>) + Send + 'static,
+    {
         self.ares_channel.lock().unwrap().search_ns(name, handler)
     }
 
     /// Look up the PTR records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn query_ptr<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::PTRResults>) + Send + 'static {
+    pub fn query_ptr<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::PTRResults>) + Send + 'static,
+    {
         self.ares_channel.lock().unwrap().query_ptr(name, handler)
     }
 
     /// Search for the PTR records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn search_ptr<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::PTRResults>) + Send + 'static {
+    pub fn search_ptr<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::PTRResults>) + Send + 'static,
+    {
         self.ares_channel.lock().unwrap().search_ptr(name, handler)
     }
 
     /// Look up the SOA record associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn query_soa<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::SOAResult>) + Send + 'static {
+    pub fn query_soa<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::SOAResult>) + Send + 'static,
+    {
         self.ares_channel.lock().unwrap().query_soa(name, handler)
     }
 
     /// Search for the SOA record associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn search_soa<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::SOAResult>) + Send + 'static {
+    pub fn search_soa<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::SOAResult>) + Send + 'static,
+    {
         self.ares_channel.lock().unwrap().search_soa(name, handler)
     }
 
     /// Look up the SRV records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn query_srv<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::SRVResults>) + Send + 'static {
+    pub fn query_srv<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::SRVResults>) + Send + 'static,
+    {
         self.ares_channel.lock().unwrap().query_srv(name, handler)
     }
 
     /// Search for the SRV records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn search_srv<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::SRVResults>) + Send + 'static {
+    pub fn search_srv<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::SRVResults>) + Send + 'static,
+    {
         self.ares_channel.lock().unwrap().search_srv(name, handler)
     }
 
     /// Look up the TXT records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn query_txt<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::TXTResults>) + Send + 'static {
+    pub fn query_txt<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::TXTResults>) + Send + 'static,
+    {
         self.ares_channel.lock().unwrap().query_txt(name, handler)
     }
 
     /// Search for the TXT records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn search_txt<F>(&self, name: &str, handler: F) where
-        F: FnOnce(c_ares::Result<c_ares::TXTResults>) + Send + 'static {
+    pub fn search_txt<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::TXTResults>) + Send + 'static,
+    {
         self.ares_channel.lock().unwrap().search_txt(name, handler)
     }
 
     /// Perform a host query by address.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn get_host_by_address<F>(
-        &self,
-        address: &IpAddr,
-        handler: F
-    ) where F: FnOnce(c_ares::Result<c_ares::HostResults>) + Send + 'static {
-        self.ares_channel.lock().unwrap().get_host_by_address(address, handler)
+    pub fn get_host_by_address<F>(&self, address: &IpAddr, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::HostResults>) + Send + 'static,
+    {
+        self.ares_channel
+            .lock()
+            .unwrap()
+            .get_host_by_address(address, handler)
     }
 
     /// Perform a host query by name.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn get_host_by_name<F>(
-        &self,
-        name: &str,
-        family: c_ares::AddressFamily,
-        handler: F
-    ) where F: FnOnce(c_ares::Result<c_ares::HostResults>) + Send + 'static {
-        self.ares_channel.lock().unwrap()
-             .get_host_by_name(name, family, handler);
+    pub fn get_host_by_name<F>(&self, name: &str, family: c_ares::AddressFamily, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::HostResults>) + Send + 'static,
+    {
+        self.ares_channel
+            .lock()
+            .unwrap()
+            .get_host_by_name(name, family, handler);
     }
 
     /// Address-to-nodename translation in protocol-independent manner.
     ///
     /// On completion, `handler` is called with the result.
-    pub fn get_name_info<F>(
-        &self,
-        address: &SocketAddr,
-        flags: c_ares::NIFlags,
-        handler: F
-    ) where F: FnOnce(c_ares::Result<c_ares::NameInfoResult>) + Send + 'static
+    pub fn get_name_info<F>(&self, address: &SocketAddr, flags: c_ares::NIFlags, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::NameInfoResult>) + Send + 'static,
     {
-        self.ares_channel.lock().unwrap()
+        self.ares_channel
+            .lock()
+            .unwrap()
             .get_name_info(address, flags, handler)
     }
 
@@ -389,14 +425,13 @@ impl Resolver {
     /// `c-ares` does not provide a parser; or in case a third-party parser is
     /// preferred.  Usually, if a suitable `query_xxx()` is available, that
     /// should be used.
-    pub fn query<F>(
-        &self,
-        name: &str,
-        dns_class: u16,
-        query_type: u16,
-        handler: F
-    ) where F: FnOnce(c_ares::Result<&[u8]>) + Send + 'static {
-        self.ares_channel.lock().unwrap()
+    pub fn query<F>(&self, name: &str, dns_class: u16, query_type: u16, handler: F)
+    where
+        F: FnOnce(c_ares::Result<&[u8]>) + Send + 'static,
+    {
+        self.ares_channel
+            .lock()
+            .unwrap()
             .query(name, dns_class, query_type, handler);
     }
 
@@ -410,14 +445,13 @@ impl Resolver {
     /// `c-ares` does not provide a parser; or in case a third-party parser is
     /// preferred.  Usually, if a suitable `search_xxx()` is available, that
     /// should be used.
-    pub fn search<F>(
-        &self,
-        name: &str,
-        dns_class: u16,
-        query_type: u16,
-        handler: F
-    ) where F: FnOnce(c_ares::Result<&[u8]>) + Send + 'static {
-        self.ares_channel.lock().unwrap()
+    pub fn search<F>(&self, name: &str, dns_class: u16, query_type: u16, handler: F)
+    where
+        F: FnOnce(c_ares::Result<&[u8]>) + Send + 'static,
+    {
+        self.ares_channel
+            .lock()
+            .unwrap()
             .search(name, dns_class, query_type, handler);
     }
 

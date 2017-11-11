@@ -38,7 +38,6 @@ fn main() {
     };
 
     // Run the query to completion and print the results.
-    let mut event_loop = tokio_core::reactor::Core::new()
-        .expect("Failed to create event loop");
+    let mut event_loop = tokio_core::reactor::Core::new().expect("Failed to create event loop");
     event_loop.run(query).ok();
 }

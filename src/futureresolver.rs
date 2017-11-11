@@ -1,9 +1,4 @@
-use std::net::{
-    IpAddr,
-    Ipv4Addr,
-    Ipv6Addr,
-    SocketAddr,
-};
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::sync::Arc;
 use c_ares;
 use futures;
@@ -12,10 +7,7 @@ use futures::Future;
 use error::Error;
 use host::HostResults;
 use nameinfo::NameInfoResult;
-use resolver::{
-    Options,
-    Resolver,
-};
+use resolver::{Options, Resolver};
 
 /// The type of future returned by methods on the `FutureResolver`.
 pub struct CAresFuture<T> {
@@ -26,9 +18,8 @@ pub struct CAresFuture<T> {
 impl<T> CAresFuture<T> {
     fn new(
         promise: futures::sync::oneshot::Receiver<c_ares::Result<T>>,
-        resolver: Arc<Resolver>
-    ) -> Self
-    {
+        resolver: Arc<Resolver>,
+    ) -> Self {
         CAresFuture {
             inner: promise,
             _resolver: resolver,
@@ -44,12 +35,10 @@ impl<T> Future for CAresFuture<T> {
         match self.inner.poll() {
             Ok(futures::Async::NotReady) => Ok(futures::Async::NotReady),
             Err(_) => Err(c_ares::Error::ECANCELLED),
-            Ok(futures::Async::Ready(res)) => {
-                match res {
-                    Ok(r) => Ok(futures::Async::Ready(r)),
-                    Err(e) => Err(e),
-                }
-            }
+            Ok(futures::Async::Ready(res)) => match res {
+                Ok(r) => Ok(futures::Async::Ready(r)),
+                Err(e) => Err(e),
+            },
         }
     }
 }
@@ -96,9 +85,7 @@ impl FutureResolver {
     ///
     /// String format is `host[:port]`.  IPv6 addresses with ports require
     /// square brackets eg `[2001:4860:4860::8888]:53`.
-    pub fn set_servers(
-        &self,
-        servers: &[&str]) -> Result<&Self, c_ares::Error> {
+    pub fn set_servers(&self, servers: &[&str]) -> Result<&Self, c_ares::Error> {
         self.inner.set_servers(servers)?;
         Ok(self)
     }
@@ -132,7 +119,7 @@ impl FutureResolver {
     }
 
     /// Look up the AAAA records associated with `name`.
-    pub fn query_aaaa(&self, name: &str)  -> CAresFuture<c_ares::AAAAResults> {
+    pub fn query_aaaa(&self, name: &str) -> CAresFuture<c_ares::AAAAResults> {
         futurize!(self.inner, query_aaaa, name)
     }
 
@@ -142,14 +129,12 @@ impl FutureResolver {
     }
 
     /// Look up the CNAME records associated with `name`.
-    pub fn query_cname(&self, name: &str)
-        -> CAresFuture<c_ares::CNameResults> {
+    pub fn query_cname(&self, name: &str) -> CAresFuture<c_ares::CNameResults> {
         futurize!(self.inner, query_cname, name)
     }
 
     /// Search for the CNAME records associated with `name`.
-    pub fn search_cname(&self, name: &str)
-        -> CAresFuture<c_ares::CNameResults> {
+    pub fn search_cname(&self, name: &str) -> CAresFuture<c_ares::CNameResults> {
         futurize!(self.inner, search_cname, name)
     }
 
@@ -164,14 +149,12 @@ impl FutureResolver {
     }
 
     /// Look up the NAPTR records associated with `name`.
-    pub fn query_naptr(&self, name: &str)
-        -> CAresFuture<c_ares::NAPTRResults> {
+    pub fn query_naptr(&self, name: &str) -> CAresFuture<c_ares::NAPTRResults> {
         futurize!(self.inner, query_naptr, name)
     }
 
     /// Search for the NAPTR records associated with `name`.
-    pub fn search_naptr(&self, name: &str)
-        -> CAresFuture<c_ares::NAPTRResults> {
+    pub fn search_naptr(&self, name: &str) -> CAresFuture<c_ares::NAPTRResults> {
         futurize!(self.inner, search_naptr, name)
     }
 
@@ -231,9 +214,7 @@ impl FutureResolver {
     /// strictly more allocation than the underlying `c-ares` code.  If this is
     /// a problem for you, you should prefer to use the analogous method on the
     /// `Resolver`.
-    pub fn get_host_by_address(&self, address: &IpAddr)
-        -> CAresFuture<HostResults>
-    {
+    pub fn get_host_by_address(&self, address: &IpAddr) -> CAresFuture<HostResults> {
         let (c, p) = futures::oneshot();
         self.inner.get_host_by_address(address, move |result| {
             let _ = c.send(result.map(|h| h.into()));
@@ -248,9 +229,11 @@ impl FutureResolver {
     /// strictly more allocation than the underlying `c-ares` code.  If this is
     /// a problem for you, you should prefer to use the analogous method on the
     /// `Resolver`.
-    pub fn get_host_by_name(&self, name: &str, family: c_ares::AddressFamily)
-        -> CAresFuture<HostResults>
-    {
+    pub fn get_host_by_name(
+        &self,
+        name: &str,
+        family: c_ares::AddressFamily,
+    ) -> CAresFuture<HostResults> {
         let (c, p) = futures::oneshot();
         self.inner.get_host_by_name(name, family, move |result| {
             let _ = c.send(result.map(|h| h.into()));
@@ -268,9 +251,8 @@ impl FutureResolver {
     pub fn get_name_info<F>(
         &self,
         address: &SocketAddr,
-        flags: c_ares::NIFlags
-    ) -> CAresFuture<NameInfoResult>
-    {
+        flags: c_ares::NIFlags,
+    ) -> CAresFuture<NameInfoResult> {
         let (c, p) = futures::oneshot();
         self.inner.get_name_info(address, flags, move |result| {
             let _ = c.send(result.map(|n| n.into()));
@@ -292,13 +274,12 @@ impl FutureResolver {
     /// `c-ares` does not provide a parser; or in case a third-party parser is
     /// preferred.  Usually, if a suitable `query_xxx()` is available, that
     /// should be used.
-    pub fn query(&self, name: &str, dns_class: u16, query_type: u16)
-        -> CAresFuture<Vec<u8>>
-    {
+    pub fn query(&self, name: &str, dns_class: u16, query_type: u16) -> CAresFuture<Vec<u8>> {
         let (c, p) = futures::oneshot();
-        self.inner.query(name, dns_class, query_type, move |result| {
-            let _ = c.send(result.map(|bs| bs.to_owned()));
-        });
+        self.inner
+            .query(name, dns_class, query_type, move |result| {
+                let _ = c.send(result.map(|bs| bs.to_owned()));
+            });
         let resolver = Arc::clone(&self.inner);
         CAresFuture::new(p, resolver)
     }
@@ -316,13 +297,12 @@ impl FutureResolver {
     /// `c-ares` does not provide a parser; or in case a third-party parser is
     /// preferred.  Usually, if a suitable `search_xxx()` is available, that
     /// should be used.
-    pub fn search(&self, name: &str, dns_class: u16, query_type: u16)
-        -> CAresFuture<Vec<u8>>
-    {
+    pub fn search(&self, name: &str, dns_class: u16, query_type: u16) -> CAresFuture<Vec<u8>> {
         let (c, p) = futures::oneshot();
-        self.inner.search(name, dns_class, query_type, move |result| {
-            let _ = c.send(result.map(|bs| bs.to_owned()));
-        });
+        self.inner
+            .search(name, dns_class, query_type, move |result| {
+                let _ = c.send(result.map(|bs| bs.to_owned()));
+            });
         let resolver = Arc::clone(&self.inner);
         CAresFuture::new(p, resolver)
     }

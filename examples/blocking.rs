@@ -15,8 +15,7 @@ fn print_txt_results(result: &Result<c_ares::TXTResults, c_ares::Error>) {
         Ok(ref txt_results) => {
             println!("Successful TXT lookup...");
             for txt_result in txt_results {
-                let text = str::from_utf8(txt_result.text())
-                    .unwrap_or("<binary>");
+                let text = str::from_utf8(txt_result.text()).unwrap_or("<binary>");
                 println!(
                     "record start: {}, text: {}",
                     txt_result.record_start(),

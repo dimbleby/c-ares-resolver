@@ -15,21 +15,14 @@ fn handle_result(result: &Result<&[u8], c_ares::Error>) {
     match *result {
         Err(ref e) => {
             println!("Query failed with error '{}'", e.description());
-        },
-        Ok(bytes) => {
-            match Packet::parse(bytes) {
-                Err(e) => {
-                    println!(
-                        "Parser failed with error '{}'",
-                        e.description()
-                    );
-                },
-                Ok(packet) => {
-                    for answer in &packet.answers {
-                        println!("{:?}", answer.data);
-                    }
-                },
+        }
+        Ok(bytes) => match Packet::parse(bytes) {
+            Err(e) => {
+                println!("Parser failed with error '{}'", e.description());
             }
+            Ok(packet) => for answer in &packet.answers {
+                println!("{:?}", answer.data);
+            },
         },
     }
 }
@@ -42,12 +35,12 @@ fn main() {
     let (tx, rx) = mpsc::channel();
     resolver.query(
         "apple.com",
-        1,  // internet
-        1,  // Host address
+        1, // internet
+        1, // Host address
         move |result| {
             handle_result(&result);
             tx.send(()).expect("failed to send on channel!");
-        }
+        },
     );
 
     // Don't allow the main thread to exit before the query completes - wait

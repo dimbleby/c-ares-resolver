@@ -1,12 +1,6 @@
 use std::collections::HashSet;
-use std::sync::{
-    Arc,
-    Mutex,
-};
-use std::sync::atomic::{
-    AtomicBool,
-    Ordering,
-};
+use std::sync::{Arc, Mutex};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::Duration;
 
@@ -57,20 +51,13 @@ impl EventLoop {
         // channel with it.
         let poll = mio::Poll::new()?;
         let (tx, rx) = mio_more::channel::channel();
-        poll.register(
-            &rx,
-            CHANNEL,
-            mio::Ready::readable(),
-            mio::PollOpt::edge()
-        )?;
+        poll.register(&rx, CHANNEL, mio::Ready::readable(), mio::PollOpt::edge())?;
 
         // Whenever c-ares tells us what to do with a file descriptor, we'll
         // send that request along, through the channel we just created.
-        let sock_callback =
-            move |fd: c_ares::Socket, readable: bool, writable: bool| {
-                let _ = tx.send(
-                    Message::RegisterInterest(fd, readable, writable));
-            };
+        let sock_callback = move |fd: c_ares::Socket, readable: bool, writable: bool| {
+            let _ = tx.send(Message::RegisterInterest(fd, readable, writable));
+        };
         options.set_socket_state_callback(sock_callback);
 
         // Create the c-ares channel.
@@ -109,11 +96,11 @@ impl EventLoop {
             match results {
                 0 => {
                     // No events - must be a timeout.  Tell c-ares about it.
-                    self.ares_channel.lock().unwrap().process_fd(
-                        c_ares::SOCKET_BAD,
-                        c_ares::SOCKET_BAD
-                    );
-                },
+                    self.ares_channel
+                        .lock()
+                        .unwrap()
+                        .process_fd(c_ares::SOCKET_BAD, c_ares::SOCKET_BAD);
+                }
                 _ => {
                     // Process events.
                     for event in &events {
@@ -121,7 +108,9 @@ impl EventLoop {
                     }
                 }
             }
-            if self.quit.load(Ordering::Relaxed) { break }
+            if self.quit.load(Ordering::Relaxed) {
+                break;
+            }
         }
     }
 
@@ -131,7 +120,7 @@ impl EventLoop {
             CHANNEL => {
                 // The channel is readable.
                 self.handle_messages()
-            },
+            }
 
             mio::Token(fd) => {
                 // Sockets became readable or writable - tell c-ares.
@@ -164,25 +153,20 @@ impl EventLoop {
             } else {
                 let token = mio::Token(fd as usize);
                 assert_ne!(token, CHANNEL);
-                let mut interest = mio::Ready::from(
-                    mio::unix::UnixReady::error() | mio::unix::UnixReady::hup()
-                );
-                if readable { interest.insert(mio::Ready::readable()) }
-                if writable { interest.insert(mio::Ready::writable()) }
+                let mut interest =
+                    mio::Ready::from(mio::unix::UnixReady::error() | mio::unix::UnixReady::hup());
+                if readable {
+                    interest.insert(mio::Ready::readable())
+                }
+                if writable {
+                    interest.insert(mio::Ready::writable())
+                }
                 let register_result = if !self.tracked_fds.insert(fd) {
-                    self.poll.reregister(
-                        &efd,
-                        token,
-                        interest,
-                        mio::PollOpt::level()
-                    )
+                    self.poll
+                        .reregister(&efd, token, interest, mio::PollOpt::level())
                 } else {
-                    self.poll.register(
-                        &efd,
-                        token,
-                        interest,
-                        mio::PollOpt::level()
-                    )
+                    self.poll
+                        .register(&efd, token, interest, mio::PollOpt::level())
                 };
                 register_result.expect("failed to register interest");
             }
