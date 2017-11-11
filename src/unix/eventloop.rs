@@ -3,6 +3,10 @@ use std::sync::{
     Arc,
     Mutex,
 };
+use std::sync::atomic::{
+    AtomicBool,
+    Ordering,
+};
 use std::thread;
 use std::time::Duration;
 
@@ -21,15 +25,12 @@ use eventloop::EventLoopHandle;
 //
 // -  events telling it that something has happened on one of these file
 //    descriptors.  When this happens, it tells the c_ares::Channel about it.
-//
-// -  a message telling it to shut down.
 pub struct EventLoop {
     poll: mio::Poll,
-    tx_msg_channel: mio_more::channel::Sender<Message>,
     rx_msg_channel: mio_more::channel::Receiver<Message>,
     tracked_fds: HashSet<c_ares::Socket>,
     pub ares_channel: Arc<Mutex<c_ares::Channel>>,
-    quit: bool,
+    quit: Arc<AtomicBool>,
 }
 
 // Messages for the event loop.
@@ -40,9 +41,6 @@ pub enum Message {
     // allowed to set both of these - or neither, meaning 'I am no longer
     // interested in this file descriptor'.
     RegisterInterest(c_ares::Socket, bool, bool),
-
-    // 'Shut down'.
-    ShutDown,
 }
 
 // A token identifying that the message channel has become available for
@@ -68,10 +66,9 @@ impl EventLoop {
 
         // Whenever c-ares tells us what to do with a file descriptor, we'll
         // send that request along, through the channel we just created.
-        let tx_clone = tx.clone();
         let sock_callback =
             move |fd: c_ares::Socket, readable: bool, writable: bool| {
-                let _ = tx_clone.send(
+                let _ = tx.send(
                     Message::RegisterInterest(fd, readable, writable));
             };
         options.set_socket_state_callback(sock_callback);
@@ -83,20 +80,19 @@ impl EventLoop {
         // Create and return the event loop.
         let event_loop = EventLoop {
             poll: poll,
-            tx_msg_channel: tx,
             rx_msg_channel: rx,
             tracked_fds: HashSet::<c_ares::Socket>::new(),
             ares_channel: locked_channel,
-            quit: false,
+            quit: Arc::new(AtomicBool::new(false)),
         };
         Ok(event_loop)
     }
 
     // Run the event loop.
     pub fn run(self) -> EventLoopHandle {
-        let tx_clone = self.tx_msg_channel.clone();
+        let quit = Arc::clone(&self.quit);
         let join_handle = thread::spawn(|| self.event_loop_thread());
-        EventLoopHandle::new(join_handle, tx_clone)
+        EventLoopHandle::new(join_handle, quit)
     }
 
     // Event loop thread - waits for events, and handles them.
@@ -119,14 +115,13 @@ impl EventLoop {
                     );
                 },
                 _ => {
-                    // Process events.  One of them might have asked us to
-                    // quit.
+                    // Process events.
                     for event in &events {
                         self.handle_event(&event);
-                        if self.quit { return }
                     }
                 }
             }
+            if self.quit.load(Ordering::Relaxed) { break }
         }
     }
 
@@ -193,12 +188,6 @@ impl EventLoop {
                         };
                         register_result.expect("failed to register interest");
                     }
-                },
-
-                // Instruction to shut down.
-                Ok(Message::ShutDown) => {
-                    self.quit = true;
-                    break
                 },
 
                 // No more instructions.
