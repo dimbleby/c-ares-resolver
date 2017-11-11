@@ -1,37 +1,36 @@
+use std::sync::Arc;
+use std::sync::atomic::{
+    AtomicBool,
+    Ordering,
+};
 use std::thread;
-
-use mio_more;
-
-#[cfg(unix)]
-use unix::eventloop::Message;
 
 #[cfg(unix)]
 pub use unix::eventloop::EventLoop;
 
 #[cfg(windows)]
-use windows::eventloop::Message;
-
-#[cfg(windows)]
 pub use windows::eventloop::EventLoop;
 
 pub struct EventLoopHandle {
-    handle: thread::JoinHandle<()>,
-    tx_msg_channel: mio_more::channel::Sender<Message>,
+    handle: Option<thread::JoinHandle<()>>,
+    quit: Arc<AtomicBool>,
 }
 
 impl EventLoopHandle {
     pub fn new(
         handle: thread::JoinHandle<()>,
-        tx_msg_channel: mio_more::channel::Sender<Message>) -> EventLoopHandle {
+        quit: Arc<AtomicBool>) -> EventLoopHandle {
         EventLoopHandle {
-            handle: handle,
-            tx_msg_channel: tx_msg_channel,
+            handle: Some(handle),
+            quit: quit,
         }
     }
+}
 
-    pub fn shutdown(self) {
-        if self.tx_msg_channel.send(Message::ShutDown).is_ok() {
-            let _ = self.handle.join();
+impl Drop for EventLoopHandle {
+    fn drop(&mut self) {
+        if let Some(_handle) = self.handle.take() {
+            self.quit.store(true, Ordering::Relaxed);
         }
     }
 }

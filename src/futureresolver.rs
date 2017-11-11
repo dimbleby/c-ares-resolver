@@ -54,6 +54,20 @@ pub struct FutureResolver {
     inner: Resolver,
 }
 
+// Most query implementations follow the same pattern: call through to the
+// `Resolver`, arranging that the callback completes a future.
+macro_rules! futurize {
+    ($resolver:expr, $query:ident, $question:expr) => {
+        {
+            let (c, p) = futures::oneshot();
+            $resolver.$query($question, move |result| {
+                let _ = c.send(result);
+            });
+            CAresFuture::new(p)
+        }
+    }
+}
+
 impl FutureResolver {
     /// Create a new `FutureResolver`, using default `Options`.
     pub fn new() -> Result<FutureResolver, Error> {
@@ -76,212 +90,132 @@ impl FutureResolver {
     /// String format is `host[:port]`.  IPv6 addresses with ports require
     /// square brackets eg `[2001:4860:4860::8888]:53`.
     pub fn set_servers(
-        &mut self,
-        servers: &[&str]) -> Result<&mut Self, c_ares::Error> {
+        &self,
+        servers: &[&str]) -> Result<&Self, c_ares::Error> {
         self.inner.set_servers(servers)?;
         Ok(self)
     }
 
     /// Set the local IPv4 address from which to make queries.
-    pub fn set_local_ipv4(&mut self, ipv4: &Ipv4Addr) -> &mut Self {
+    pub fn set_local_ipv4(&self, ipv4: &Ipv4Addr) -> &Self {
         self.inner.set_local_ipv4(ipv4);
         self
     }
 
     /// Set the local IPv6 address from which to make queries.
-    pub fn set_local_ipv6(&mut self, ipv6: &Ipv6Addr) -> &mut Self {
+    pub fn set_local_ipv6(&self, ipv6: &Ipv6Addr) -> &Self {
         self.inner.set_local_ipv6(ipv6);
         self
     }
 
     /// Set the local device from which to make queries.
-    pub fn set_local_device(&mut self, device: &str) -> &mut Self {
+    pub fn set_local_device(&self, device: &str) -> &Self {
         self.inner.set_local_device(device);
         self
     }
 
     /// Look up the A records associated with `name`.
     pub fn query_a(&self, name: &str) -> CAresFuture<c_ares::AResults> {
-        let (c, p) = futures::oneshot();
-        self.inner.query_a(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, query_a, name)
     }
 
     /// Search for the A records associated with `name`.
     pub fn search_a(&self, name: &str) -> CAresFuture<c_ares::AResults> {
-        let (c, p) = futures::oneshot();
-        self.inner.search_a(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, search_a, name)
     }
 
     /// Look up the AAAA records associated with `name`.
     pub fn query_aaaa(&self, name: &str)  -> CAresFuture<c_ares::AAAAResults> {
-        let (c, p) = futures::oneshot();
-        self.inner.query_aaaa(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, query_aaaa, name)
     }
 
     /// Search for the AAAA records associated with `name`.
     pub fn search_aaaa(&self, name: &str) -> CAresFuture<c_ares::AAAAResults> {
-        let (c, p) = futures::oneshot();
-        self.inner.search_aaaa(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, search_aaaa, name)
     }
 
     /// Look up the CNAME records associated with `name`.
     pub fn query_cname(&self, name: &str)
         -> CAresFuture<c_ares::CNameResults> {
-        let (c, p) = futures::oneshot();
-        self.inner.query_cname(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, query_cname, name)
     }
 
     /// Search for the CNAME records associated with `name`.
     pub fn search_cname(&self, name: &str)
         -> CAresFuture<c_ares::CNameResults> {
-        let (c, p) = futures::oneshot();
-        self.inner.search_cname(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, search_cname, name)
     }
 
     /// Look up the MX records associated with `name`.
     pub fn query_mx(&self, name: &str) -> CAresFuture<c_ares::MXResults> {
-        let (c, p) = futures::oneshot();
-        self.inner.query_mx(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, query_mx, name)
     }
 
     /// Search for the MX records associated with `name`.
     pub fn search_mx(&self, name: &str) -> CAresFuture<c_ares::MXResults> {
-        let (c, p) = futures::oneshot();
-        self.inner.search_mx(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, search_mx, name)
     }
 
     /// Look up the NAPTR records associated with `name`.
     pub fn query_naptr(&self, name: &str)
         -> CAresFuture<c_ares::NAPTRResults> {
-        let (c, p) = futures::oneshot();
-        self.inner.query_naptr(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, query_naptr, name)
     }
 
     /// Search for the NAPTR records associated with `name`.
     pub fn search_naptr(&self, name: &str)
         -> CAresFuture<c_ares::NAPTRResults> {
-        let (c, p) = futures::oneshot();
-        self.inner.search_naptr(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, search_naptr, name)
     }
 
     /// Look up the NS records associated with `name`.
     pub fn query_ns(&self, name: &str) -> CAresFuture<c_ares::NSResults> {
-        let (c, p) = futures::oneshot();
-        self.inner.query_ns(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, query_ns, name)
     }
 
     /// Search for the NS records associated with `name`.
     pub fn search_ns(&self, name: &str) -> CAresFuture<c_ares::NSResults> {
-        let (c, p) = futures::oneshot();
-        self.inner.search_ns(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, search_ns, name)
     }
 
     /// Look up the PTR records associated with `name`.
     pub fn query_ptr(&self, name: &str) -> CAresFuture<c_ares::PTRResults> {
-        let (c, p) = futures::oneshot();
-        self.inner.query_ptr(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, query_ptr, name)
     }
 
     /// Search for the PTR records associated with `name`.
     pub fn search_ptr(&self, name: &str) -> CAresFuture<c_ares::PTRResults> {
-        let (c, p) = futures::oneshot();
-        self.inner.search_ptr(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, search_ptr, name)
     }
 
     /// Look up the SOA records associated with `name`.
     pub fn query_soa(&self, name: &str) -> CAresFuture<c_ares::SOAResult> {
-        let (c, p) = futures::oneshot();
-        self.inner.query_soa(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, query_soa, name)
     }
 
     /// Search for the SOA records associated with `name`.
     pub fn search_soa(&self, name: &str) -> CAresFuture<c_ares::SOAResult> {
-        let (c, p) = futures::oneshot();
-        self.inner.search_soa(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, search_soa, name)
     }
 
     /// Look up the SRV records associated with `name`.
     pub fn query_srv(&self, name: &str) -> CAresFuture<c_ares::SRVResults> {
-        let (c, p) = futures::oneshot();
-        self.inner.query_srv(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, query_srv, name)
     }
 
     /// Search for the SRV records associated with `name`.
     pub fn search_srv(&self, name: &str) -> CAresFuture<c_ares::SRVResults> {
-        let (c, p) = futures::oneshot();
-        self.inner.search_srv(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, search_srv, name)
     }
 
     /// Look up the TXT records associated with `name`.
     pub fn query_txt(&self, name: &str) -> CAresFuture<c_ares::TXTResults> {
-        let (c, p) = futures::oneshot();
-        self.inner.query_txt(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, query_txt, name)
     }
 
     /// Search for the TXT records associated with `name`.
     pub fn search_txt(&self, name: &str) -> CAresFuture<c_ares::TXTResults> {
-        let (c, p) = futures::oneshot();
-        self.inner.search_txt(name, move |result| {
-            let _ = c.send(result);
-        });
-        CAresFuture::new(p)
+        futurize!(self.inner, search_txt, name)
     }
 
     /// Perform a host query by address.
@@ -377,7 +311,7 @@ impl FutureResolver {
     }
 
     /// Cancel all requests made on this `FutureResolver`.
-    pub fn cancel(&mut self) {
+    pub fn cancel(&self) {
         self.inner.cancel()
     }
 }

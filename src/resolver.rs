@@ -121,9 +121,14 @@ impl Options {
 }
 
 /// An asynchronous DNS resolver, which returns results via callbacks.
+///
+/// Note that dropping the resolver will cause all outstanding requests to fail
+/// with result `c_ares::Error::EDESTRUCTION`.
 pub struct Resolver {
     ares_channel: Arc<Mutex<c_ares::Channel>>,
-    event_loop_handle: Option<EventLoopHandle>,
+
+    // Only for ownership - dropping this causes the event loop to quit.
+    _event_loop_handle: EventLoopHandle,
 }
 
 impl Resolver {
@@ -143,7 +148,7 @@ impl Resolver {
         // Return the Resolver.
         let resolver = Resolver {
             ares_channel: channel,
-            event_loop_handle: Some(handle),
+            _event_loop_handle: handle,
         };
         Ok(resolver)
     }
@@ -153,28 +158,25 @@ impl Resolver {
     ///
     /// String format is `host[:port]`.  IPv6 addresses with ports require
     /// square brackets eg `[2001:4860:4860::8888]:53`.
-    pub fn set_servers(
-        &mut self,
-        servers: &[&str]
-    ) -> c_ares::Result<&mut Self> {
+    pub fn set_servers(&self, servers: &[&str]) -> c_ares::Result<&Self> {
         self.ares_channel.lock().unwrap().set_servers(servers)?;
         Ok(self)
     }
 
     /// Set the local IPv4 address from which to make queries.
-    pub fn set_local_ipv4(&mut self, ipv4: &Ipv4Addr) -> &mut Self {
+    pub fn set_local_ipv4(&self, ipv4: &Ipv4Addr) -> &Self {
         self.ares_channel.lock().unwrap().set_local_ipv4(ipv4);
         self
     }
 
     /// Set the local IPv6 address from which to make queries.
-    pub fn set_local_ipv6(&mut self, ipv6: &Ipv6Addr) -> &mut Self {
+    pub fn set_local_ipv6(&self, ipv6: &Ipv6Addr) -> &Self {
         self.ares_channel.lock().unwrap().set_local_ipv6(ipv6);
         self
     }
 
     /// Set the local device from which to make queries.
-    pub fn set_local_device(&mut self, device: &str) -> &mut Self {
+    pub fn set_local_device(&self, device: &str) -> &Self {
         self.ares_channel.lock().unwrap().set_local_device(device);
         self
     }
@@ -347,8 +349,7 @@ impl Resolver {
         address: &IpAddr,
         handler: F
     ) where F: FnOnce(c_ares::Result<c_ares::HostResults>) + Send + 'static {
-         self.ares_channel.lock().unwrap()
-             .get_host_by_address(address, handler)
+        self.ares_channel.lock().unwrap().get_host_by_address(address, handler)
     }
 
     /// Perform a host query by name.
@@ -360,7 +361,7 @@ impl Resolver {
         family: c_ares::AddressFamily,
         handler: F
     ) where F: FnOnce(c_ares::Result<c_ares::HostResults>) + Send + 'static {
-         self.ares_channel.lock().unwrap()
+        self.ares_channel.lock().unwrap()
              .get_host_by_name(name, family, handler);
     }
 
@@ -421,15 +422,7 @@ impl Resolver {
     }
 
     /// Cancel all requests made on this `Resolver`.
-    pub fn cancel(&mut self) {
+    pub fn cancel(&self) {
         self.ares_channel.lock().unwrap().cancel();
-    }
-}
-
-impl Drop for Resolver {
-    fn drop(&mut self) {
-        if let Some(handle) = self.event_loop_handle.take() {
-            handle.shutdown()
-        }
     }
 }
