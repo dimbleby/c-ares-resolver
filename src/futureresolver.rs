@@ -76,26 +76,26 @@ impl FutureResolver {
     /// String format is `host[:port]`.  IPv6 addresses with ports require
     /// square brackets eg `[2001:4860:4860::8888]:53`.
     pub fn set_servers(
-        &mut self,
-        servers: &[&str]) -> Result<&mut Self, c_ares::Error> {
+        &self,
+        servers: &[&str]) -> Result<&Self, c_ares::Error> {
         self.inner.set_servers(servers)?;
         Ok(self)
     }
 
     /// Set the local IPv4 address from which to make queries.
-    pub fn set_local_ipv4(&mut self, ipv4: &Ipv4Addr) -> &mut Self {
+    pub fn set_local_ipv4(&self, ipv4: &Ipv4Addr) -> &Self {
         self.inner.set_local_ipv4(ipv4);
         self
     }
 
     /// Set the local IPv6 address from which to make queries.
-    pub fn set_local_ipv6(&mut self, ipv6: &Ipv6Addr) -> &mut Self {
+    pub fn set_local_ipv6(&self, ipv6: &Ipv6Addr) -> &Self {
         self.inner.set_local_ipv6(ipv6);
         self
     }
 
     /// Set the local device from which to make queries.
-    pub fn set_local_device(&mut self, device: &str) -> &mut Self {
+    pub fn set_local_device(&self, device: &str) -> &Self {
         self.inner.set_local_device(device);
         self
     }
@@ -377,7 +377,7 @@ impl FutureResolver {
     }
 
     /// Cancel all requests made on this `FutureResolver`.
-    pub fn cancel(&mut self) {
+    pub fn cancel(&self) {
         self.inner.cancel()
     }
 }

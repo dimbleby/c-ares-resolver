@@ -124,7 +124,7 @@ impl Options {
 /// An asynchronous DNS resolver, which returns results via callbacks.
 pub struct Resolver {
     ares_channel: Arc<Mutex<c_ares::Channel>>,
-    event_loop_handle: Arc<Mutex<EventLoopHandle>>,
+    event_loop_handle: Arc<EventLoopHandle>,
 }
 
 // For each outstanding query, we want to make sure that the event-loop stays
@@ -166,7 +166,7 @@ impl Resolver {
         // Return the Resolver.
         let resolver = Resolver {
             ares_channel: channel,
-            event_loop_handle: Arc::new(Mutex::new(handle)),
+            event_loop_handle: Arc::new(handle),
         };
         Ok(resolver)
     }
@@ -177,27 +177,27 @@ impl Resolver {
     /// String format is `host[:port]`.  IPv6 addresses with ports require
     /// square brackets eg `[2001:4860:4860::8888]:53`.
     pub fn set_servers(
-        &mut self,
+        &self,
         servers: &[&str]
-    ) -> c_ares::Result<&mut Self> {
+    ) -> c_ares::Result<&Self> {
         self.ares_channel.lock().unwrap().set_servers(servers)?;
         Ok(self)
     }
 
     /// Set the local IPv4 address from which to make queries.
-    pub fn set_local_ipv4(&mut self, ipv4: &Ipv4Addr) -> &mut Self {
+    pub fn set_local_ipv4(&self, ipv4: &Ipv4Addr) -> &Self {
         self.ares_channel.lock().unwrap().set_local_ipv4(ipv4);
         self
     }
 
     /// Set the local IPv6 address from which to make queries.
-    pub fn set_local_ipv6(&mut self, ipv6: &Ipv6Addr) -> &mut Self {
+    pub fn set_local_ipv6(&self, ipv6: &Ipv6Addr) -> &Self {
         self.ares_channel.lock().unwrap().set_local_ipv6(ipv6);
         self
     }
 
     /// Set the local device from which to make queries.
-    pub fn set_local_device(&mut self, device: &str) -> &mut Self {
+    pub fn set_local_device(&self, device: &str) -> &Self {
         self.ares_channel.lock().unwrap().set_local_device(device);
         self
     }
@@ -468,7 +468,7 @@ impl Resolver {
     }
 
     /// Cancel all requests made on this `Resolver`.
-    pub fn cancel(&mut self) {
+    pub fn cancel(&self) {
         self.ares_channel.lock().unwrap().cancel();
     }
 }

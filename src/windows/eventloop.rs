@@ -4,6 +4,10 @@ use std::sync::{
     Arc,
     Mutex,
 };
+use std::sync::atomic::{
+    AtomicBool,
+    Ordering,
+};
 use std::thread;
 use std::time::Duration;
 
@@ -31,17 +35,8 @@ use eventloop::EventLoopHandle;
 // It also waits for a message telling it to shut down.  We use a mio channel
 // here only for consistency with the unix interface.
 pub struct EventLoop {
-    tx_msg_channel: mio_more::channel::Sender<Message>,
-    rx_msg_channel: mio_more::channel::Receiver<Message>,
     pub ares_channel: Arc<Mutex<c_ares::Channel>>,
-    quit: bool,
-}
-
-// Messages for the event loop.
-#[derive(Debug)]
-pub enum Message {
-    // 'Shut down'.
-    ShutDown,
+    quit: Arc<AtomicBool>,
 }
 
 impl EventLoop {
@@ -53,19 +48,14 @@ impl EventLoop {
             WSAStartup(0x101, &mut wsadata);
         }
 
-        // Create the message channel.
-        let (tx, rx) = mio_more::channel::channel();
-
         // Create the c-ares channel.
         let ares_channel = c_ares::Channel::with_options(options)?;
         let locked_channel = Arc::new(Mutex::new(ares_channel));
 
         // Create and return the event loop.
         let event_loop = EventLoop {
-            tx_msg_channel: tx,
-            rx_msg_channel: rx,
             ares_channel: locked_channel,
-            quit: false,
+            quit: Arc::new(AtomicBool::new(false)),
         };
         Ok(event_loop)
     }
@@ -113,18 +103,7 @@ impl EventLoop {
                         .process(&mut read_fds, &mut write_fds),
                 }
             }
-
-            // Check whether we've been asked to quit.
-            self.handle_messages();
-            if self.quit { break }
-        }
-    }
-
-    // Process messages incoming on the channel.
-    fn handle_messages(&mut self) {
-        // The only possible message is an instruction to shut down.
-        if let Ok(Message::ShutDown) = self.rx_msg_channel.try_recv() {
-            self.quit = true;
+            if self.quit.load(Ordering::Relaxed) { break }
         }
     }
 }
