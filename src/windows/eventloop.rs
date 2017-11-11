@@ -31,9 +31,6 @@ use eventloop::EventLoopHandle;
 
 // The EventLoop will use select() to check on the status of file descriptors
 // that c-ares cares about.
-//
-// It also waits for a message telling it to shut down.  We use a mio channel
-// here only for consistency with the unix interface.
 pub struct EventLoop {
     pub ares_channel: Arc<Mutex<c_ares::Channel>>,
     quit: Arc<AtomicBool>,

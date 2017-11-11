@@ -25,8 +25,6 @@ use eventloop::EventLoopHandle;
 //
 // -  events telling it that something has happened on one of these file
 //    descriptors.  When this happens, it tells the c_ares::Channel about it.
-//
-// -  a message telling it to shut down.
 pub struct EventLoop {
     poll: mio::Poll,
     rx_msg_channel: mio_more::channel::Receiver<Message>,
