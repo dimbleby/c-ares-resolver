@@ -18,14 +18,15 @@ use resolver::{
 
 /// The type of future returned by methods on the `FutureResolver`.
 pub struct CAresFuture<T> {
-    inner: futures::sync::oneshot::Receiver<Result<T, c_ares::Error>>,
+    inner: futures::sync::oneshot::Receiver<c_ares::Result<T>>,
 }
 
 impl<T> CAresFuture<T> {
-    fn new(p: futures::sync::oneshot::Receiver<Result<T, c_ares::Error>>)
-        -> Self {
+    fn new(promise: futures::sync::oneshot::Receiver<c_ares::Result<T>>)
+        -> Self
+    {
         CAresFuture {
-            inner: p,
+            inner: promise,
         }
     }
 }
@@ -225,7 +226,8 @@ impl FutureResolver {
     /// a problem for you, you should prefer to use the analogous method on the
     /// `Resolver`.
     pub fn get_host_by_address(&self, address: &IpAddr)
-        -> CAresFuture<HostResults> {
+        -> CAresFuture<HostResults>
+    {
         let (c, p) = futures::oneshot();
         self.inner.get_host_by_address(address, move |result| {
             let _ = c.send(result.map(|h| h.into()));
@@ -240,7 +242,8 @@ impl FutureResolver {
     /// a problem for you, you should prefer to use the analogous method on the
     /// `Resolver`.
     pub fn get_host_by_name(&self, name: &str, family: c_ares::AddressFamily)
-        -> CAresFuture<HostResults> {
+        -> CAresFuture<HostResults>
+    {
         let (c, p) = futures::oneshot();
         self.inner.get_host_by_name(name, family, move |result| {
             let _ = c.send(result.map(|h| h.into()));
@@ -258,7 +261,8 @@ impl FutureResolver {
         &self,
         address: &SocketAddr,
         flags: c_ares::NIFlags)
-        -> CAresFuture<NameInfoResult> {
+        -> CAresFuture<NameInfoResult>
+    {
         let (c, p) = futures::oneshot();
         self.inner.get_name_info(address, flags, move |result| {
             let _ = c.send(result.map(|n| n.into()));
@@ -280,7 +284,8 @@ impl FutureResolver {
     /// preferred.  Usually, if a suitable `query_xxx()` is available, that
     /// should be used.
     pub fn query(&self, name: &str, dns_class: u16, query_type: u16)
-        -> CAresFuture<Vec<u8>> {
+        -> CAresFuture<Vec<u8>>
+    {
         let (c, p) = futures::oneshot();
         self.inner.query(name, dns_class, query_type, move |result| {
             let _ = c.send(result.map(|bs| bs.to_owned()));
@@ -302,7 +307,8 @@ impl FutureResolver {
     /// preferred.  Usually, if a suitable `search_xxx()` is available, that
     /// should be used.
     pub fn search(&self, name: &str, dns_class: u16, query_type: u16)
-        -> CAresFuture<Vec<u8>> {
+        -> CAresFuture<Vec<u8>>
+    {
         let (c, p) = futures::oneshot();
         self.inner.search(name, dns_class, query_type, move |result| {
             let _ = c.send(result.map(|bs| bs.to_owned()));
