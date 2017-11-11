@@ -9,7 +9,7 @@ use std::error::Error;
 use c_ares_resolver::FutureResolver;
 use futures::future::Future;
 
-fn print_mx_results(result: &Result<c_ares::MXResults, c_ares::Error>) {
+fn print_mx_results(result: &c_ares::Result<c_ares::MXResults>) {
     match *result {
         Err(ref e) => {
             println!("MX lookup failed with error '{}'", e.description());
@@ -37,7 +37,7 @@ fn main() {
         })
     };
 
-    // Run the query to completion and print the results.
+    // Run the query to completion.
     let mut event_loop = tokio_core::reactor::Core::new().expect("Failed to create event loop");
     event_loop.run(query).ok();
 }

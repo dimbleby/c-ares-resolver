@@ -11,7 +11,7 @@ use std::sync::mpsc;
 use c_ares_resolver::Resolver;
 use dns_parser::Packet;
 
-fn handle_result(result: &Result<&[u8], c_ares::Error>) {
+fn handle_result(result: &c_ares::Result<&[u8]>) {
     match *result {
         Err(ref e) => {
             println!("Query failed with error '{}'", e.description());

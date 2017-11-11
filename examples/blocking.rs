@@ -7,7 +7,7 @@ use std::str;
 
 use c_ares_resolver::BlockingResolver;
 
-fn print_txt_results(result: &Result<c_ares::TXTResults, c_ares::Error>) {
+fn print_txt_results(result: &c_ares::Result<c_ares::TXTResults>) {
     match *result {
         Err(ref e) => {
             println!("TXT lookup failed with error '{}'", e.description());
