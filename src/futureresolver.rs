@@ -47,8 +47,8 @@ impl<T> Future for CAresFuture<T> {
 /// `futures::Future`s.
 ///
 /// Note that dropping the `FutureResolver` does *not* cause outstanding
-/// queries to be cancelled - contrast the `Resolver` - because the
-/// returned futures hold a reference to the underlying resolver.
+/// queries to fail - contrast the `Resolver` - because the returned
+/// futures hold a reference to the underlying resolver.
 pub struct FutureResolver {
     inner: Arc<Resolver>,
 }
