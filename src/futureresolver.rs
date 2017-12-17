@@ -45,6 +45,10 @@ impl<T> Future for CAresFuture<T> {
 
 /// An asynchronous DNS resolver, which returns results as
 /// `futures::Future`s.
+///
+/// Note that dropping the `FutureResolver` does *not* cause outstanding
+/// queries to be cancelled - contrast the `Resolver` - because the
+/// returned futures hold a reference to the underlying resolver.
 pub struct FutureResolver {
     inner: Arc<Resolver>,
 }
