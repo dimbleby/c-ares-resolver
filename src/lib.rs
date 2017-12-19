@@ -56,9 +56,6 @@ extern crate mio;
 #[cfg(windows)]
 extern crate winapi;
 
-#[cfg(windows)]
-extern crate ws2_32;
-
 mod blockingresolver;
 mod error;
 mod eventloop;

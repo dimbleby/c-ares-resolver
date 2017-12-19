@@ -5,8 +5,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::Duration;
 
-use winapi::winsock2::{fd_set, timeval, SOCKET_ERROR, WSADATA};
-use ws2_32::{select, WSACleanup, WSAStartup};
+use winapi::um::winsock2::{fd_set, select, timeval, WSACleanup, WSAStartup, SOCKET_ERROR, WSADATA};
 
 use c_ares;
 
@@ -67,7 +66,7 @@ impl EventLoop {
             } else {
                 let timeout = timeval {
                     tv_sec: 0,
-                    tv_usec: 100000,
+                    tv_usec: 100_000,
                 };
                 let results =
                     unsafe { select(0, &mut read_fds, &mut write_fds, ptr::null_mut(), &timeout) };
