@@ -15,7 +15,7 @@ categories = ["asynchronous", "network-programming"]
 [dependencies]
 c-ares = "4"
 futures = "0.1"
-mio-extras = "1"
+mio-extras = "2"
 
 [target.'cfg(unix)'.dependencies]
 mio = "0.6"
