@@ -12,7 +12,7 @@ This crate does that hard work for you so that the presented API is much more st
 
 ## Documentation ##
 
-API documentation is [here](http://dimbleby.github.io/c-ares-resolver).
+API documentation is [here](https://docs.rs/c-ares-resolver).
 
 ## Examples ##
 
