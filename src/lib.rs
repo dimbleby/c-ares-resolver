@@ -48,7 +48,7 @@
 #![deny(missing_docs)]
 extern crate c_ares;
 extern crate futures;
-extern crate mio_more;
+extern crate mio_extras;
 
 #[cfg(unix)]
 extern crate mio;

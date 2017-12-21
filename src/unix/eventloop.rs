@@ -6,7 +6,7 @@ use std::time::Duration;
 
 use c_ares;
 use mio;
-use mio_more;
+use mio_extras;
 
 use error::Error;
 use eventloop::EventLoopHandle;
@@ -21,7 +21,7 @@ use eventloop::EventLoopHandle;
 //    descriptors.  When this happens, it tells the c_ares::Channel about it.
 pub struct EventLoop {
     poll: mio::Poll,
-    rx_msg_channel: mio_more::channel::Receiver<Message>,
+    rx_msg_channel: mio_extras::channel::Receiver<Message>,
     tracked_fds: HashSet<c_ares::Socket>,
     pub ares_channel: Arc<Mutex<c_ares::Channel>>,
     quit: Arc<AtomicBool>,
@@ -50,7 +50,7 @@ impl EventLoop {
         // Create a mio::Poll on which to wait for events, and register a
         // channel with it.
         let poll = mio::Poll::new()?;
-        let (tx, rx) = mio_more::channel::channel();
+        let (tx, rx) = mio_extras::channel::channel();
         poll.register(&rx, CHANNEL, mio::Ready::readable(), mio::PollOpt::edge())?;
 
         // Whenever c-ares tells us what to do with a file descriptor, we'll
