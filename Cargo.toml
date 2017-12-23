@@ -7,7 +7,7 @@ description = """
 An asynchronous DNS resolver, backed by c-ares.
 """
 repository = "https://github.com/dimbleby/c-ares-resolver"
-documentation = "https://dimbleby.github.io/c-ares-resolver"
+documentation = "https://docs.rs/c-ares-resolver"
 readme = "README.md"
 keywords = ["DNS", "c-ares", "futures"]
 categories = ["asynchronous", "network-programming"]
