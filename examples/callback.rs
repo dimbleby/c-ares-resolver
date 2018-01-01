@@ -15,9 +15,9 @@ fn print_a_results(result: &c_ares::Result<c_ares::AResults>) {
         Ok(ref a_results) => {
             println!("Successful A lookup...");
             for a_result in a_results {
-                 println!("IPv4: {}, TTL {}", a_result.ipv4(), a_result.ttl());
+                println!("IPv4: {}, TTL {}", a_result.ipv4(), a_result.ttl());
             }
-        },
+        }
     }
 }
 
@@ -32,13 +32,10 @@ fn main() {
 
     // Create a resolver and make a query.
     let resolver = Resolver::new().expect("Failed to create resolver");
-    resolver.query_a(
-        "apple.com",
-        move |result| {
-            print_a_results(&result);
-            tx.send(()).unwrap();
-        },
-    );
+    resolver.query_a("apple.com", move |result| {
+        print_a_results(&result);
+        tx.send(()).unwrap();
+    });
 
     // Wait to be told that the callback has happened.
     rx.recv().unwrap();
