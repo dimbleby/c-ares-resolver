@@ -1,4 +1,4 @@
-//! A convenient wrapper for the [`c-ares`](http://c-ares.haxx.se) library.
+//! A convenient wrapper for the [`c-ares`](https://c-ares.haxx.se) library.
 //!
 //! The [`c-ares` crate](https://crates.io/crates/c-ares) provides a safe wrapper around the
 //! underlying C library, but it's relatively hard work to use: the user needs to drive the polling
