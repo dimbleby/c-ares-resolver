@@ -68,7 +68,7 @@ impl EventLoop {
         let event_loop = EventLoop {
             poll: poll,
             rx_msg_channel: rx,
-            tracked_fds: HashSet::<c_ares::Socket>::new(),
+            tracked_fds: HashSet::new(),
             ares_channel: locked_channel,
             quit: Arc::new(AtomicBool::new(false)),
         };
