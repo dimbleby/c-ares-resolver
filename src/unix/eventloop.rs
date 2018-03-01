@@ -66,7 +66,7 @@ impl EventLoop {
 
         // Create and return the event loop.
         let event_loop = EventLoop {
-            poll: poll,
+            poll,
             rx_msg_channel: rx,
             tracked_fds: HashSet::new(),
             ares_channel: locked_channel,

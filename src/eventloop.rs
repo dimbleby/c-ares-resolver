@@ -17,7 +17,7 @@ impl EventLoopHandle {
     pub fn new(handle: thread::JoinHandle<()>, quit: Arc<AtomicBool>) -> EventLoopHandle {
         EventLoopHandle {
             handle: Some(handle),
-            quit: quit,
+            quit,
         }
     }
 }

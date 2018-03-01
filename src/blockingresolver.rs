@@ -36,7 +36,7 @@ impl BlockingResolver {
     /// Create a new `BlockingResolver`, with the given `Options`.
     pub fn with_options(options: Options) -> Result<BlockingResolver, Error> {
         let inner = Resolver::with_options(options)?;
-        let resolver = BlockingResolver { inner: inner };
+        let resolver = BlockingResolver { inner };
         Ok(resolver)
     }
 
