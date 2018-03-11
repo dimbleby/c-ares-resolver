@@ -18,14 +18,18 @@ API documentation is [here](https://docs.rs/c-ares-resolver).
 
 ```rust
 extern crate c_ares_resolver;
-extern crate tokio_core;
+extern crate futures;
+extern crate tokio;
+use std::error::Error;
+use futures::future::Future;
 
 fn main() {
     let resolver = c_ares_resolver::FutureResolver::new().unwrap();
-    let query = resolver.query_a("google.com");
-    let mut event_loop = tokio_core::reactor::Core::new().unwrap();
-    let result = event_loop.run(query).unwrap();
-    println!("{}", result);
+    let query = resolver
+        .query_a("google.com")
+        .map_err(|e| println!("Lookup failed with error '{}'", e.description()))
+        .map(|result| println!("{}", result));
+    tokio::run(query);
 }
 ```
 

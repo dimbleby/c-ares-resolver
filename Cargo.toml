@@ -24,4 +24,4 @@ mio = "0.6"
 winapi = { version = "0.3", features = ["winsock2"] }
 
 [dev-dependencies]
-tokio-core = "0.1"
+tokio = "0.1"

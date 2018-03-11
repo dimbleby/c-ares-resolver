@@ -2,42 +2,27 @@
 extern crate c_ares;
 extern crate c_ares_resolver;
 extern crate futures;
-extern crate tokio_core;
+extern crate tokio;
 
 use std::error::Error;
 
 use c_ares_resolver::FutureResolver;
 use futures::future::Future;
 
-fn print_mx_results(result: &c_ares::Result<c_ares::MXResults>) {
-    match *result {
-        Err(ref e) => {
-            println!("MX lookup failed with error '{}'", e.description());
-        }
-        Ok(ref mx_results) => {
-            println!("Successful MX lookup...");
-            for mx_result in mx_results {
-                println!(
-                    "host {}, priority {}",
-                    mx_result.host(),
-                    mx_result.priority()
-                );
-            }
-        }
-    }
-}
-
 fn main() {
     // Create Resolver and make a query.
     let query = {
         let resolver = FutureResolver::new().expect("Failed to create resolver");
-        resolver.query_mx("gmail.com").then(|result| {
-            print_mx_results(&result);
-            result
-        })
+        resolver
+            .query_mx("gmail.com")
+            .map_err(|e| println!("MX lookup failed with error '{}'", e.description()))
+            .map(|results| {
+                for result in &results {
+                    println!("host {}, priority {}", result.host(), result.priority());
+                }
+            })
     };
 
     // Run the query to completion.
-    let mut event_loop = tokio_core::reactor::Core::new().expect("Failed to create event loop");
-    event_loop.run(query).ok();
+    tokio::run(query);
 }
