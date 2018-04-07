@@ -13,9 +13,9 @@ keywords = ["DNS", "c-ares", "futures"]
 categories = ["asynchronous", "network-programming"]
 
 [dependencies]
-c-ares = "5"
+c-ares = "5.0.3"
 futures = "0.1"
-mio-extras = "2"
+mio-extras = "2.0.4"
 
 [target.'cfg(unix)'.dependencies]
 mio = "0.6"
