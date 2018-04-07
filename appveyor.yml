@@ -37,6 +37,8 @@ build: false
 test_script:
   - cargo build
   - cargo test -j1
+  - if [%channel%]==[nightly] (cargo update -Z minimal-versions)
+  - if [%channel%]==[nightly] (cargo build)
 
 matrix:
   allow_failures:
