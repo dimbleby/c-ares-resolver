@@ -1,21 +1,15 @@
-//! A convenient wrapper for the [`c-ares`](https://c-ares.haxx.se) library.
+//! DNS resolvers built on [`c-ares`](https://c-ares.haxx.se), for asynchronous DNS requests.
 //!
-//! The [`c-ares` crate](https://crates.io/crates/c-ares) provides a safe wrapper around the
-//! underlying C library, but it's relatively hard work to use: the user needs to drive the polling
-//! of file descriptors according to `c-ares` demands, which likely involves writing something
-//! close to a full-blown event loop.
+//! This crate provides three resolver types: the `Resolver`, the `FutureResolver`, and the
+//! `BlockingResolver`:
 //!
-//! This crate does that hard work for you so that the presented API is much more straightforward.
-//! Simply create a `Resolver`, and make your query - providing a callback to be called when the
-//! query completes.
+//! * The `Resolver` is the thinnest wrapper around the underlying `c-ares` library.  It returns
+//! answers via callbacks.  The other resolvers are built on top of this.
 //!
-//! This crate also provides a `FutureResolver`.  Queries on this object return `futures::Future`
-//! objects, and don't use callbacks.
+//! * The `FutureResolver` returns answers as `futures::Future`s.
 //!
-//! Additionally, this crate provides a `BlockingResolver`.  Usually if you're using `c-ares`, it's
-//! because you care about high-performance, asynchronous code.  But sometimes you'd just like to
-//! make a query with as little ceremony as possible, and you're willing to have your code block
-//! while you do it.  In such cases the `BlockingResolver` is the most convenient option.
+//! * The `BlockingResolver` isn't asynchronous at all - as the name suggests, it blocks until the
+//! lookup completes.
 //!
 //! On all resolvers:
 //!
