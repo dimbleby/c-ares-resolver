@@ -14,7 +14,7 @@
 //! On all resolvers:
 //!
 //! -  methods like `query_xxx` correspond to the `c-ares` function `ares_query`, which "initiates
-//! a single-question DNS query"
+//! a single-question DNS query".
 //!
 //! -  methods like `search_xxx` correspond to the `c-ares` function `ares_search`, which
 //! "initiates a series of single-question DNS queries ... using the channel's search domains as
