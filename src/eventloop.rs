@@ -8,15 +8,16 @@ pub use unix::eventloop::EventLoop;
 #[cfg(windows)]
 pub use windows::eventloop::EventLoop;
 
+// Dropping the EventLoopHandle causes the event loop to quit.
 pub struct EventLoopHandle {
-    handle: Option<thread::JoinHandle<()>>,
+    _handle: thread::JoinHandle<()>,
     quit: Arc<AtomicBool>,
 }
 
 impl EventLoopHandle {
     pub fn new(handle: thread::JoinHandle<()>, quit: Arc<AtomicBool>) -> EventLoopHandle {
         EventLoopHandle {
-            handle: Some(handle),
+            _handle: handle,
             quit,
         }
     }
@@ -24,8 +25,6 @@ impl EventLoopHandle {
 
 impl Drop for EventLoopHandle {
     fn drop(&mut self) {
-        if let Some(_handle) = self.handle.take() {
-            self.quit.store(true, Ordering::Relaxed);
-        }
+        self.quit.store(true, Ordering::Relaxed);
     }
 }
