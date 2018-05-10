@@ -1,6 +1,6 @@
+use c_ares;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::sync::mpsc;
-use c_ares;
 
 use error::Error;
 use host::HostResults;
@@ -15,15 +15,11 @@ pub struct BlockingResolver {
 // Most query implementations follow the same pattern: call through to the
 // `Resolver`, arranging that the callback sends the result down a channel.
 macro_rules! blockify {
-    ($resolver:expr, $query:ident, $question:expr) => {
-        {
-            let (tx, rx) = mpsc::channel();
-            $resolver.$query($question, move |result| {
-                tx.send(result).unwrap()
-            });
-            rx.recv().unwrap()
-        }
-    }
+    ($resolver:expr, $query:ident, $question:expr) => {{
+        let (tx, rx) = mpsc::channel();
+        $resolver.$query($question, move |result| tx.send(result).unwrap());
+        rx.recv().unwrap()
+    }};
 }
 
 impl BlockingResolver {

@@ -1,8 +1,8 @@
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
-use std::sync::Arc;
 use c_ares;
 use futures;
 use futures::Future;
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
+use std::sync::Arc;
 
 use error::Error;
 use host::HostResults;
@@ -56,16 +56,14 @@ pub struct FutureResolver {
 // Most query implementations follow the same pattern: call through to the
 // `Resolver`, arranging that the callback completes a future.
 macro_rules! futurize {
-    ($resolver:expr, $query:ident, $question:expr) => {
-        {
-            let (c, p) = futures::oneshot();
-            $resolver.$query($question, move |result| {
-                let _ = c.send(result);
-            });
-            let resolver = Arc::clone(&$resolver);
-            CAresFuture::new(p, resolver)
-        }
-    }
+    ($resolver:expr, $query:ident, $question:expr) => {{
+        let (c, p) = futures::oneshot();
+        $resolver.$query($question, move |result| {
+            let _ = c.send(result);
+        });
+        let resolver = Arc::clone(&$resolver);
+        CAresFuture::new(p, resolver)
+    }};
 }
 
 impl FutureResolver {
