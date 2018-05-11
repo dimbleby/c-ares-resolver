@@ -1,3 +1,8 @@
+## 4.0.3 (11 May 2018)
+
+* Improved docs and examples
+* Minor reworking of event loop shutdown
+
 ## 4.0.2 (7 Apr 2018)
 
 * Bump dependencies (fixes minimal-versions build on OSX)
