@@ -10,7 +10,6 @@ use winapi::um::winsock2::{fd_set, select, timeval, WSACleanup, WSAStartup, SOCK
 use c_ares;
 
 use error::Error;
-use eventloop::EventLoopHandle;
 
 // The EventLoop will use select() to check on the status of file descriptors
 // that c-ares cares about.
@@ -41,10 +40,10 @@ impl EventLoop {
     }
 
     // Run the event loop.
-    pub fn run(self) -> EventLoopHandle {
-        let quit = Arc::clone(&self.quit);
-        let join_handle = thread::spawn(|| self.event_loop_thread());
-        EventLoopHandle::new(join_handle, quit)
+    pub fn run(self) -> Arc<AtomicBool> {
+        let stopper = Arc::clone(&self.quit);
+        thread::spawn(|| self.event_loop_thread());
+        stopper
     }
 
     // Event loop thread - waits for events, and handles them.

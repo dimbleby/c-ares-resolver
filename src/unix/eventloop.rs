@@ -9,7 +9,6 @@ use mio;
 use mio_extras;
 
 use error::Error;
-use eventloop::EventLoopHandle;
 
 // The EventLoop will set up a mio::Poll and use it to wait for the following:
 //
@@ -76,10 +75,10 @@ impl EventLoop {
     }
 
     // Run the event loop.
-    pub fn run(self) -> EventLoopHandle {
-        let quit = Arc::clone(&self.quit);
-        let join_handle = thread::spawn(|| self.event_loop_thread());
-        EventLoopHandle::new(join_handle, quit)
+    pub fn run(self) -> Arc<AtomicBool> {
+        let stopper = Arc::clone(&self.quit);
+        thread::spawn(|| self.event_loop_thread());
+        stopper
     }
 
     // Event loop thread - waits for events, and handles them.

@@ -1,10 +1,11 @@
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::sync::{Arc, Mutex};
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use c_ares;
 
 use error::Error;
-use eventloop::{EventLoop, EventLoopHandle};
+use eventloop::EventLoop;
 
 /// Used to configure the behaviour of the resolver.
 #[derive(Default)]
@@ -116,8 +117,14 @@ impl Options {
 pub struct Resolver {
     ares_channel: Arc<Mutex<c_ares::Channel>>,
 
-    // Only for ownership - dropping this causes the event loop to quit.
-    _event_loop_handle: EventLoopHandle,
+    // Set this true to stop the underlying event loop.
+    event_loop_stopper: Arc<AtomicBool>,
+}
+
+impl Drop for Resolver {
+    fn drop(&mut self) {
+        self.event_loop_stopper.store(true, Ordering::Relaxed);
+    }
 }
 
 impl Resolver {
@@ -132,12 +139,12 @@ impl Resolver {
         // Create and run the event loop.
         let event_loop = EventLoop::new(options.inner)?;
         let channel = Arc::clone(&event_loop.ares_channel);
-        let handle = event_loop.run();
+        let stopper = event_loop.run();
 
         // Return the Resolver.
         let resolver = Resolver {
             ares_channel: channel,
-            _event_loop_handle: handle,
+            event_loop_stopper: stopper,
         };
         Ok(resolver)
     }
