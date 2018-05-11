@@ -1,10 +1,10 @@
 ## 4.0.2 (7 Apr 2018)
 
-Bump dependencies (fixes minimal-versions build on OSX)
+* Bump dependencies (fixes minimal-versions build on OSX)
 
 ## 4.0.1 (7 Apr 2018)
 
-Bump dependencies (fixes minimal-versions build)
+* Bump dependencies (fixes minimal-versions build)
 
 ## 4.0.0 (4 Jan 2018)
 
