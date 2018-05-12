@@ -1,6 +1,6 @@
 //! DNS resolvers built on [`c-ares`](https://c-ares.haxx.se), for asynchronous DNS requests.
 //!
-//! This crate provides three resolver types: the `Resolver`, the `FutureResolver`, and the
+//! This crate provides three resolver types - the `Resolver`, the `FutureResolver`, and the
 //! `BlockingResolver`:
 //!
 //! * The `Resolver` is the thinnest wrapper around the underlying `c-ares` library.  It returns

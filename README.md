@@ -2,7 +2,7 @@
 
 DNS resolvers built on [`c-ares`](https://github.com/dimbleby/rust-c-ares/), for asynchronous DNS requests.
 
-This crate provides three resolver types: the `Resolver`, the `FutureResolver`, and the `BlockingResolver`:
+This crate provides three resolver types - the `Resolver`, the `FutureResolver`, and the `BlockingResolver`:
 
 * The `Resolver` is the thinnest wrapper around the underlying `c-ares` library.  It returns answers via callbacks.  The other resolvers are built on top of this.
 * The `FutureResolver` returns answers as `futures::Future`s.

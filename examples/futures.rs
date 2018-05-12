@@ -10,7 +10,7 @@ use c_ares_resolver::FutureResolver;
 use futures::future::Future;
 
 fn main() {
-    // Create Resolver and make a query.
+    // Create resolver and make a query.
     let resolver = FutureResolver::new().expect("Failed to create resolver");
     let query = resolver
         .query_mx("gmail.com")
