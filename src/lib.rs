@@ -68,6 +68,9 @@ mod unix;
 #[cfg(windows)]
 mod windows;
 
+#[cfg(test)]
+mod tests;
+
 pub use blockingresolver::BlockingResolver;
 pub use error::Error;
 pub use futureresolver::{CAresFuture, FutureResolver};
