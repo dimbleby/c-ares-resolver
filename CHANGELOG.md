@@ -1,3 +1,7 @@
+## 5.0.0 (27 May 2018)
+
+* Bump dependencies (bump to `c-ares` is a breaking change)
+
 ## 4.0.3 (11 May 2018)
 
 * Improved docs and examples

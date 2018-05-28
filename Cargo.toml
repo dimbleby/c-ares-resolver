@@ -1,7 +1,7 @@
 [package]
 name = "c-ares-resolver"
 license = "MIT"
-version = "4.0.3"
+version = "5.0.0"
 authors = ["David Hotham"]
 description = """
 An asynchronous DNS resolver, backed by c-ares.
@@ -13,7 +13,7 @@ keywords = ["DNS", "c-ares", "futures"]
 categories = ["asynchronous", "network-programming"]
 
 [dependencies]
-c-ares = "5.0.4"
+c-ares = "6"
 futures = "0.1"
 mio-extras = "2.0.4"
 

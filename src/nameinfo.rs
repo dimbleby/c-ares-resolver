@@ -1,13 +1,15 @@
+use std::ffi::CString;
+
 use c_ares;
 
 /// An owned version of `c_ares::NameInfoResult`.
 #[derive(Clone, Eq, PartialEq, Debug, Hash, PartialOrd, Ord)]
 pub struct NameInfoResult {
     /// The node returned by the lookup.
-    pub node: Option<String>,
+    pub node: Option<CString>,
 
     /// The service returned by the lookup.
-    pub service: Option<String>,
+    pub service: Option<CString>,
 }
 
 impl<'a> From<c_ares::NameInfoResult<'a>> for NameInfoResult {

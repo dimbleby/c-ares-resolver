@@ -17,7 +17,11 @@ fn main() {
         .map_err(|e| println!("MX lookup failed with error '{}'", e.description()))
         .map(|results| {
             for result in &results {
-                println!("host {}, priority {}", result.host(), result.priority());
+                println!(
+                    "host {}, priority {}",
+                    result.host().to_string_lossy(),
+                    result.priority()
+                );
             }
         });
 
