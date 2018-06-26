@@ -1,3 +1,7 @@
+## 6.0.0 (unreleased)
+
+* Take small arguments by value, per clippy's `trivially_copy_pass_by_ref`
+
 ## 5.0.0 (27 May 2018)
 
 * Bump dependencies (bump to `c-ares` is a breaking change)
