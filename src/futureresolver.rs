@@ -93,7 +93,7 @@ impl FutureResolver {
     }
 
     /// Set the local IPv4 address from which to make queries.
-    pub fn set_local_ipv4(&self, ipv4: &Ipv4Addr) -> &Self {
+    pub fn set_local_ipv4(&self, ipv4: Ipv4Addr) -> &Self {
         self.inner.set_local_ipv4(ipv4);
         self
     }
