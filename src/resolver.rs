@@ -161,7 +161,7 @@ impl Resolver {
 
     /// Set the local IPv4 address from which to make queries.
     pub fn set_local_ipv4(&self, ipv4: Ipv4Addr) -> &Self {
-        self.ares_channel.lock().unwrap().set_local_ipv4(&ipv4);
+        self.ares_channel.lock().unwrap().set_local_ipv4(ipv4);
         self
     }
 
