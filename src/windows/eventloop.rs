@@ -5,7 +5,9 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 
-use winapi::um::winsock2::{fd_set, select, timeval, WSACleanup, WSAStartup, SOCKET_ERROR, WSADATA};
+use winapi::um::winsock2::{
+    fd_set, select, timeval, WSACleanup, WSAStartup, SOCKET_ERROR, WSADATA,
+};
 
 use c_ares;
 
