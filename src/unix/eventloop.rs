@@ -87,7 +87,8 @@ impl EventLoop {
         loop {
             // Wait for something to happen.
             let timeout = Duration::from_millis(100);
-            let results = self.poll
+            let results = self
+                .poll
                 .poll(&mut events, Some(timeout))
                 .expect("poll failed");
 

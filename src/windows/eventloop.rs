@@ -57,7 +57,8 @@ impl EventLoop {
         loop {
             read_fds.fd_count = 0;
             write_fds.fd_count = 0;
-            let count = self.ares_channel
+            let count = self
+                .ares_channel
                 .lock()
                 .unwrap()
                 .fds(&mut read_fds, &mut write_fds);
@@ -75,7 +76,8 @@ impl EventLoop {
                 // Process whatever happened.
                 match results {
                     SOCKET_ERROR => panic!("Socket error"),
-                    _ => self.ares_channel
+                    _ => self
+                        .ares_channel
                         .lock()
                         .unwrap()
                         .process(&mut read_fds, &mut write_fds),
