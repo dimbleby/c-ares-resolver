@@ -84,9 +84,9 @@ impl EventLoop {
     // Event loop thread - waits for events, and handles them.
     fn event_loop_thread(mut self) {
         let mut events = mio::Events::with_capacity(16);
+        let timeout = Duration::from_millis(100);
         loop {
             // Wait for something to happen.
-            let timeout = Duration::from_millis(100);
             let results = self
                 .poll
                 .poll(&mut events, Some(timeout))
