@@ -22,12 +22,11 @@ fn print_a_results(result: &c_ares::Result<c_ares::AResults>) {
 }
 
 fn main() {
-    // We'll need to be careful while we're waiting for our callback.  Dropping
-    // the resolver would cause the outstanding query to fail - and if we
-    // exited the main thread too soon we wouldn't see even that happen.
+    // We'll need to be careful while we're waiting for our callback.  Dropping the resolver would
+    // cause the outstanding query to fail - and if we exited the main thread too soon we wouldn't
+    // see even that happen.
     //
-    // Create a channel that the callback will use to tell the main thread that
-    // it is done.
+    // Create a channel that the callback will use to tell the main thread that it is done.
     let (tx, rx) = mpsc::channel();
 
     // Create a resolver and make a query.
