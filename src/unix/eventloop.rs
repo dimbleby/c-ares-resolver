@@ -12,12 +12,11 @@ use error::Error;
 
 // The EventLoop will set up a mio::Poll and use it to wait for the following:
 //
-// -  messages telling it which file descriptors it should be interested in.
-//    These file descriptors are then registered (or deregistered) with the
-//    mio::Poll as required.
+// - messages telling it which file descriptors it should be interested in.  These file
+// descriptors are then registered (or deregistered) with the mio::Poll as required.
 //
-// -  events telling it that something has happened on one of these file
-//    descriptors.  When this happens, it tells the c_ares::Channel about it.
+// - events telling it that something has happened on one of these file descriptors.  When this
+// happens, it tells the c_ares::Channel about it.
 pub struct EventLoop {
     poll: mio::Poll,
     rx_msg_channel: mio_extras::channel::Receiver<Message>,
@@ -29,18 +28,16 @@ pub struct EventLoop {
 // Messages for the event loop.
 #[derive(Debug)]
 pub enum Message {
-    // 'Notify me when this file descriptor becomes readable, or writable'.
-    // The first bool is for 'readable' and the second is for 'writable'.  It's
-    // allowed to set both of these - or neither, meaning 'I am no longer
-    // interested in this file descriptor'.
+    // 'Notify me when this file descriptor becomes readable, or writable'.  The first bool is for
+    // 'readable' and the second is for 'writable'.  It's allowed to set both of these - or
+    // neither, meaning 'I am no longer interested in this file descriptor'.
     RegisterInterest(c_ares::Socket, bool, bool),
 }
 
-// A token identifying that the message channel has become available for
-// reading.
+// A token identifying that the message channel has become available for reading.
 //
-// We use Token(fd) for file descriptors, so this relies on zero not being a
-// valid file descriptor for c-ares to use.  Zero is stdin, so that's true.
+// We use Token(fd) for file descriptors, so this relies on zero not being a valid file descriptor
+// for c-ares to use.  Zero is stdin, so that's true.
 const CHANNEL: mio::Token = mio::Token(0);
 
 impl EventLoop {
@@ -52,8 +49,8 @@ impl EventLoop {
         let (tx, rx) = mio_extras::channel::channel();
         poll.register(&rx, CHANNEL, mio::Ready::readable(), mio::PollOpt::edge())?;
 
-        // Whenever c-ares tells us what to do with a file descriptor, we'll
-        // send that request along, through the channel we just created.
+        // Whenever c-ares tells us what to do with a file descriptor, we'll send that request
+        // along, through the channel we just created.
         let sock_callback = move |fd: c_ares::Socket, readable: bool, writable: bool| {
             let _ = tx.send(Message::RegisterInterest(fd, readable, writable));
         };

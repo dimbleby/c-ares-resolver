@@ -13,8 +13,8 @@ use c_ares;
 
 use error::Error;
 
-// The EventLoop will use select() to check on the status of file descriptors
-// that c-ares cares about.
+// The EventLoop will use select() to check on the status of file descriptors that c-ares cares
+// about.
 pub struct EventLoop {
     pub ares_channel: Arc<Mutex<c_ares::Channel>>,
     quit: Arc<AtomicBool>,

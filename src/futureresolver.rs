@@ -43,18 +43,16 @@ impl<T> Future for CAresFuture<T> {
     }
 }
 
-/// An asynchronous DNS resolver, which returns results as
-/// `futures::Future`s.
+/// An asynchronous DNS resolver, which returns results as `futures::Future`s.
 ///
-/// Note that dropping the `FutureResolver` does *not* cause outstanding
-/// queries to fail - contrast the `Resolver` - because the returned
-/// futures hold a reference to the underlying resolver.
+/// Note that dropping the `FutureResolver` does *not* cause outstanding queries to fail - contrast
+/// the `Resolver` - because the returned futures hold a reference to the underlying resolver.
 pub struct FutureResolver {
     inner: Arc<Resolver>,
 }
 
-// Most query implementations follow the same pattern: call through to the
-// `Resolver`, arranging that the callback completes a future.
+// Most query implementations follow the same pattern: call through to the `Resolver`, arranging
+// that the callback completes a future.
 macro_rules! futurize {
     ($resolver:expr, $query:ident, $question:expr) => {{
         let (c, p) = futures::oneshot();
@@ -82,11 +80,11 @@ impl FutureResolver {
         Ok(resolver)
     }
 
-    /// Set the list of servers to contact, instead of the servers specified
-    /// in resolv.conf or the local named.
+    /// Set the list of servers to contact, instead of the servers specified in resolv.conf or the
+    /// local named.
     ///
-    /// String format is `host[:port]`.  IPv6 addresses with ports require
-    /// square brackets eg `[2001:4860:4860::8888]:53`.
+    /// String format is `host[:port]`.  IPv6 addresses with ports require square brackets eg
+    /// `[2001:4860:4860::8888]:53`.
     pub fn set_servers(&self, servers: &[&str]) -> Result<&Self, c_ares::Error> {
         self.inner.set_servers(servers)?;
         Ok(self)
@@ -212,10 +210,9 @@ impl FutureResolver {
 
     /// Perform a host query by address.
     ///
-    /// This method is one of the very few places where this library performs
-    /// strictly more allocation than the underlying `c-ares` code.  If this is
-    /// a problem for you, you should prefer to use the analogous method on the
-    /// `Resolver`.
+    /// This method is one of the very few places where this library performs strictly more
+    /// allocation than the underlying `c-ares` code.  If this is a problem for you, you should
+    /// prefer to use the analogous method on the `Resolver`.
     pub fn get_host_by_address(&self, address: &IpAddr) -> CAresFuture<HostResults> {
         let (c, p) = futures::oneshot();
         self.inner.get_host_by_address(address, move |result| {
@@ -227,10 +224,9 @@ impl FutureResolver {
 
     /// Perform a host query by name.
     ///
-    /// This method is one of the very few places where this library performs
-    /// strictly more allocation than the underlying `c-ares` code.  If this is
-    /// a problem for you, you should prefer to use the analogous method on the
-    /// `Resolver`.
+    /// This method is one of the very few places where this library performs strictly more
+    /// allocation than the underlying `c-ares` code.  If this is a problem for you, you should
+    /// prefer to use the analogous method on the `Resolver`.
     pub fn get_host_by_name(
         &self,
         name: &str,
@@ -246,10 +242,9 @@ impl FutureResolver {
 
     /// Address-to-nodename translation in protocol-independent manner.
     ///
-    /// This method is one of the very few places where this library performs
-    /// strictly more allocation than the underlying `c-ares` code.  If this is
-    /// a problem for you, you should prefer to use the analogous method on the
-    /// `Resolver`.
+    /// This method is one of the very few places where this library performs strictly more
+    /// allocation than the underlying `c-ares` code.  If this is a problem for you, you should
+    /// prefer to use the analogous method on the `Resolver`.
     pub fn get_name_info<F>(
         &self,
         address: &SocketAddr,
@@ -263,19 +258,16 @@ impl FutureResolver {
         CAresFuture::new(p, resolver)
     }
 
-    /// Initiate a single-question DNS query for `name`.  The class and type of
-    /// the query are per the provided parameters, taking values as defined in
-    /// `arpa/nameser.h`.
+    /// Initiate a single-question DNS query for `name`.  The class and type of the query are per
+    /// the provided parameters, taking values as defined in `arpa/nameser.h`.
     ///
-    /// This method is one of the very few places where this library performs
-    /// strictly more allocation than the underlying `c-ares` code.  If this is
-    /// a problem for you, you should prefer to use the analogous method on the
-    /// `Resolver`.
+    /// This method is one of the very few places where this library performs strictly more
+    /// allocation than the underlying `c-ares` code.  If this is a problem for you, you should
+    /// prefer to use the analogous method on the `Resolver`.
     ///
-    /// This method is provided so that users can query DNS types for which
-    /// `c-ares` does not provide a parser; or in case a third-party parser is
-    /// preferred.  Usually, if a suitable `query_xxx()` is available, that
-    /// should be used.
+    /// This method is provided so that users can query DNS types for which `c-ares` does not
+    /// provide a parser; or in case a third-party parser is preferred.  Usually, if a suitable
+    /// `query_xxx()` is available, that should be used.
     pub fn query(&self, name: &str, dns_class: u16, query_type: u16) -> CAresFuture<Vec<u8>> {
         let (c, p) = futures::oneshot();
         self.inner
@@ -286,19 +278,16 @@ impl FutureResolver {
         CAresFuture::new(p, resolver)
     }
 
-    /// Initiate a series of single-question DNS queries for `name`.  The
-    /// class and type of the query are per the provided parameters, taking
-    /// values as defined in `arpa/nameser.h`.
+    /// Initiate a series of single-question DNS queries for `name`.  The class and type of the
+    /// query are per the provided parameters, taking values as defined in `arpa/nameser.h`.
     ///
-    /// This method is one of the very few places where this library performs
-    /// strictly more allocation than the underlying `c-ares` code.  If this is
-    /// a problem for you, you should prefer to use the analogous method on the
-    /// `Resolver`.
+    /// This method is one of the very few places where this library performs strictly more
+    /// allocation than the underlying `c-ares` code.  If this is a problem for you, you should
+    /// prefer to use the analogous method on the `Resolver`.
     ///
-    /// This method is provided so that users can search DNS types for which
-    /// `c-ares` does not provide a parser; or in case a third-party parser is
-    /// preferred.  Usually, if a suitable `search_xxx()` is available, that
-    /// should be used.
+    /// This method is provided so that users can search DNS types for which `c-ares` does not
+    /// provide a parser; or in case a third-party parser is preferred.  Usually, if a suitable
+    /// `search_xxx()` is available, that should be used.
     pub fn search(&self, name: &str, dns_class: u16, query_type: u16) -> CAresFuture<Vec<u8>> {
         let (c, p) = futures::oneshot();
         self.inner

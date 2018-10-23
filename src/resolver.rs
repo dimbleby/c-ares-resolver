@@ -25,55 +25,53 @@ impl Options {
         self
     }
 
-    /// Set the number of milliseconds each name server is given to respond to
-    /// a query on the first try.  (After the first try, the timeout algorithm
-    /// becomes more complicated, but scales linearly with the value of
-    /// timeout).  The default is 5000ms.
+    /// Set the number of milliseconds each name server is given to respond to a query on the first
+    /// try.  (After the first try, the timeout algorithm becomes more complicated, but scales
+    /// linearly with the value of timeout).  The default is 5000ms.
     pub fn set_timeout(&mut self, ms: u32) -> &mut Self {
         self.inner.set_timeout(ms);
         self
     }
 
-    /// Set the number of tries the resolver will try contacting each name
-    /// server before giving up.  The default is four tries.
+    /// Set the number of tries the resolver will try contacting each name server before giving up.
+    /// The default is four tries.
     pub fn set_tries(&mut self, tries: u32) -> &mut Self {
         self.inner.set_tries(tries);
         self
     }
 
-    /// Set the number of dots which must be present in a domain name for it to
-    /// be queried for "as is" prior to querying for it with the default domain
-    /// extensions appended.  The default value is 1 unless set otherwise by
-    /// resolv.conf or the RES_OPTIONS environment variable.
+    /// Set the number of dots which must be present in a domain name for it to be queried for "as
+    /// is" prior to querying for it with the default domain extensions appended.  The default
+    /// value is 1 unless set otherwise by resolv.conf or the RES_OPTIONS environment variable.
     pub fn set_ndots(&mut self, ndots: u32) -> &mut Self {
         self.inner.set_ndots(ndots);
         self
     }
 
-    /// Set the UDP port to use for queries.  The default value is 53, the
-    /// standard name service port.
+    /// Set the UDP port to use for queries.  The default value is 53, the standard name service
+    /// port.
     pub fn set_udp_port(&mut self, udp_port: u16) -> &mut Self {
         self.inner.set_udp_port(udp_port);
         self
     }
 
-    /// Set the TCP port to use for queries.  The default value is 53, the
-    /// standard name service port.
+    /// Set the TCP port to use for queries.  The default value is 53, the standard name service
+    /// port.
     pub fn set_tcp_port(&mut self, tcp_port: u16) -> &mut Self {
         self.inner.set_tcp_port(tcp_port);
         self
     }
 
-    /// Set the domains to search, instead of the domains specified in
-    /// resolv.conf or the domain derived from the kernel hostname variable.
+    /// Set the domains to search, instead of the domains specified in resolv.conf or the domain
+    /// derived from the kernel hostname variable.
     pub fn set_domains(&mut self, domains: &[&str]) -> &mut Self {
         self.inner.set_domains(domains);
         self
     }
 
-    /// Set the lookups to perform for host queries. `lookups` should be set to
-    /// a string of the characters "b" or "f", where "b" indicates a DNS lookup
-    /// and "f" indicates a lookup in the hosts file.
+    /// Set the lookups to perform for host queries. `lookups` should be set to a string of the
+    /// characters "b" or "f", where "b" indicates a DNS lookup and "f" indicates a lookup in the
+    /// hosts file.
     pub fn set_lookups(&mut self, lookups: &str) -> &mut Self {
         self.inner.set_lookups(lookups);
         self
@@ -112,8 +110,8 @@ impl Options {
 
 /// An asynchronous DNS resolver, which returns results via callbacks.
 ///
-/// Note that dropping the resolver will cause all outstanding requests to fail
-/// with result `c_ares::Error::EDESTRUCTION`.
+/// Note that dropping the resolver will cause all outstanding requests to fail with result
+/// `c_ares::Error::EDESTRUCTION`.
 pub struct Resolver {
     ares_channel: Arc<Mutex<c_ares::Channel>>,
 
@@ -149,11 +147,11 @@ impl Resolver {
         Ok(resolver)
     }
 
-    /// Set the list of servers to contact, instead of the servers specified
-    /// in resolv.conf or the local named.
+    /// Set the list of servers to contact, instead of the servers specified in resolv.conf or the
+    /// local named.
     ///
-    /// String format is `host[:port]`.  IPv6 addresses with ports require
-    /// square brackets eg `[2001:4860:4860::8888]:53`.
+    /// String format is `host[:port]`.  IPv6 addresses with ports require square brackets eg
+    /// `[2001:4860:4860::8888]:53`.
     pub fn set_servers(&self, servers: &[&str]) -> c_ares::Result<&Self> {
         self.ares_channel.lock().unwrap().set_servers(servers)?;
         Ok(self)
@@ -422,16 +420,14 @@ impl Resolver {
             .get_name_info(address, flags, handler)
     }
 
-    /// Initiate a single-question DNS query for `name`.  The class and type of
-    /// the query are per the provided parameters, taking values as defined in
-    /// `arpa/nameser.h`.
+    /// Initiate a single-question DNS query for `name`.  The class and type of the query are per
+    /// the provided parameters, taking values as defined in `arpa/nameser.h`.
     ///
     /// On completion, `handler` is called with the result.
     ///
-    /// This method is provided so that users can query DNS types for which
-    /// `c-ares` does not provide a parser; or in case a third-party parser is
-    /// preferred.  Usually, if a suitable `query_xxx()` is available, that
-    /// should be used.
+    /// This method is provided so that users can query DNS types for which `c-ares` does not
+    /// provide a parser; or in case a third-party parser is preferred.  Usually, if a suitable
+    /// `query_xxx()` is available, that should be used.
     pub fn query<F>(&self, name: &str, dns_class: u16, query_type: u16, handler: F)
     where
         F: FnOnce(c_ares::Result<&[u8]>) + Send + 'static,
@@ -442,16 +438,14 @@ impl Resolver {
             .query(name, dns_class, query_type, handler);
     }
 
-    /// Initiate a series of single-question DNS queries for `name`.  The
-    /// class and type of the query are per the provided parameters, taking
-    /// values as defined in `arpa/nameser.h`.
+    /// Initiate a series of single-question DNS queries for `name`.  The class and type of the
+    /// query are per the provided parameters, taking values as defined in `arpa/nameser.h`.
     ///
     /// On completion, `handler` is called with the result.
     ///
-    /// This method is provided so that users can search DNS types for which
-    /// `c-ares` does not provide a parser; or in case a third-party parser is
-    /// preferred.  Usually, if a suitable `search_xxx()` is available, that
-    /// should be used.
+    /// This method is provided so that users can search DNS types for which `c-ares` does not
+    /// provide a parser; or in case a third-party parser is preferred.  Usually, if a suitable
+    /// `search_xxx()` is available, that should be used.
     pub fn search<F>(&self, name: &str, dns_class: u16, query_type: u16, handler: F)
     where
         F: FnOnce(c_ares::Result<&[u8]>) + Send + 'static,
