@@ -22,7 +22,7 @@ pub struct EventLoop {
 
 impl EventLoop {
     // Create a new event loop.
-    pub fn new(options: c_ares::Options) -> Result<EventLoop, Error> {
+    pub fn new(options: c_ares::Options) -> Result<Self, Error> {
         // Initialize sockets.
         unsafe {
             let mut wsadata: WSADATA = mem::uninitialized();

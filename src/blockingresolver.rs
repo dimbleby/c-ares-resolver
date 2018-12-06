@@ -24,7 +24,7 @@ macro_rules! blockify {
 
 impl BlockingResolver {
     /// Create a new `BlockingResolver`, using default `Options`.
-    pub fn new() -> Result<BlockingResolver, Error> {
+    pub fn new() -> Result<Self, Error> {
         let options = Options::default();
         Self::with_options(options)
     }

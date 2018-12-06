@@ -42,7 +42,7 @@ const CHANNEL: mio::Token = mio::Token(0);
 
 impl EventLoop {
     // Create a new event loop.
-    pub fn new(mut options: c_ares::Options) -> Result<EventLoop, Error> {
+    pub fn new(mut options: c_ares::Options) -> Result<Self, Error> {
         // Create a mio::Poll on which to wait for events, and register a
         // channel with it.
         let poll = mio::Poll::new()?;

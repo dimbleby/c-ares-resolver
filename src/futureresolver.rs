@@ -66,7 +66,7 @@ macro_rules! futurize {
 
 impl FutureResolver {
     /// Create a new `FutureResolver`, using default `Options`.
-    pub fn new() -> Result<FutureResolver, Error> {
+    pub fn new() -> Result<Self, Error> {
         let options = Options::default();
         Self::with_options(options)
     }

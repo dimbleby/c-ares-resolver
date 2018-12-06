@@ -134,7 +134,7 @@ impl Drop for Resolver {
 
 impl Resolver {
     /// Create a new `Resolver`, using default `Options`.
-    pub fn new() -> Result<Resolver, Error> {
+    pub fn new() -> Result<Self, Error> {
         let options = Options::default();
         Self::with_options(options)
     }
