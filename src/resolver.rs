@@ -4,8 +4,8 @@ use std::sync::{Arc, Mutex};
 
 use c_ares;
 
-use error::Error;
-use eventloop::EventLoop;
+use crate::error::Error;
+use crate::eventloop::EventLoop;
 
 /// Used to configure the behaviour of the resolver.
 #[derive(Default)]

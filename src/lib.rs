@@ -71,9 +71,9 @@ mod windows;
 #[cfg(test)]
 mod tests;
 
-pub use blockingresolver::BlockingResolver;
-pub use error::Error;
-pub use futureresolver::{CAresFuture, FutureResolver};
-pub use host::HostResults;
-pub use nameinfo::NameInfoResult;
-pub use resolver::{Options, Resolver};
+pub use crate::blockingresolver::BlockingResolver;
+pub use crate::error::Error;
+pub use crate::futureresolver::{CAresFuture, FutureResolver};
+pub use crate::host::HostResults;
+pub use crate::nameinfo::NameInfoResult;
+pub use crate::resolver::{Options, Resolver};

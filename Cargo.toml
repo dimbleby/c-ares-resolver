@@ -11,6 +11,7 @@ documentation = "https://docs.rs/c-ares-resolver"
 readme = "README.md"
 keywords = ["DNS", "c-ares", "futures"]
 categories = ["asynchronous", "network-programming"]
+edition = "2018"
 
 [dependencies]
 c-ares = "7.1"

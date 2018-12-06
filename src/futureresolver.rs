@@ -4,10 +4,10 @@ use futures::Future;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::sync::Arc;
 
-use error::Error;
-use host::HostResults;
-use nameinfo::NameInfoResult;
-use resolver::{Options, Resolver};
+use crate::error::Error;
+use crate::host::HostResults;
+use crate::nameinfo::NameInfoResult;
+use crate::resolver::{Options, Resolver};
 
 /// The type of future returned by methods on the `FutureResolver`.
 pub struct CAresFuture<T> {
