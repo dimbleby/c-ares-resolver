@@ -11,7 +11,7 @@ use winapi::um::winsock2::{
 
 use c_ares;
 
-use error::Error;
+use crate::error::Error;
 
 // The EventLoop will use select() to check on the status of file descriptors that c-ares cares
 // about.
