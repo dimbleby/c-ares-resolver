@@ -216,7 +216,7 @@ impl FutureResolver {
     pub fn get_host_by_address(&self, address: &IpAddr) -> CAresFuture<HostResults> {
         let (c, p) = futures::oneshot();
         self.inner.get_host_by_address(address, move |result| {
-            let _ = c.send(result.map(|h| h.into()));
+            let _ = c.send(result.map(std::convert::Into::into));
         });
         let resolver = Arc::clone(&self.inner);
         CAresFuture::new(p, resolver)
@@ -234,7 +234,7 @@ impl FutureResolver {
     ) -> CAresFuture<HostResults> {
         let (c, p) = futures::oneshot();
         self.inner.get_host_by_name(name, family, move |result| {
-            let _ = c.send(result.map(|h| h.into()));
+            let _ = c.send(result.map(std::convert::Into::into));
         });
         let resolver = Arc::clone(&self.inner);
         CAresFuture::new(p, resolver)
@@ -252,7 +252,7 @@ impl FutureResolver {
     ) -> CAresFuture<NameInfoResult> {
         let (c, p) = futures::oneshot();
         self.inner.get_name_info(address, flags, move |result| {
-            let _ = c.send(result.map(|n| n.into()));
+            let _ = c.send(result.map(std::convert::Into::into));
         });
         let resolver = Arc::clone(&self.inner);
         CAresFuture::new(p, resolver)
@@ -272,7 +272,7 @@ impl FutureResolver {
         let (c, p) = futures::oneshot();
         self.inner
             .query(name, dns_class, query_type, move |result| {
-                let _ = c.send(result.map(|bs| bs.to_owned()));
+                let _ = c.send(result.map(std::borrow::ToOwned::to_owned));
             });
         let resolver = Arc::clone(&self.inner);
         CAresFuture::new(p, resolver)
@@ -292,7 +292,7 @@ impl FutureResolver {
         let (c, p) = futures::oneshot();
         self.inner
             .search(name, dns_class, query_type, move |result| {
-                let _ = c.send(result.map(|bs| bs.to_owned()));
+                let _ = c.send(result.map(std::borrow::ToOwned::to_owned));
             });
         let resolver = Arc::clone(&self.inner);
         CAresFuture::new(p, resolver)

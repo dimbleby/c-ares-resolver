@@ -15,8 +15,8 @@ pub struct NameInfoResult {
 impl<'a> From<c_ares::NameInfoResult<'a>> for NameInfoResult {
     fn from(result: c_ares::NameInfoResult) -> Self {
         NameInfoResult {
-            node: result.node().map(|x| x.to_owned()),
-            service: result.service().map(|x| x.to_owned()),
+            node: result.node().map(std::borrow::ToOwned::to_owned),
+            service: result.service().map(std::borrow::ToOwned::to_owned),
         }
     }
 }

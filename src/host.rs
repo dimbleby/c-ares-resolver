@@ -21,7 +21,10 @@ impl<'a> From<c_ares::HostResults<'a>> for HostResults {
         HostResults {
             hostname: results.hostname().to_owned(),
             addresses: results.addresses().collect(),
-            aliases: results.aliases().map(|s| s.to_owned()).collect(),
+            aliases: results
+                .aliases()
+                .map(std::borrow::ToOwned::to_owned)
+                .collect(),
         }
     }
 }

@@ -172,7 +172,7 @@ impl BlockingResolver {
     pub fn get_host_by_address(&self, address: &IpAddr) -> c_ares::Result<HostResults> {
         let (tx, rx) = mpsc::channel();
         self.inner.get_host_by_address(address, move |result| {
-            tx.send(result.map(|h| h.into())).unwrap()
+            tx.send(result.map(std::convert::Into::into)).unwrap()
         });
         rx.recv().unwrap()
     }
@@ -189,7 +189,7 @@ impl BlockingResolver {
     ) -> c_ares::Result<HostResults> {
         let (tx, rx) = mpsc::channel();
         self.inner.get_host_by_name(name, family, move |result| {
-            tx.send(result.map(|h| h.into())).unwrap()
+            tx.send(result.map(std::convert::Into::into)).unwrap()
         });
         rx.recv().unwrap()
     }
@@ -206,7 +206,7 @@ impl BlockingResolver {
     ) -> c_ares::Result<NameInfoResult> {
         let (tx, rx) = mpsc::channel();
         self.inner.get_name_info(address, flags, move |result| {
-            tx.send(result.map(|n| n.into())).unwrap()
+            tx.send(result.map(std::convert::Into::into)).unwrap()
         });
         rx.recv().unwrap()
     }
@@ -225,7 +225,7 @@ impl BlockingResolver {
         let (tx, rx) = mpsc::channel();
         self.inner
             .query(name, dns_class, query_type, move |result| {
-                tx.send(result.map(|bs| bs.to_owned())).unwrap()
+                tx.send(result.map(std::borrow::ToOwned::to_owned)).unwrap()
             });
         rx.recv().unwrap()
     }
@@ -244,7 +244,7 @@ impl BlockingResolver {
         let (tx, rx) = mpsc::channel();
         self.inner
             .search(name, dns_class, query_type, move |result| {
-                tx.send(result.map(|bs| bs.to_owned())).unwrap()
+                tx.send(result.map(std::borrow::ToOwned::to_owned)).unwrap()
             });
         rx.recv().unwrap()
     }
