@@ -25,8 +25,8 @@ impl EventLoop {
     pub fn new(options: c_ares::Options) -> Result<Self, Error> {
         // Initialize sockets.
         unsafe {
-            let mut wsadata: WSADATA = mem::uninitialized();
-            WSAStartup(0x101, &mut wsadata);
+            let mut wsadata = mem::MaybeUninit::<WSADATA>::uninit();
+            WSAStartup(0x101, wsadata.as_mut_ptr());
         }
 
         // Create the c-ares channel.
@@ -50,8 +50,8 @@ impl EventLoop {
 
     // Event loop thread - waits for events, and handles them.
     fn event_loop_thread(self) {
-        let mut read_fds: fd_set = unsafe { mem::uninitialized() };
-        let mut write_fds: fd_set = unsafe { mem::uninitialized() };
+        let mut read_fds: fd_set = unsafe { mem::MaybeUninit::zeroed().assume_init() };
+        let mut write_fds: fd_set = unsafe { mem::MaybeUninit::zeroed().assume_init() };
 
         // Loop round, asking c-ares what it cares about and doing as asked.
         loop {
