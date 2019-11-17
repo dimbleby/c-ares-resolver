@@ -1,8 +1,10 @@
 use c_ares;
 use futures;
-use futures::Future;
+use std::future::Future;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
+use std::pin::Pin;
 use std::sync::Arc;
+use std::task::{Context, Poll};
 
 use crate::error::Error;
 use crate::host::HostResults;
@@ -11,13 +13,13 @@ use crate::resolver::{Options, Resolver};
 
 /// The type of future returned by methods on the `FutureResolver`.
 pub struct CAresFuture<T> {
-    inner: futures::sync::oneshot::Receiver<c_ares::Result<T>>,
+    inner: futures::channel::oneshot::Receiver<c_ares::Result<T>>,
     _resolver: Arc<Resolver>,
 }
 
 impl<T> CAresFuture<T> {
     fn new(
-        promise: futures::sync::oneshot::Receiver<c_ares::Result<T>>,
+        promise: futures::channel::oneshot::Receiver<c_ares::Result<T>>,
         resolver: Arc<Resolver>,
     ) -> Self {
         CAresFuture {
@@ -25,20 +27,22 @@ impl<T> CAresFuture<T> {
             _resolver: resolver,
         }
     }
+
+    fn pin_get_inner(
+        self: Pin<&mut Self>,
+    ) -> Pin<&mut futures::channel::oneshot::Receiver<c_ares::Result<T>>> {
+        unsafe { self.map_unchecked_mut(|s| &mut s.inner) }
+    }
 }
 
 impl<T> Future for CAresFuture<T> {
-    type Item = T;
-    type Error = c_ares::Error;
+    type Output = Result<T, c_ares::Error>;
 
-    fn poll(&mut self) -> futures::Poll<Self::Item, Self::Error> {
-        match self.inner.poll() {
-            Ok(futures::Async::NotReady) => Ok(futures::Async::NotReady),
-            Err(_) => Err(c_ares::Error::ECANCELLED),
-            Ok(futures::Async::Ready(res)) => match res {
-                Ok(r) => Ok(futures::Async::Ready(r)),
-                Err(e) => Err(e),
-            },
+    fn poll(self: Pin<&mut Self>, cx: &mut Context) -> Poll<Self::Output> {
+        match self.pin_get_inner().poll(cx) {
+            Poll::Pending => Poll::Pending,
+            Poll::Ready(Err(_)) => Poll::Ready(Err(c_ares::Error::ECANCELLED)),
+            Poll::Ready(Ok(result)) => Poll::Ready(result),
         }
     }
 }
@@ -55,12 +59,12 @@ pub struct FutureResolver {
 // that the callback completes a future.
 macro_rules! futurize {
     ($resolver:expr, $query:ident, $question:expr) => {{
-        let (c, p) = futures::oneshot();
+        let (sender, receiver) = futures::channel::oneshot::channel();
         $resolver.$query($question, move |result| {
-            let _ = c.send(result);
+            let _ = sender.send(result);
         });
         let resolver = Arc::clone(&$resolver);
-        CAresFuture::new(p, resolver)
+        CAresFuture::new(receiver, resolver)
     }};
 }
 
@@ -214,12 +218,12 @@ impl FutureResolver {
     /// allocation than the underlying `c-ares` code.  If this is a problem for you, you should
     /// prefer to use the analogous method on the `Resolver`.
     pub fn get_host_by_address(&self, address: &IpAddr) -> CAresFuture<HostResults> {
-        let (c, p) = futures::oneshot();
+        let (sender, receiver) = futures::channel::oneshot::channel();
         self.inner.get_host_by_address(address, move |result| {
-            let _ = c.send(result.map(std::convert::Into::into));
+            let _ = sender.send(result.map(std::convert::Into::into));
         });
         let resolver = Arc::clone(&self.inner);
-        CAresFuture::new(p, resolver)
+        CAresFuture::new(receiver, resolver)
     }
 
     /// Perform a host query by name.
@@ -232,12 +236,12 @@ impl FutureResolver {
         name: &str,
         family: c_ares::AddressFamily,
     ) -> CAresFuture<HostResults> {
-        let (c, p) = futures::oneshot();
+        let (sender, receiver) = futures::channel::oneshot::channel();
         self.inner.get_host_by_name(name, family, move |result| {
-            let _ = c.send(result.map(std::convert::Into::into));
+            let _ = sender.send(result.map(std::convert::Into::into));
         });
         let resolver = Arc::clone(&self.inner);
-        CAresFuture::new(p, resolver)
+        CAresFuture::new(receiver, resolver)
     }
 
     /// Address-to-nodename translation in protocol-independent manner.
@@ -250,12 +254,12 @@ impl FutureResolver {
         address: &SocketAddr,
         flags: c_ares::NIFlags,
     ) -> CAresFuture<NameInfoResult> {
-        let (c, p) = futures::oneshot();
+        let (sender, receiver) = futures::channel::oneshot::channel();
         self.inner.get_name_info(address, flags, move |result| {
-            let _ = c.send(result.map(std::convert::Into::into));
+            let _ = sender.send(result.map(std::convert::Into::into));
         });
         let resolver = Arc::clone(&self.inner);
-        CAresFuture::new(p, resolver)
+        CAresFuture::new(receiver, resolver)
     }
 
     /// Initiate a single-question DNS query for `name`.  The class and type of the query are per
@@ -269,13 +273,13 @@ impl FutureResolver {
     /// provide a parser; or in case a third-party parser is preferred.  Usually, if a suitable
     /// `query_xxx()` is available, that should be used.
     pub fn query(&self, name: &str, dns_class: u16, query_type: u16) -> CAresFuture<Vec<u8>> {
-        let (c, p) = futures::oneshot();
+        let (sender, receiver) = futures::channel::oneshot::channel();
         self.inner
             .query(name, dns_class, query_type, move |result| {
-                let _ = c.send(result.map(std::borrow::ToOwned::to_owned));
+                let _ = sender.send(result.map(std::borrow::ToOwned::to_owned));
             });
         let resolver = Arc::clone(&self.inner);
-        CAresFuture::new(p, resolver)
+        CAresFuture::new(receiver, resolver)
     }
 
     /// Initiate a series of single-question DNS queries for `name`.  The class and type of the
@@ -289,13 +293,13 @@ impl FutureResolver {
     /// provide a parser; or in case a third-party parser is preferred.  Usually, if a suitable
     /// `search_xxx()` is available, that should be used.
     pub fn search(&self, name: &str, dns_class: u16, query_type: u16) -> CAresFuture<Vec<u8>> {
-        let (c, p) = futures::oneshot();
+        let (sender, receiver) = futures::channel::oneshot::channel();
         self.inner
             .search(name, dns_class, query_type, move |result| {
-                let _ = c.send(result.map(std::borrow::ToOwned::to_owned));
+                let _ = sender.send(result.map(std::borrow::ToOwned::to_owned));
             });
         let resolver = Arc::clone(&self.inner);
-        CAresFuture::new(p, resolver)
+        CAresFuture::new(receiver, resolver)
     }
 
     /// Cancel all requests made on this `FutureResolver`.

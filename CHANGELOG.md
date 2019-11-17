@@ -1,3 +1,9 @@
+# Changelog
+
+## 7.0.0 (17 Nov 2019)
+
+- Move to using `std::future::Future`s.
+
 ## 6.1.0 (2 Nov 2018)
 
 - Take upstream c-ares 1.15.0
