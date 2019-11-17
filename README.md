@@ -26,17 +26,17 @@ API documentation is [here](https://docs.rs/c-ares-resolver).
 ```rust
 extern crate c_ares_resolver;
 extern crate futures;
-extern crate tokio;
 use std::error::Error;
-use futures::future::Future;
+use futures::executor::block_on;
 
 fn main() {
     let resolver = c_ares_resolver::FutureResolver::new().unwrap();
-    let query = resolver
-        .query_a("google.com")
-        .map_err(|e| println!("Lookup failed with error '{}'", e.description()))
-        .map(|result| println!("{}", result));
-    tokio::run(query);
+    let query = resolver.query_a("google.com");
+    let response = block_on(query);
+    match response {
+        Ok(result) => println!("{}", result),
+        Err(e) => println!("Lookup failed with error '{}'", e.description())
+    }
 }
 ```
 
