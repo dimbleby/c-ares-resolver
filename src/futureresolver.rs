@@ -39,11 +39,9 @@ impl<T> Future for CAresFuture<T> {
     type Output = Result<T, c_ares::Error>;
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context) -> Poll<Self::Output> {
-        match self.pin_get_inner().poll(cx) {
-            Poll::Pending => Poll::Pending,
-            Poll::Ready(Err(_)) => Poll::Ready(Err(c_ares::Error::ECANCELLED)),
-            Poll::Ready(Ok(result)) => Poll::Ready(result),
-        }
+        self.pin_get_inner().poll(cx).map(|result|
+            result.unwrap_or(Err(c_ares::Error::ECANCELLED))
+        )
     }
 }
 
