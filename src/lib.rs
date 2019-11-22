@@ -27,7 +27,6 @@
 //! ```rust
 //! extern crate c_ares_resolver;
 //! extern crate futures;
-//! use std::error::Error;
 //! use futures::executor::block_on;
 //!
 //! fn main() {
@@ -36,7 +35,7 @@
 //!     let response = block_on(query);
 //!     match response {
 //!         Ok(result) => println!("{}", result),
-//!         Err(e) => println!("Lookup failed with error '{}'", e.description())
+//!         Err(e) => println!("Lookup failed with error '{}'", e)
 //!     }
 //! }
 //! ```

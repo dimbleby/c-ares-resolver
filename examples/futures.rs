@@ -3,8 +3,6 @@ extern crate c_ares;
 extern crate c_ares_resolver;
 extern crate futures;
 
-use std::error::Error;
-
 use c_ares_resolver::FutureResolver;
 use futures::executor::block_on;
 
@@ -30,6 +28,6 @@ fn main() {
                 );
             }
         }
-        Err(e) => println!("MX lookup failed with error '{}'", e.description()),
+        Err(e) => println!("MX lookup failed with error '{}'", e),
     }
 }

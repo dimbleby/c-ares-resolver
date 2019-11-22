@@ -35,7 +35,7 @@ fn main() {
     let response = block_on(query);
     match response {
         Ok(result) => println!("{}", result),
-        Err(e) => println!("Lookup failed with error '{}'", e.description())
+        Err(e) => println!("Lookup failed with error '{}'", e)
     }
 }
 ```

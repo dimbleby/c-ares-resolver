@@ -2,7 +2,6 @@
 extern crate c_ares;
 extern crate c_ares_resolver;
 
-use std::error::Error;
 use std::str;
 
 use c_ares_resolver::BlockingResolver;
@@ -10,7 +9,7 @@ use c_ares_resolver::BlockingResolver;
 fn print_txt_results(result: &c_ares::Result<c_ares::TXTResults>) {
     match *result {
         Err(ref e) => {
-            println!("TXT lookup failed with error '{}'", e.description());
+            println!("TXT lookup failed with error '{}'", e);
         }
         Ok(ref txt_results) => {
             println!("Successful TXT lookup...");
