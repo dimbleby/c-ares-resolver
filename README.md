@@ -26,7 +26,6 @@ API documentation is [here](https://docs.rs/c-ares-resolver).
 ```rust
 extern crate c_ares_resolver;
 extern crate futures;
-use std::error::Error;
 use futures::executor::block_on;
 
 fn main() {
