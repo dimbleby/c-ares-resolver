@@ -218,7 +218,7 @@ impl FutureResolver {
     pub fn get_host_by_address(&self, address: &IpAddr) -> CAresFuture<HostResults> {
         let (sender, receiver) = futures::channel::oneshot::channel();
         self.inner.get_host_by_address(address, move |result| {
-            let _ = sender.send(result.map(std::convert::Into::into));
+            let _ = sender.send(result.map(Into::into));
         });
         let resolver = Arc::clone(&self.inner);
         CAresFuture::new(receiver, resolver)
@@ -236,7 +236,7 @@ impl FutureResolver {
     ) -> CAresFuture<HostResults> {
         let (sender, receiver) = futures::channel::oneshot::channel();
         self.inner.get_host_by_name(name, family, move |result| {
-            let _ = sender.send(result.map(std::convert::Into::into));
+            let _ = sender.send(result.map(Into::into));
         });
         let resolver = Arc::clone(&self.inner);
         CAresFuture::new(receiver, resolver)
@@ -254,7 +254,7 @@ impl FutureResolver {
     ) -> CAresFuture<NameInfoResult> {
         let (sender, receiver) = futures::channel::oneshot::channel();
         self.inner.get_name_info(address, flags, move |result| {
-            let _ = sender.send(result.map(std::convert::Into::into));
+            let _ = sender.send(result.map(Into::into));
         });
         let resolver = Arc::clone(&self.inner);
         CAresFuture::new(receiver, resolver)

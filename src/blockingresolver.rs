@@ -172,7 +172,7 @@ impl BlockingResolver {
     pub fn get_host_by_address(&self, address: &IpAddr) -> c_ares::Result<HostResults> {
         let (tx, rx) = mpsc::channel();
         self.inner.get_host_by_address(address, move |result| {
-            tx.send(result.map(std::convert::Into::into)).unwrap()
+            tx.send(result.map(Into::into)).unwrap()
         });
         rx.recv().unwrap()
     }
@@ -189,7 +189,7 @@ impl BlockingResolver {
     ) -> c_ares::Result<HostResults> {
         let (tx, rx) = mpsc::channel();
         self.inner.get_host_by_name(name, family, move |result| {
-            tx.send(result.map(std::convert::Into::into)).unwrap()
+            tx.send(result.map(Into::into)).unwrap()
         });
         rx.recv().unwrap()
     }
@@ -206,7 +206,7 @@ impl BlockingResolver {
     ) -> c_ares::Result<NameInfoResult> {
         let (tx, rx) = mpsc::channel();
         self.inner.get_name_info(address, flags, move |result| {
-            tx.send(result.map(std::convert::Into::into)).unwrap()
+            tx.send(result.map(Into::into)).unwrap()
         });
         rx.recv().unwrap()
     }
