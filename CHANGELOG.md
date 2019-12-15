@@ -4,6 +4,7 @@
 
 - Modernize error handling: `description()` and `cause()` are deprecated, we now
   use `Display` and `source()`.
+- Fix docs to say that we now use `std::future::Future`s.
 
 ## 7.0.0 (17 Nov 2019)
 

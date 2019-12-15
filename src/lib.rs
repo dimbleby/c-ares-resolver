@@ -6,7 +6,7 @@
 //! * The `Resolver` is the thinnest wrapper around the underlying `c-ares` library.  It returns
 //! answers via callbacks.  The other resolvers are built on top of this.
 //!
-//! * The `FutureResolver` returns answers as `futures::Future`s.
+//! * The `FutureResolver` returns answers as `std::future::Future`s.
 //!
 //! * The `BlockingResolver` isn't asynchronous at all - as the name suggests, it blocks until the
 //! lookup completes.
