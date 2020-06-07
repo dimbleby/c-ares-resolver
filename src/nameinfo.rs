@@ -1,7 +1,5 @@
 use std::ffi::CString;
 
-use c_ares;
-
 /// An owned version of `c_ares::NameInfoResult`.
 #[derive(Clone, Eq, PartialEq, Debug, Hash, PartialOrd, Ord)]
 pub struct NameInfoResult {

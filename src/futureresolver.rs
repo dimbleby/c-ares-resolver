@@ -1,5 +1,3 @@
-use c_ares;
-use futures;
 use std::future::Future;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::pin::Pin;

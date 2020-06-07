@@ -9,8 +9,6 @@ use winapi::um::winsock2::{
     fd_set, select, timeval, WSACleanup, WSAStartup, SOCKET_ERROR, WSADATA,
 };
 
-use c_ares;
-
 use crate::error::Error;
 
 // The EventLoop will use select() to check on the status of file descriptors that c-ares cares

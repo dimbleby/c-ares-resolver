@@ -2,8 +2,6 @@ use std::error;
 use std::fmt;
 use std::io;
 
-use c_ares;
-
 /// Error codes that the library might return.
 #[derive(Debug)]
 pub enum Error {

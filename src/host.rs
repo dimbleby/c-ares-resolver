@@ -1,8 +1,6 @@
 use std::ffi::CString;
 use std::net::IpAddr;
 
-use c_ares;
-
 /// An owned version of `c_ares::HostResults`.
 #[derive(Clone, Eq, PartialEq, Debug, Hash, PartialOrd, Ord)]
 pub struct HostResults {

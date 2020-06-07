@@ -4,10 +4,6 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 
-use c_ares;
-use mio;
-use mio_extras;
-
 use crate::error::Error;
 
 // The EventLoop will set up a mio::Poll and use it to wait for the following:

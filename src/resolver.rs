@@ -2,8 +2,6 @@ use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
-use c_ares;
-
 use crate::error::Error;
 use crate::eventloop::EventLoop;
 
