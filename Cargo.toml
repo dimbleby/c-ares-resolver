@@ -15,11 +15,6 @@ edition = "2018"
 
 [dependencies]
 c-ares = "7.1"
+crossbeam-channel = "0.4.3"
 futures = "0.3"
-mio-extras = "2.0.4"
-
-[target.'cfg(unix)'.dependencies]
-mio = "0.6"
-
-[target.'cfg(windows)'.dependencies]
-winapi = { version = "0.3", features = ["winsock2"] }
+polling = "0.1.5"

@@ -44,14 +44,9 @@
 //! [here](https://github.com/dimbleby/c-ares-resolver/tree/master/examples).
 #![deny(missing_docs)]
 extern crate c_ares;
+extern crate crossbeam_channel;
 extern crate futures;
-extern crate mio_extras;
-
-#[cfg(unix)]
-extern crate mio;
-
-#[cfg(windows)]
-extern crate winapi;
+extern crate polling;
 
 mod blockingresolver;
 mod error;
@@ -60,12 +55,6 @@ mod futureresolver;
 mod host;
 mod nameinfo;
 mod resolver;
-
-#[cfg(unix)]
-mod unix;
-
-#[cfg(windows)]
-mod windows;
 
 #[cfg(test)]
 mod tests;
