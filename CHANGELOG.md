@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 7.1.0 (15 Aug 2020)
 
 - Modernize error handling: `description()` and `cause()` are deprecated, we now
   use `Display` and `source()`.
