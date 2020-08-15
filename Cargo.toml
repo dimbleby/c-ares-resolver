@@ -14,7 +14,7 @@ categories = ["asynchronous", "network-programming"]
 edition = "2018"
 
 [dependencies]
-c-ares = "7.1"
+c-ares = "7.2"
 crossbeam-channel = "0.4.3"
 futures = "0.3"
 polling = "0.1.5"
