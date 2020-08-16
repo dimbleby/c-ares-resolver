@@ -1,5 +1,4 @@
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
-use std::sync::mpsc;
 
 use crate::error::Error;
 use crate::host::HostResults;
@@ -15,7 +14,7 @@ pub struct BlockingResolver {
 // that the callback sends the result down a channel.
 macro_rules! blockify {
     ($resolver:expr, $query:ident, $question:expr) => {{
-        let (tx, rx) = mpsc::channel();
+        let (tx, rx) = crossbeam_channel::bounded(1);
         $resolver.$query($question, move |result| tx.send(result).unwrap());
         rx.recv().unwrap()
     }};
@@ -169,7 +168,7 @@ impl BlockingResolver {
     /// allocation than the underlying `c-ares` code.  If this is a problem for you, you should
     /// prefer to use the analogous method on the `Resolver`.
     pub fn get_host_by_address(&self, address: &IpAddr) -> c_ares::Result<HostResults> {
-        let (tx, rx) = mpsc::channel();
+        let (tx, rx) = crossbeam_channel::bounded(1);
         self.inner.get_host_by_address(address, move |result| {
             tx.send(result.map(Into::into)).unwrap()
         });
@@ -186,7 +185,7 @@ impl BlockingResolver {
         name: &str,
         family: c_ares::AddressFamily,
     ) -> c_ares::Result<HostResults> {
-        let (tx, rx) = mpsc::channel();
+        let (tx, rx) = crossbeam_channel::bounded(1);
         self.inner.get_host_by_name(name, family, move |result| {
             tx.send(result.map(Into::into)).unwrap()
         });
@@ -203,7 +202,7 @@ impl BlockingResolver {
         address: &SocketAddr,
         flags: c_ares::NIFlags,
     ) -> c_ares::Result<NameInfoResult> {
-        let (tx, rx) = mpsc::channel();
+        let (tx, rx) = crossbeam_channel::bounded(1);
         self.inner.get_name_info(address, flags, move |result| {
             tx.send(result.map(Into::into)).unwrap()
         });
@@ -221,7 +220,7 @@ impl BlockingResolver {
     /// provide a parser; or in case a third-party parser is preferred.  Usually, if a suitable
     /// `query_xxx()` is available, that should be used.
     pub fn query(&self, name: &str, dns_class: u16, query_type: u16) -> c_ares::Result<Vec<u8>> {
-        let (tx, rx) = mpsc::channel();
+        let (tx, rx) = crossbeam_channel::bounded(1);
         self.inner
             .query(name, dns_class, query_type, move |result| {
                 tx.send(result.map(std::borrow::ToOwned::to_owned)).unwrap()
@@ -240,7 +239,7 @@ impl BlockingResolver {
     /// provide a parser; or in case a third-party parser is preferred.  Usually, if a suitable
     /// `search_xxx()` is available, that should be used.
     pub fn search(&self, name: &str, dns_class: u16, query_type: u16) -> c_ares::Result<Vec<u8>> {
-        let (tx, rx) = mpsc::channel();
+        let (tx, rx) = crossbeam_channel::bounded(1);
         self.inner
             .search(name, dns_class, query_type, move |result| {
                 tx.send(result.map(std::borrow::ToOwned::to_owned)).unwrap()
