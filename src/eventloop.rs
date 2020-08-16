@@ -159,7 +159,7 @@ impl EventLoop {
 
     // Process messages incoming on the channel.
     fn handle_messages(&mut self) {
-        while let Ok(event) = self.rx_msg_channel.try_recv() {
+        for event in self.rx_msg_channel.try_iter() {
             let socket = event.key as c_ares::Socket;
             if !event.readable && !event.writable {
                 self.interests.remove(&socket);
