@@ -9,17 +9,7 @@ use crate::error::Error;
 // Indicate an interest in read and/or write events.
 struct Interest(bool, bool);
 
-// The EventLoop sets up a polling::Poller and use it to wait for events on file descriptors as
-// directed by the c-ares library.
-pub struct EventLoop {
-    poller: Arc<polling::Poller>,
-    rx_msg_channel: crossbeam_channel::Receiver<polling::Event>,
-    interests: HashMap<c_ares::Socket, Interest>,
-    pub ares_channel: Arc<Mutex<c_ares::Channel>>,
-    quit: Arc<AtomicBool>,
-}
-
-// Object returned when the EventLoop is run.  Call `stop()` to stop the associated EventLoop.
+// Object returned when the EventLoop is run.  When this is dropped, the EventLoop is stopped.
 pub struct EventLoopStopper {
     poller: Arc<polling::Poller>,
     quit: Arc<AtomicBool>,
@@ -29,11 +19,22 @@ impl EventLoopStopper {
     pub fn new(poller: Arc<polling::Poller>, quit: Arc<AtomicBool>) -> Self {
         Self { poller, quit }
     }
+}
 
-    pub fn stop(&self) {
+impl Drop for EventLoopStopper {
+    fn drop(&mut self) {
         self.quit.store(true, Ordering::Relaxed);
-        let _ = self.poller.notify();
+        self.poller.notify().expect("Failed to notify poller");
     }
+}
+
+// The EventLoop sets up a polling::Poller and use it to wait for events on file descriptors as
+// directed by the c-ares library.
+pub struct EventLoop {
+    poller: Arc<polling::Poller>,
+    interests: Arc<Mutex<HashMap<c_ares::Socket, Interest>>>,
+    pub ares_channel: Arc<Mutex<c_ares::Channel>>,
+    quit: Arc<AtomicBool>,
 }
 
 impl EventLoop {
@@ -42,20 +43,38 @@ impl EventLoop {
         // Create a polling::Poller on which to wait for events, and a channel for sending messages
         // to the event loop.
         let poller = Arc::new(polling::Poller::new()?);
-        let (tx, rx) = crossbeam_channel::unbounded();
+        let interests: HashMap<c_ares::Socket, Interest> = HashMap::new();
+        let interests = Arc::new(Mutex::new(interests));
 
-        // Whenever c-ares tells us what to do with a file descriptor, we'll send a message
-        // registering our interest, and wake up the poller.
+        // Whenever c-ares tells us what to do with a file descriptor, we'll update the poller
+        // accordingly.
         {
             let poller = Arc::clone(&poller);
+            let interests = Arc::clone(&interests);
             let sock_callback = move |socket: c_ares::Socket, readable: bool, writable: bool| {
-                let event = polling::Event {
-                    key: socket as usize,
-                    readable,
-                    writable,
-                };
-                let _ = tx.send(event);
-                let _ = poller.notify();
+                let mut interests = interests.lock().unwrap();
+                if !readable && !writable {
+                    if interests.remove(&socket).is_some() {
+                        poller
+                            .remove(socket)
+                            .expect("Failed to remove socket from poller");
+                    }
+                } else {
+                    let interest = Interest(readable, writable);
+                    if interests.insert(socket, interest).is_none() {
+                        poller
+                            .insert(socket)
+                            .expect("failed to add socket to poller");
+                    }
+                    let event = polling::Event {
+                        key: socket as usize,
+                        readable,
+                        writable,
+                    };
+                    poller
+                        .interest(socket, event)
+                        .expect("failed to register interest");
+                }
             };
             options.set_socket_state_callback(sock_callback);
         }
@@ -67,8 +86,7 @@ impl EventLoop {
         // Create and return the event loop.
         let event_loop = EventLoop {
             poller,
-            rx_msg_channel: rx,
-            interests: HashMap::new(),
+            interests,
             ares_channel: locked_channel,
             quit: Arc::new(AtomicBool::new(false)),
         };
@@ -119,9 +137,6 @@ impl EventLoop {
                     }
                 }
             }
-
-            // Process any messages.
-            self.handle_messages();
         }
     }
 
@@ -132,15 +147,18 @@ impl EventLoop {
         //
         // So re-assert our interest in this socket.
         let socket = event.key as c_ares::Socket;
-        if let Some(Interest(readable, writable)) = self.interests.get(&socket) {
-            let new_event = polling::Event {
-                key: event.key,
-                readable: *readable,
-                writable: *writable,
-            };
-            self.poller
-                .interest(socket, new_event)
-                .expect("failed to register interest");
+        {
+            let interests = self.interests.lock().unwrap();
+            if let Some(Interest(readable, writable)) = interests.get(&socket) {
+                let new_event = polling::Event {
+                    key: event.key,
+                    readable: *readable,
+                    writable: *writable,
+                };
+                self.poller
+                    .interest(socket, new_event)
+                    .expect("failed to register interest");
+            }
         }
 
         // Tell c-ares that something happened.
@@ -155,26 +173,5 @@ impl EventLoop {
             c_ares::SOCKET_BAD
         };
         self.ares_channel.lock().unwrap().process_fd(rfd, wfd);
-    }
-
-    // Process messages incoming on the channel.
-    fn handle_messages(&mut self) {
-        for event in self.rx_msg_channel.try_iter() {
-            let socket = event.key as c_ares::Socket;
-            if !event.readable && !event.writable {
-                self.interests.remove(&socket);
-                let _ = self.poller.remove(socket);
-            } else {
-                let interest = Interest(event.readable, event.writable);
-                if self.interests.insert(socket, interest).is_none() {
-                    self.poller
-                        .insert(socket)
-                        .expect("failed to add socket to poller");
-                }
-                self.poller
-                    .interest(socket, event)
-                    .expect("failed to register interest");
-            }
-        }
     }
 }

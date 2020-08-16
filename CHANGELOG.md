@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.1.2 (16 Aug 2020)
+
+- Bug fix
+  - We had a window where our poller could hold a file descriptor that c-ares
+    had already closed
+
 ## 7.1.1 (16 Aug 2020)
 
 - Wake up the event loop less often

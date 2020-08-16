@@ -118,13 +118,7 @@ impl Options {
 /// `c_ares::Error::EDESTRUCTION`.
 pub struct Resolver {
     ares_channel: Arc<Mutex<c_ares::Channel>>,
-    event_loop_stopper: EventLoopStopper,
-}
-
-impl Drop for Resolver {
-    fn drop(&mut self) {
-        self.event_loop_stopper.stop();
-    }
+    _event_loop_stopper: EventLoopStopper,
 }
 
 impl Resolver {
@@ -144,7 +138,7 @@ impl Resolver {
         // Return the Resolver.
         let resolver = Resolver {
             ares_channel: channel,
-            event_loop_stopper: stopper,
+            _event_loop_stopper: stopper,
         };
         Ok(resolver)
     }
