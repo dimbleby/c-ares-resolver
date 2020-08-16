@@ -19,6 +19,23 @@ pub struct EventLoop {
     quit: Arc<AtomicBool>,
 }
 
+// Object returned when the EventLoop is run.  Call `stop()` to stop the associated EventLoop.
+pub struct EventLoopStopper {
+    poller: Arc<polling::Poller>,
+    quit: Arc<AtomicBool>,
+}
+
+impl EventLoopStopper {
+    pub fn new(poller: Arc<polling::Poller>, quit: Arc<AtomicBool>) -> Self {
+        Self { poller, quit }
+    }
+
+    pub fn stop(&self) {
+        self.quit.store(true, Ordering::Relaxed);
+        let _ = self.poller.notify();
+    }
+}
+
 impl EventLoop {
     // Create a new event loop.
     pub fn new(mut options: c_ares::Options) -> Result<Self, Error> {
@@ -30,7 +47,7 @@ impl EventLoop {
         // Whenever c-ares tells us what to do with a file descriptor, we'll send a message
         // registering our interest, and wake up the poller.
         {
-            let poller = poller.clone();
+            let poller = Arc::clone(&poller);
             let sock_callback = move |socket: c_ares::Socket, readable: bool, writable: bool| {
                 let event = polling::Event {
                     key: socket as usize,
@@ -59,8 +76,12 @@ impl EventLoop {
     }
 
     // Run the event loop.
-    pub fn run(self) -> Arc<AtomicBool> {
-        let stopper = Arc::clone(&self.quit);
+    pub fn run(self) -> EventLoopStopper {
+        // Create a stopper.
+        let poller = Arc::clone(&self.poller);
+        let quit = Arc::clone(&self.quit);
+        let stopper = EventLoopStopper::new(poller, quit);
+
         thread::spawn(|| self.event_loop_thread());
         stopper
     }
@@ -68,7 +89,7 @@ impl EventLoop {
     // Event loop thread - waits for events, and handles them.
     fn event_loop_thread(mut self) {
         let mut events = vec![];
-        let timeout = Duration::from_millis(100);
+        let timeout = Duration::from_millis(500);
         loop {
             // Wait for something to happen.
             events.clear();

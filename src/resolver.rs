@@ -1,9 +1,8 @@
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
 use crate::error::Error;
-use crate::eventloop::EventLoop;
+use crate::eventloop::{EventLoop, EventLoopStopper};
 
 /// Used to configure the behaviour of the resolver.
 #[derive(Default)]
@@ -119,14 +118,12 @@ impl Options {
 /// `c_ares::Error::EDESTRUCTION`.
 pub struct Resolver {
     ares_channel: Arc<Mutex<c_ares::Channel>>,
-
-    // Set this true to stop the underlying event loop.
-    event_loop_stopper: Arc<AtomicBool>,
+    event_loop_stopper: EventLoopStopper,
 }
 
 impl Drop for Resolver {
     fn drop(&mut self) {
-        self.event_loop_stopper.store(true, Ordering::Relaxed);
+        self.event_loop_stopper.stop();
     }
 }
 
