@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.1.1 (16 Aug 2020)
+
+- Wake up the event loop less often
+
 ## 7.1.0 (15 Aug 2020)
 
 - Modernize error handling: `description()` and `cause()` are deprecated, we now
