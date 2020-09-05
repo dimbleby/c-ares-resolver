@@ -1,5 +1,9 @@
 # Changelog
 
+## Bug fix (5 Sep 2020)
+
+- Handle being interrupted while mid-poll()
+
 ## 7.1.2 (16 Aug 2020)
 
 - Bug fix
