@@ -1,7 +1,7 @@
 [package]
 name = "c-ares-resolver"
 license = "MIT"
-version = "7.1.2"
+version = "7.1.3"
 authors = ["David Hotham"]
 description = """
 An asynchronous DNS resolver, backed by c-ares.
