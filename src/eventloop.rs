@@ -111,10 +111,7 @@ impl EventLoop {
         loop {
             // Wait for something to happen.
             events.clear();
-            let results = self
-                .poller
-                .wait(&mut events, Some(timeout))
-                .expect("poll failed");
+            let results = self.poller.wait(&mut events, Some(timeout));
 
             // If we're asked to quit, then quit.
             if self.quit.load(Ordering::Relaxed) {
@@ -123,19 +120,22 @@ impl EventLoop {
 
             // Process any events.
             match results {
-                0 => {
+                Ok(0) => {
                     // No events.  Have c-ares process any timeouts.
                     self.ares_channel
                         .lock()
                         .unwrap()
                         .process_fd(c_ares::SOCKET_BAD, c_ares::SOCKET_BAD);
                 }
-                _ => {
+                Ok(_) => {
                     // Process events.
                     for event in &events {
                         self.handle_event(&event);
                     }
                 }
+
+                // The syscall was interrupted.
+                Err(_) => {}
             }
         }
     }
