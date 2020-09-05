@@ -134,7 +134,7 @@ impl EventLoop {
                     }
                 }
 
-                // The syscall was interrupted.
+                // The syscall was interrupted or an actual error occureed.
                 Err(_) => {}
             }
         }
