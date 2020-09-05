@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::io::ErrorKind;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -111,15 +112,20 @@ impl EventLoop {
         loop {
             // Wait for something to happen.
             events.clear();
-            let results = self
-                .poller
-                .wait(&mut events, Some(timeout))
-                .expect("poll failed");
+            let results = self.poller.wait(&mut events, Some(timeout));
 
             // If we're asked to quit, then quit.
             if self.quit.load(Ordering::Relaxed) {
                 break;
             }
+
+            // Interrupted is OK, we just retry.  Other errors are unexpected.
+            if let Err(ref err) = results {
+                if err.kind() == ErrorKind::Interrupted {
+                    continue;
+                }
+            }
+            let results = results.expect("Poll failed");
 
             // Process any events.
             match results {
