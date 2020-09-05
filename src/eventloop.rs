@@ -41,8 +41,8 @@ pub struct EventLoop {
 impl EventLoop {
     // Create a new event loop.
     pub fn new(mut options: c_ares::Options) -> Result<Self, Error> {
-        // Create a polling::Poller on which to wait for events, and a channel for sending messages
-        // to the event loop.
+        // Create a polling::Poller on which to wait for events, and a hashmap to record what
+        // sockets are interested in.
         let poller = Arc::new(polling::Poller::new()?);
         let interests: HashMap<c_ares::Socket, Interest> = HashMap::new();
         let interests = Arc::new(Mutex::new(interests));
