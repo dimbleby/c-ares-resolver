@@ -41,13 +41,13 @@ pub struct EventLoop {
 impl EventLoop {
     // Create a new event loop.
     pub fn new(mut options: c_ares::Options) -> Result<Self, Error> {
-        // Create a polling::Poller on which to wait for events, and a hashmap to record what
-        // sockets are interested in.
+        // Create a polling::Poller on which to wait for events, and a hashmap to record which
+        // sockets we are interested in.
         let poller = Arc::new(polling::Poller::new()?);
         let interests: HashMap<c_ares::Socket, Interest> = HashMap::new();
         let interests = Arc::new(Mutex::new(interests));
 
-        // Whenever c-ares tells us what to do with a file descriptor, we'll update the poller
+        // Whenever c-ares tells us that it cares about a socket, we'll update the poller
         // accordingly.
         {
             let poller = Arc::clone(&poller);
