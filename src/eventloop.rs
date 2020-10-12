@@ -57,24 +57,25 @@ impl EventLoop {
                 if !readable && !writable {
                     if interests.remove(&socket).is_some() {
                         poller
-                            .remove(socket)
+                            .delete(socket)
                             .expect("Failed to remove socket from poller");
                     }
                 } else {
-                    let interest = Interest(readable, writable);
-                    if interests.insert(socket, interest).is_none() {
-                        poller
-                            .insert(socket)
-                            .expect("failed to add socket to poller");
-                    }
                     let event = polling::Event {
                         key: socket as usize,
                         readable,
                         writable,
                     };
-                    poller
-                        .interest(socket, event)
-                        .expect("failed to register interest");
+                    let interest = Interest(readable, writable);
+                    if interests.insert(socket, interest).is_none() {
+                        poller
+                            .add(socket, event)
+                            .expect("failed to add socket to poller");
+                    } else {
+                        poller
+                            .modify(socket, event)
+                            .expect("failed to update interest");
+                    }
                 }
             };
             options.set_socket_state_callback(sock_callback);
@@ -162,8 +163,8 @@ impl EventLoop {
                     writable: *writable,
                 };
                 self.poller
-                    .interest(socket, new_event)
-                    .expect("failed to register interest");
+                    .modify(socket, new_event)
+                    .expect("failed to update interest");
             }
         }
 
