@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Update `polling`
+- Update `polling`, `crossbeam-channel`
 
 ## 7.1.3 (5 Sep 2020)
 

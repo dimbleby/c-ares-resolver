@@ -15,6 +15,6 @@ edition = "2018"
 
 [dependencies]
 c-ares = "7.2"
-crossbeam-channel = "0.4.3"
+crossbeam-channel = "0.5.0"
 futures = "0.3"
 polling = "1.1"
