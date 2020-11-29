@@ -82,6 +82,16 @@ impl BlockingResolver {
         blockify!(self.inner, search_aaaa, name)
     }
 
+    /// Look up the CAA records associated with `name`.
+    pub fn query_caa(&self, name: &str) -> c_ares::Result<c_ares::CAAResults> {
+        blockify!(self.inner, query_caa, name)
+    }
+
+    /// Search for the CAA records associated with `name`.
+    pub fn search_caa(&self, name: &str) -> c_ares::Result<c_ares::CAAResults> {
+        blockify!(self.inner, search_caa, name)
+    }
+
     /// Look up the CNAME records associated with `name`.
     pub fn query_cname(&self, name: &str) -> c_ares::Result<c_ares::CNameResults> {
         blockify!(self.inner, query_cname, name)
