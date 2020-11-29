@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 7.2.0 (29 Nov 2020)
 
-- Update `polling`, `crossbeam-channel`
+- Update dependencies
+- Add support for CAA records
 
 ## 7.1.3 (5 Sep 2020)
 

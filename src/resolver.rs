@@ -211,6 +211,26 @@ impl Resolver {
         self.ares_channel.lock().unwrap().search_aaaa(name, handler)
     }
 
+    /// Look up the CAA records associated with `name`.
+    ///
+    /// On completion, `handler` is called with the result.
+    pub fn query_caa<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::CAAResults>) + Send + 'static,
+    {
+        self.ares_channel.lock().unwrap().query_caa(name, handler)
+    }
+
+    /// Search for the CAA records associated with `name`.
+    ///
+    /// On completion, `handler` is called with the result.
+    pub fn search_caa<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::CAAResults>) + Send + 'static,
+    {
+        self.ares_channel.lock().unwrap().search_caa(name, handler)
+    }
+
     /// Look up the CNAME records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
