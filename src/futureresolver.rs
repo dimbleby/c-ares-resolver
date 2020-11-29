@@ -34,7 +34,7 @@ impl<T> CAresFuture<T> {
 }
 
 impl<T> Future for CAresFuture<T> {
-    type Output = Result<T, c_ares::Error>;
+    type Output = c_ares::Result<T>;
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context) -> Poll<Self::Output> {
         self.pin_get_inner()
@@ -85,7 +85,7 @@ impl FutureResolver {
     ///
     /// String format is `host[:port]`.  IPv6 addresses with ports require square brackets eg
     /// `[2001:4860:4860::8888]:53`.
-    pub fn set_servers(&self, servers: &[&str]) -> Result<&Self, c_ares::Error> {
+    pub fn set_servers(&self, servers: &[&str]) -> c_ares::Result<&Self> {
         self.inner.set_servers(servers)?;
         Ok(self)
     }
