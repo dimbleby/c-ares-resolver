@@ -11,13 +11,13 @@ use crate::resolver::{Options, Resolver};
 
 /// The type of future returned by methods on the `FutureResolver`.
 pub struct CAresFuture<T> {
-    inner: futures::channel::oneshot::Receiver<c_ares::Result<T>>,
+    inner: futures_channel::oneshot::Receiver<c_ares::Result<T>>,
     _resolver: Arc<Resolver>,
 }
 
 impl<T> CAresFuture<T> {
     fn new(
-        promise: futures::channel::oneshot::Receiver<c_ares::Result<T>>,
+        promise: futures_channel::oneshot::Receiver<c_ares::Result<T>>,
         resolver: Arc<Resolver>,
     ) -> Self {
         CAresFuture {
@@ -28,7 +28,7 @@ impl<T> CAresFuture<T> {
 
     fn pin_get_inner(
         self: Pin<&mut Self>,
-    ) -> Pin<&mut futures::channel::oneshot::Receiver<c_ares::Result<T>>> {
+    ) -> Pin<&mut futures_channel::oneshot::Receiver<c_ares::Result<T>>> {
         unsafe { self.map_unchecked_mut(|s| &mut s.inner) }
     }
 }
@@ -55,7 +55,7 @@ pub struct FutureResolver {
 // that the callback completes a future.
 macro_rules! futurize {
     ($resolver:expr, $query:ident, $question:expr) => {{
-        let (sender, receiver) = futures::channel::oneshot::channel();
+        let (sender, receiver) = futures_channel::oneshot::channel();
         $resolver.$query($question, move |result| {
             let _ = sender.send(result);
         });
@@ -224,7 +224,7 @@ impl FutureResolver {
     /// allocation than the underlying `c-ares` code.  If this is a problem for you, you should
     /// prefer to use the analogous method on the `Resolver`.
     pub fn get_host_by_address(&self, address: &IpAddr) -> CAresFuture<HostResults> {
-        let (sender, receiver) = futures::channel::oneshot::channel();
+        let (sender, receiver) = futures_channel::oneshot::channel();
         self.inner.get_host_by_address(address, move |result| {
             let _ = sender.send(result.map(Into::into));
         });
@@ -242,7 +242,7 @@ impl FutureResolver {
         name: &str,
         family: c_ares::AddressFamily,
     ) -> CAresFuture<HostResults> {
-        let (sender, receiver) = futures::channel::oneshot::channel();
+        let (sender, receiver) = futures_channel::oneshot::channel();
         self.inner.get_host_by_name(name, family, move |result| {
             let _ = sender.send(result.map(Into::into));
         });
@@ -260,7 +260,7 @@ impl FutureResolver {
         address: &SocketAddr,
         flags: c_ares::NIFlags,
     ) -> CAresFuture<NameInfoResult> {
-        let (sender, receiver) = futures::channel::oneshot::channel();
+        let (sender, receiver) = futures_channel::oneshot::channel();
         self.inner.get_name_info(address, flags, move |result| {
             let _ = sender.send(result.map(Into::into));
         });
@@ -279,7 +279,7 @@ impl FutureResolver {
     /// provide a parser; or in case a third-party parser is preferred.  Usually, if a suitable
     /// `query_xxx()` is available, that should be used.
     pub fn query(&self, name: &str, dns_class: u16, query_type: u16) -> CAresFuture<Vec<u8>> {
-        let (sender, receiver) = futures::channel::oneshot::channel();
+        let (sender, receiver) = futures_channel::oneshot::channel();
         self.inner
             .query(name, dns_class, query_type, move |result| {
                 let _ = sender.send(result.map(std::borrow::ToOwned::to_owned));
@@ -299,7 +299,7 @@ impl FutureResolver {
     /// provide a parser; or in case a third-party parser is preferred.  Usually, if a suitable
     /// `search_xxx()` is available, that should be used.
     pub fn search(&self, name: &str, dns_class: u16, query_type: u16) -> CAresFuture<Vec<u8>> {
-        let (sender, receiver) = futures::channel::oneshot::channel();
+        let (sender, receiver) = futures_channel::oneshot::channel();
         self.inner
             .search(name, dns_class, query_type, move |result| {
                 let _ = sender.send(result.map(std::borrow::ToOwned::to_owned));

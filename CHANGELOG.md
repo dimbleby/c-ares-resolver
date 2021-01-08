@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Only pull in the `futures` crates that we use
+
 ## 7.2.0 (29 Nov 2020)
 
 - Update dependencies
