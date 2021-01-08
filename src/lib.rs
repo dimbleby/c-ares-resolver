@@ -26,8 +26,8 @@
 //!
 //! ```rust
 //! extern crate c_ares_resolver;
-//! extern crate futures;
-//! use futures::executor::block_on;
+//! extern crate futures_executor;
+//! use futures_executor::block_on;
 //!
 //! fn main() {
 //!     let resolver = c_ares_resolver::FutureResolver::new().unwrap();
@@ -45,7 +45,7 @@
 #![deny(missing_docs)]
 extern crate c_ares;
 extern crate crossbeam_channel;
-extern crate futures;
+extern crate futures_channel;
 extern crate polling;
 
 mod blockingresolver;

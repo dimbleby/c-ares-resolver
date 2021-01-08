@@ -1,10 +1,10 @@
 // This example demonstrates use of the `FutureResolver`.
 extern crate c_ares;
 extern crate c_ares_resolver;
-extern crate futures;
+extern crate futures_executor;
 
 use c_ares_resolver::FutureResolver;
-use futures::executor::block_on;
+use futures_executor::block_on;
 
 fn main() {
     // Create resolver and make a query.
