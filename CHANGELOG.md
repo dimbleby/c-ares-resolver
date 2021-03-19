@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- `cargo diet` to reduce crate size
+
 ## 7.2.1 (20 Jan 2021)
 
 - Only pull in the `futures` crates that we use

@@ -12,6 +12,7 @@ readme = "README.md"
 keywords = ["DNS", "c-ares", "futures"]
 categories = ["asynchronous", "network-programming"]
 edition = "2018"
+include = ["src/**/*", "LICENSE.txt", "README.md", "CHANGELOG.md"]
 
 [dependencies]
 c-ares = "7.3"
