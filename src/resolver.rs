@@ -397,6 +397,26 @@ impl Resolver {
         self.ares_channel.lock().unwrap().search_txt(name, handler)
     }
 
+    /// Look up the URI records associated with `name`.
+    ///
+    /// On completion, `handler` is called with the result.
+    pub fn query_uri<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::URIResults>) + Send + 'static,
+    {
+        self.ares_channel.lock().unwrap().query_uri(name, handler)
+    }
+
+    /// Search for the URI records associated with `name`.
+    ///
+    /// On completion, `handler` is called with the result.
+    pub fn search_uri<F>(&self, name: &str, handler: F)
+    where
+        F: FnOnce(c_ares::Result<c_ares::URIResults>) + Send + 'static,
+    {
+        self.ares_channel.lock().unwrap().search_uri(name, handler)
+    }
+
     /// Perform a host query by address.
     ///
     /// On completion, `handler` is called with the result.
