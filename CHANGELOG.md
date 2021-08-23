@@ -3,6 +3,7 @@
 ## Unreleased
 
 - `cargo diet` to reduce crate size
+- Add support for URI records
 
 ## 7.2.1 (20 Jan 2021)
 

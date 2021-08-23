@@ -172,6 +172,16 @@ impl BlockingResolver {
         blockify!(self.inner, search_txt, name)
     }
 
+    /// Look up the URI records associated with `name`.
+    pub fn query_uri(&self, name: &str) -> c_ares::Result<c_ares::URIResults> {
+        blockify!(self.inner, query_uri, name)
+    }
+
+    /// Search for the URI records associated with `name`.
+    pub fn search_uri(&self, name: &str) -> c_ares::Result<c_ares::URIResults> {
+        blockify!(self.inner, search_uri, name)
+    }
+
     /// Perform a host query by address.
     ///
     /// This method is one of the very few places where this library performs strictly more

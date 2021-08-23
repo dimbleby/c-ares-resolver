@@ -140,7 +140,7 @@ impl EventLoop {
                 _ => {
                     // Process events.
                     for event in &events {
-                        self.handle_event(&event);
+                        self.handle_event(event);
                     }
                 }
             }
