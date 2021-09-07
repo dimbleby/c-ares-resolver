@@ -1,4 +1,4 @@
-//! DNS resolvers built on [`c-ares`](https://c-ares.haxx.se), for asynchronous DNS requests.
+//! DNS resolvers built on [`c-ares`](https://c-ares.org), for asynchronous DNS requests.
 //!
 //! This crate provides three resolver types - the `Resolver`, the `FutureResolver`, and the
 //! `BlockingResolver`:
@@ -20,7 +20,7 @@
 //! "initiates a series of single-question DNS queries ... using the channel's search domains as
 //! well as a host alias file given by the HOSTALIAS environment variable".
 //!
-//! See [`c-ares` documentation](https://c-ares.haxx.se/docs.html) for more details.
+//! See [`c-ares` documentation](https://c-ares.org/docs.html) for more details.
 //!
 //! # Example
 //!
