@@ -108,6 +108,17 @@ impl FutureResolver {
         self
     }
 
+    /// Initializes an address sortlist configuration, so that addresses returned by
+    /// `get_host_by_name()` are sorted according to the sortlist.
+    ///
+    /// Each element of the sortlist holds an IP-address/netmask pair. The netmask is optional but
+    /// follows the address after a slash if present. For example: "130.155.160.0/255.255.240.0",
+    /// or "130.155.0.0".
+    pub fn set_sortlist(&self, sortlist: &[&str]) -> c_ares::Result<&Self> {
+        self.inner.set_sortlist(sortlist)?;
+        Ok(self)
+    }
+
     /// Look up the A records associated with `name`.
     pub fn query_a(&self, name: &str) -> CAresFuture<c_ares::AResults> {
         futurize!(self.inner, query_a, name)

@@ -1,5 +1,10 @@
 # Changelog
 
+## 7.4.0 (26 Oct 2021)
+
+- Update dependencies
+- Expose `set_sortlist()`
+
 ## 7.3.0 (23 Aug 2021)
 
 - `cargo diet` to reduce crate size
