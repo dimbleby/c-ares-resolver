@@ -50,6 +50,9 @@ jobs:
         run: rustup update ${{ matrix.rust }} --no-self-update && rustup default ${{ matrix.rust }}
         shell: bash
       - run: rustup target add ${{ matrix.target }}
+      - run: brew install automake
+        if: matrix.build == 'macos'
+        name: Install automake
       - run: cargo test
         name: Run tests
       - run: |
