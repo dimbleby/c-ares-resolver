@@ -5,6 +5,8 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  schedule:
+    - cron: "0 3 1 * *"
 
 jobs:
   test:
@@ -53,6 +55,9 @@ jobs:
       - run: brew install automake
         if: matrix.build == 'macos'
         name: Install automake
+      - run: cargo fmt -- --check
+        if: matrix.build == 'x86_64'
+        name: Check formatting
       - run: cargo test
         name: Run tests
       - run: |
