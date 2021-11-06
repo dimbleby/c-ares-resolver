@@ -25,6 +25,11 @@ and the `BlockingResolver`:
 
 API documentation is [here](https://docs.rs/c-ares-resolver).
 
+Setting the feature `build-cmake` will cause the `c-ares` library to be built
+using `cmake`.
+This is significantly faster than the default `autotools` build on unix
+platforms: so if it works for you, you should probably prefer it.
+
 ## Examples
 
 ```rust
