@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.4.1 (6 Nov 2021)
+
+- feature "build-cmake" to use the cmake-based build for c-ares
+
 ## 7.4.0 (26 Oct 2021)
 
 - Update dependencies
