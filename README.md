@@ -19,7 +19,7 @@ and the `BlockingResolver`:
 [crates-badge]: https://img.shields.io/crates/v/c-ares-resolver.svg
 [crates-url]: https://crates.io/crates/c-ares-resolver
 [actions-badge]: https://github.com/dimbleby/c-ares-resolver/actions/workflows/build.yml/badge.svg
-[actions-url]: https://github.com/dimbleby/c-ares-resolver/actions?query=workflow%3ACI+branch%3Amaster
+[actions-url]: https://github.com/dimbleby/c-ares-resolver/actions?query=workflow%3ACI+branch%3Amain
 
 ## Documentation
 
@@ -49,7 +49,7 @@ fn main() {
 ```
 
 Further example programs can be found
-[here](https://github.com/dimbleby/c-ares-resolver/tree/master/examples).
+[here](https://github.com/dimbleby/c-ares-resolver/tree/main/examples).
 
 ## Contributing
 

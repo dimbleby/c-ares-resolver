@@ -41,7 +41,7 @@
 //! ```
 //!
 //! Further examples showing how to use the library can be found
-//! [here](https://github.com/dimbleby/c-ares-resolver/tree/master/examples).
+//! [here](https://github.com/dimbleby/c-ares-resolver/tree/main/examples).
 #![deny(missing_docs)]
 
 mod blockingresolver;
