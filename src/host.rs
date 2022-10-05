@@ -16,7 +16,7 @@ pub struct HostResults {
 
 impl<'a> From<c_ares::HostResults<'a>> for HostResults {
     fn from(results: c_ares::HostResults) -> Self {
-        HostResults {
+        Self {
             hostname: results.hostname().to_owned(),
             addresses: results.addresses().collect(),
             aliases: results

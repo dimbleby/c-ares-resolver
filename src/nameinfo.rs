@@ -12,7 +12,7 @@ pub struct NameInfoResult {
 
 impl<'a> From<c_ares::NameInfoResult<'a>> for NameInfoResult {
     fn from(result: c_ares::NameInfoResult) -> Self {
-        NameInfoResult {
+        Self {
             node: result.node().map(std::borrow::ToOwned::to_owned),
             service: result.service().map(std::borrow::ToOwned::to_owned),
         }

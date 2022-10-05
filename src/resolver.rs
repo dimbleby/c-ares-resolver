@@ -129,14 +129,14 @@ impl Resolver {
     }
 
     /// Create a new `Resolver`, with the given `Options`.
-    pub fn with_options(options: Options) -> Result<Resolver, Error> {
+    pub fn with_options(options: Options) -> Result<Self, Error> {
         // Create and run the event loop.
         let event_loop = EventLoop::new(options.inner)?;
         let channel = Arc::clone(&event_loop.ares_channel);
         let stopper = event_loop.run();
 
         // Return the Resolver.
-        let resolver = Resolver {
+        let resolver = Self {
             ares_channel: channel,
             _event_loop_stopper: stopper,
         };
