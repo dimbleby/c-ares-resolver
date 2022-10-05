@@ -86,7 +86,7 @@ impl EventLoop {
         let locked_channel = Arc::new(Mutex::new(ares_channel));
 
         // Create and return the event loop.
-        let event_loop = EventLoop {
+        let event_loop = Self {
             poller,
             interests,
             ares_channel: locked_channel,

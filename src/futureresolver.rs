@@ -20,7 +20,7 @@ impl<T> CAresFuture<T> {
         promise: futures_channel::oneshot::Receiver<c_ares::Result<T>>,
         resolver: Arc<Resolver>,
     ) -> Self {
-        CAresFuture {
+        Self {
             inner: promise,
             _resolver: resolver,
         }
@@ -72,9 +72,9 @@ impl FutureResolver {
     }
 
     /// Create a new `FutureResolver`, with the given `Options`.
-    pub fn with_options(options: Options) -> Result<FutureResolver, Error> {
+    pub fn with_options(options: Options) -> Result<Self, Error> {
         let inner = Resolver::with_options(options)?;
-        let resolver = FutureResolver {
+        let resolver = Self {
             inner: Arc::new(inner),
         };
         Ok(resolver)

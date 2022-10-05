@@ -28,9 +28,9 @@ impl BlockingResolver {
     }
 
     /// Create a new `BlockingResolver`, with the given `Options`.
-    pub fn with_options(options: Options) -> Result<BlockingResolver, Error> {
+    pub fn with_options(options: Options) -> Result<Self, Error> {
         let inner = Resolver::with_options(options)?;
-        let resolver = BlockingResolver { inner };
+        let resolver = Self { inner };
         Ok(resolver)
     }
 
