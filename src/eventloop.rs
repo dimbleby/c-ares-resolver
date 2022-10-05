@@ -62,7 +62,7 @@ impl EventLoop {
                     }
                 } else {
                     let event = polling::Event {
-                        key: socket as usize,
+                        key: usize::try_from(socket).unwrap(),
                         readable,
                         writable,
                     };
@@ -153,7 +153,7 @@ impl EventLoop {
         // in sockets until told otherwise.
         //
         // So re-assert our interest in this socket.
-        let socket = event.key as c_ares::Socket;
+        let socket = c_ares::Socket::try_from(event.key).unwrap();
         {
             let interests = self.interests.lock().unwrap();
             if let Some(Interest(readable, writable)) = interests.get(&socket) {
