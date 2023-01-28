@@ -1,6 +1,6 @@
 # Changelog
 
-## 7.5.0 (28 Jan 2023)
+## 7.5.0 (29 Jan 2023)
 
 - Take upstream c-ares 1.19.0
   - In particular, introduces `Options::set_hosts_path()`

@@ -58,6 +58,8 @@ jobs:
       - run: cargo fmt -- --check
         if: matrix.build == 'x86_64'
         name: Check formatting
+      - run: cargo build
+        name: Build
       - run: cargo test
         name: Run tests
       - run: |
