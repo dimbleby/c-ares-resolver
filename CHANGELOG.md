@@ -1,5 +1,10 @@
 # Changelog
 
+## 7.5.0 (28 Jan 2023)
+
+- Take upstream c-ares 1.19.0
+  - In particular, introduces `Options::set_hosts_path()`
+
 ## 7.4.1 (6 Nov 2021)
 
 - feature "build-cmake" to use the cmake-based build for c-ares
