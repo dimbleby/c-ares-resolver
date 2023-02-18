@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Drop crossbeam-channel in favour of standard library channels
+  - As of 1.67.0, the standard library's implementation is based on
+    crossbeam-channel
+
 ## 7.5.0 (29 Jan 2023)
 
 - Take upstream c-ares 1.19.0
