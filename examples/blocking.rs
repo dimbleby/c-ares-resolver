@@ -26,6 +26,10 @@ fn print_txt_results(result: &c_ares::Result<c_ares::TXTResults>) {
 }
 
 fn main() {
+    #[cfg(windows)]
+    // Initialize winsock.
+    let _ = std::net::UdpSocket::bind("127.0.0.1:0");
+
     // Create Resolver and make a query.
     let resolver = BlockingResolver::new().expect("Failed to create resolver");
     let result = resolver.query_txt("gmail.com");
