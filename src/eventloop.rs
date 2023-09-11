@@ -1,5 +1,9 @@
 use std::collections::HashMap;
 use std::io::ErrorKind;
+#[cfg(unix)]
+use std::os::fd::BorrowedFd;
+#[cfg(windows)]
+use std::os::windows::io::BorrowedSocket;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -29,8 +33,8 @@ impl Drop for EventLoopStopper {
     }
 }
 
-// The EventLoop sets up a polling::Poller and use it to wait for events on file descriptors as
-// directed by the c-ares library.
+// The EventLoop sets up a polling::Poller and use it to wait for events on sockets as directed by
+// the c-ares library.
 pub struct EventLoop {
     poller: Arc<polling::Poller>,
     interests: Arc<Mutex<HashMap<c_ares::Socket, Interest>>>,
@@ -49,6 +53,9 @@ impl EventLoop {
 
         // Whenever c-ares tells us that it cares about a socket, we'll update the poller
         // accordingly.
+        //
+        // Safety: we are trusting c-ares to give us a socket that is valid and that will remain
+        // open until we are asked to drop our interest.
         {
             let poller = Arc::clone(&poller);
             let interests = Arc::clone(&interests);
@@ -56,24 +63,25 @@ impl EventLoop {
                 let mut interests = interests.lock().unwrap();
                 if !readable && !writable {
                     if interests.remove(&socket).is_some() {
+                        let source = unsafe { borrow_socket(socket) };
                         poller
-                            .delete(socket)
+                            .delete(source)
                             .expect("Failed to remove socket from poller");
                     }
                 } else {
-                    let event = polling::Event {
-                        key: usize::try_from(socket).unwrap(),
-                        readable,
-                        writable,
-                    };
+                    let key = usize::try_from(socket).unwrap();
+                    let event = make_event(key, readable, writable);
                     let interest = Interest(readable, writable);
                     if interests.insert(socket, interest).is_none() {
-                        poller
-                            .add(socket, event)
-                            .expect("failed to add socket to poller");
+                        unsafe {
+                            poller
+                                .add(socket, event)
+                                .expect("failed to add socket to poller");
+                        }
                     } else {
+                        let source = unsafe { borrow_socket(socket) };
                         poller
-                            .modify(socket, event)
+                            .modify(source, event)
                             .expect("failed to update interest");
                     }
                 }
@@ -108,7 +116,7 @@ impl EventLoop {
 
     // Event loop thread - waits for events, and handles them.
     fn event_loop_thread(mut self) {
-        let mut events = vec![];
+        let mut events = polling::Events::new();
         let timeout = Duration::from_millis(500);
         loop {
             // Wait for something to happen.
@@ -139,8 +147,8 @@ impl EventLoop {
                 }
                 _ => {
                     // Process events.
-                    for event in &events {
-                        self.handle_event(event);
+                    for event in events.iter() {
+                        self.handle_event(&event);
                     }
                 }
             }
@@ -153,17 +161,17 @@ impl EventLoop {
         // in sockets until told otherwise.
         //
         // So re-assert our interest in this socket.
+        //
+        // Safety: we trust that since c-ares hasn't yet told us that it is done with this socket,
+        // it's still open.
         let socket = c_ares::Socket::try_from(event.key).unwrap();
         {
             let interests = self.interests.lock().unwrap();
             if let Some(Interest(readable, writable)) = interests.get(&socket) {
-                let new_event = polling::Event {
-                    key: event.key,
-                    readable: *readable,
-                    writable: *writable,
-                };
+                let source = unsafe { borrow_socket(socket) };
+                let new_event = make_event(event.key, *readable, *writable);
                 self.poller
-                    .modify(socket, new_event)
+                    .modify(source, new_event)
                     .expect("failed to update interest");
             }
         }
@@ -181,4 +189,24 @@ impl EventLoop {
         };
         self.ares_channel.lock().unwrap().process_fd(rfd, wfd);
     }
+}
+
+// https://github.com/smol-rs/polling/issues/148
+fn make_event(key: usize, readable: bool, writable: bool) -> polling::Event {
+    match (readable, writable) {
+        (true, true) => polling::Event::all(key),
+        (true, false) => polling::Event::readable(key),
+        (false, true) => polling::Event::writable(key),
+        _ => unreachable!(),
+    }
+}
+
+#[cfg(unix)]
+unsafe fn borrow_socket(socket: c_ares::Socket) -> impl polling::AsSource {
+    BorrowedFd::borrow_raw(socket)
+}
+
+#[cfg(windows)]
+unsafe fn borrow_socket(socket: c_ares::Socket) -> impl polling::AsSource {
+    BorrowedSocket::borrow_raw(socket)
 }

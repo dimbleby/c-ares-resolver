@@ -21,6 +21,10 @@ fn print_a_results(result: &c_ares::Result<c_ares::AResults>) {
 }
 
 fn main() {
+    #[cfg(windows)]
+    // Initialize winsock.
+    let _ = std::net::UdpSocket::bind("127.0.0.1:0");
+
     // We'll need to be careful while we're waiting for our callback.  Dropping the resolver would
     // cause the outstanding query to fail - and if we exited the main thread too soon we wouldn't
     // see even that happen.

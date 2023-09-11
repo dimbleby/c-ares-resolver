@@ -67,3 +67,8 @@ jobs:
           cargo build
         if: matrix.rust == 'nightly'
         name: Check minimal versions
+      - run: |
+          cargo run --example blocking
+          cargo run --example callback
+          cargo run --example futures
+        name: Run examples
