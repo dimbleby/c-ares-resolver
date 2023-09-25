@@ -10,6 +10,7 @@ use std::thread;
 use std::time::Duration;
 
 use crate::error::Error;
+use polling::Event;
 
 // Indicate an interest in read and/or write events.
 struct Interest(bool, bool);
@@ -70,7 +71,7 @@ impl EventLoop {
                     }
                 } else {
                     let key = usize::try_from(socket).unwrap();
-                    let event = make_event(key, readable, writable);
+                    let event = Event::new(key, readable, writable);
                     let interest = Interest(readable, writable);
                     if interests.insert(socket, interest).is_none() {
                         unsafe {
@@ -169,7 +170,7 @@ impl EventLoop {
             let interests = self.interests.lock().unwrap();
             if let Some(Interest(readable, writable)) = interests.get(&socket) {
                 let source = unsafe { borrow_socket(socket) };
-                let new_event = make_event(event.key, *readable, *writable);
+                let new_event = Event::new(event.key, *readable, *writable);
                 self.poller
                     .modify(source, new_event)
                     .expect("failed to update interest");
@@ -188,16 +189,6 @@ impl EventLoop {
             c_ares::SOCKET_BAD
         };
         self.ares_channel.lock().unwrap().process_fd(rfd, wfd);
-    }
-}
-
-// https://github.com/smol-rs/polling/issues/148
-fn make_event(key: usize, readable: bool, writable: bool) -> polling::Event {
-    match (readable, writable) {
-        (true, true) => polling::Event::all(key),
-        (true, false) => polling::Event::readable(key),
-        (false, true) => polling::Event::writable(key),
-        _ => unreachable!(),
     }
 }
 
