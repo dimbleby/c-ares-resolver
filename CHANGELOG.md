@@ -1,10 +1,12 @@
 # Changelog
 
-## Unreleased
+## 7.6.0 (14 Oct 2023)
 
 - Drop crossbeam-channel in favour of standard library channels
   - As of 1.67.0, the standard library's implementation is based on
     crossbeam-channel
+- Take upstream c-ares 1.19.0
+  - Introduces `Options::set_udp_max_queries()`
 
 ## 7.5.0 (29 Jan 2023)
 
