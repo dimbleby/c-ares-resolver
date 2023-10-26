@@ -15,7 +15,7 @@ edition = "2021"
 include = ["src/**/*", "LICENSE.txt", "README.md", "CHANGELOG.md"]
 
 [dependencies]
-c-ares = "7.7.0"
+c-ares = { version = "7.8.0", git = "https://github.com/dimbleby/rust-c-ares.git", default-features = false }
 futures-channel = "0.3.9"
 polling = "3.1.0"
 
@@ -23,5 +23,7 @@ polling = "3.1.0"
 futures-executor = "0.3.9"
 
 [features]
-default = []
+default = ["maybe-vendored"]
+vendored = ["c-ares/vendored"]
+maybe-vendored = ["c-ares/maybe-vendored"]
 build-cmake = ["c-ares/build-cmake"]
