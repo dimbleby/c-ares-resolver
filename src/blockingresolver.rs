@@ -95,11 +95,13 @@ impl BlockingResolver {
     }
 
     /// Look up the CAA records associated with `name`.
+    #[cfg(cares117)]
     pub fn query_caa(&self, name: &str) -> c_ares::Result<c_ares::CAAResults> {
         blockify!(self.inner, query_caa, name)
     }
 
     /// Search for the CAA records associated with `name`.
+    #[cfg(cares117)]
     pub fn search_caa(&self, name: &str) -> c_ares::Result<c_ares::CAAResults> {
         blockify!(self.inner, search_caa, name)
     }

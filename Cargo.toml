@@ -15,7 +15,7 @@ edition = "2021"
 include = ["src/**/*", "LICENSE.txt", "README.md", "CHANGELOG.md"]
 
 [dependencies]
-c-ares = { version = "7.8.0", git = "https://github.com/dimbleby/rust-c-ares.git", default-features = false }
+c-ares = { version = "7.8.0", default-features = false }
 futures-channel = "0.3.9"
 polling = "3.1.0"
 
@@ -27,3 +27,7 @@ default = ["maybe-vendored"]
 vendored = ["c-ares/vendored"]
 maybe-vendored = ["c-ares/maybe-vendored"]
 build-cmake = ["c-ares/build-cmake"]
+
+[patch.crates-io]
+c-ares = { version = "7.8.0", git = "https://github.com/zh-jq/rust-c-ares.git", branch = "compat" }
+
