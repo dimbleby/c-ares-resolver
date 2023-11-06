@@ -6,22 +6,22 @@ fn main() {
 
         if version >= 0x1_0f_00 {
             // 1.15.0
-            println!("cargo:rustc-cfg=cares115");
+            println!("cargo:rustc-cfg=cares1_15");
         }
 
         if version >= 0x1_11_00 {
             // 1.17.0
-            println!("cargo:rustc-cfg=cares117");
+            println!("cargo:rustc-cfg=cares1_17");
         }
 
         if version >= 0x1_13_00 {
             // 1.19.0
-            println!("cargo:rustc-cfg=cares119");
+            println!("cargo:rustc-cfg=cares1_19");
         }
 
         if version >= 0x1_14_00 {
             // 1.20.0
-            println!("cargo:rustc-cfg=cares120");
+            println!("cargo:rustc-cfg=cares1_20");
         }
     }
 }
