@@ -141,11 +141,13 @@ impl FutureResolver {
     }
 
     /// Look up the CAA records associated with `name`.
+    #[cfg(cares1_17)]
     pub fn query_caa(&self, name: &str) -> CAresFuture<c_ares::CAAResults> {
         futurize!(self.inner, query_caa, name)
     }
 
     /// Search for the CAA records associated with `name`.
+    #[cfg(cares1_17)]
     pub fn search_caa(&self, name: &str) -> CAresFuture<c_ares::CAAResults> {
         futurize!(self.inner, search_caa, name)
     }

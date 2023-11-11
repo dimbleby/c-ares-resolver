@@ -106,6 +106,7 @@ impl Options {
 
     /// The path to use for reading the resolv.conf file.  The `resolvconf_path` should be set to a
     /// path string, and will be honoured on *nix like systems.  The default is /etc/resolv.conf.
+    #[cfg(cares1_15)]
     pub fn set_resolvconf_path(&mut self, resolvconf_path: &str) -> &mut Self {
         self.inner.set_resolvconf_path(resolvconf_path);
         self
@@ -113,6 +114,7 @@ impl Options {
 
     /// The path to use for reading the hosts file.  The `hosts_path` should be set to a
     /// path string, and will be honoured on *nix like systems.  The default is /etc/hosts.
+    #[cfg(cares1_19)]
     pub fn set_hosts_path(&mut self, hosts_path: &str) -> &mut Self {
         self.inner.set_hosts_path(hosts_path);
         self
@@ -121,6 +123,7 @@ impl Options {
     /// The maximum number of udp queries that can be sent on a single ephemeral port to a given
     /// DNS server before a new ephemeral port is assigned.  Any value of 0 or less will be
     /// considered unlimited, and is the default.
+    #[cfg(cares1_20)]
     pub fn set_udp_max_queries(&mut self, udp_max_queries: i32) -> &mut Self {
         self.inner.set_udp_max_queries(udp_max_queries);
         self
@@ -240,6 +243,7 @@ impl Resolver {
     /// Look up the CAA records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
+    #[cfg(cares1_17)]
     pub fn query_caa<F>(&self, name: &str, handler: F)
     where
         F: FnOnce(c_ares::Result<c_ares::CAAResults>) + Send + 'static,
@@ -250,6 +254,7 @@ impl Resolver {
     /// Search for the CAA records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
+    #[cfg(cares1_17)]
     pub fn search_caa<F>(&self, name: &str, handler: F)
     where
         F: FnOnce(c_ares::Result<c_ares::CAAResults>) + Send + 'static,
