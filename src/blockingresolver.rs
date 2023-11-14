@@ -35,6 +35,13 @@ impl BlockingResolver {
         Ok(resolver)
     }
 
+    /// Reinitialize a channel from system configuration.
+    #[cfg(cares1_22)]
+    pub fn reinit(&self) -> c_ares::Result<&Self> {
+        self.inner.reinit()?;
+        Ok(self)
+    }
+
     /// Set the list of servers to contact, instead of the servers specified in resolv.conf or the
     /// local named.
     ///
