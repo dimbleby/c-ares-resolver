@@ -104,28 +104,38 @@ impl Options {
         self
     }
 
-    /// The path to use for reading the resolv.conf file.  The `resolvconf_path` should be set to a
-    /// path string, and will be honoured on *nix like systems.  The default is /etc/resolv.conf.
+    /// Set the path to use for reading the resolv.conf file.  The `resolvconf_path` should be set
+    /// to a path string, and will be honoured on *nix like systems.  The default is
+    /// /etc/resolv.conf.
     #[cfg(cares1_15)]
     pub fn set_resolvconf_path(&mut self, resolvconf_path: &str) -> &mut Self {
         self.inner.set_resolvconf_path(resolvconf_path);
         self
     }
 
-    /// The path to use for reading the hosts file.  The `hosts_path` should be set to a
-    /// path string, and will be honoured on *nix like systems.  The default is /etc/hosts.
+    /// Set the path to use for reading the hosts file.  The `hosts_path` should be set to a path
+    /// string, and will be honoured on *nix like systems.  The default is /etc/hosts.
     #[cfg(cares1_19)]
     pub fn set_hosts_path(&mut self, hosts_path: &str) -> &mut Self {
         self.inner.set_hosts_path(hosts_path);
         self
     }
 
-    /// The maximum number of udp queries that can be sent on a single ephemeral port to a given
-    /// DNS server before a new ephemeral port is assigned.  Any value of 0 or less will be
+    /// Set the maximum number of udp queries that can be sent on a single ephemeral port to a
+    /// given DNS server before a new ephemeral port is assigned.  Any value of 0 or less will be
     /// considered unlimited, and is the default.
     #[cfg(cares1_20)]
     pub fn set_udp_max_queries(&mut self, udp_max_queries: i32) -> &mut Self {
         self.inner.set_udp_max_queries(udp_max_queries);
+        self
+    }
+
+    /// Set the upper bound for timeout between sequential retry attempts, in milliseconds.  When
+    /// retrying queries, the timeout is increased from the requested timeout parameter, this caps
+    /// the value.
+    #[cfg(cares1_22)]
+    pub fn set_max_timeout(&mut self, max_timeout: i32) -> &mut Self {
+        self.inner.set_max_timeout(max_timeout);
         self
     }
 }
@@ -159,6 +169,13 @@ impl Resolver {
             _event_loop_stopper: stopper,
         };
         Ok(resolver)
+    }
+
+    /// Reinitialize a channel from system configuration.
+    #[cfg(cares1_22)]
+    pub fn reinit(&self) -> c_ares::Result<&Self> {
+        self.ares_channel.lock().unwrap().reinit()?;
+        Ok(self)
     }
 
     /// Set the list of servers to contact, instead of the servers specified in resolv.conf or the
