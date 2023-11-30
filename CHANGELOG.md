@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.2.0 (30 November 2023)
+
+- c-ares 1.23.0
+
 ## 8.1.0 (14 November 2023)
 
 - c-ares 1.22.0
