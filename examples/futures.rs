@@ -24,6 +24,7 @@ fn main() {
     // Handle the response.
     match response {
         Ok(results) => {
+            println!("Successful MX lookup...");
             for result in &results {
                 println!(
                     "host {}, priority {}",
