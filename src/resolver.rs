@@ -138,6 +138,18 @@ impl Options {
         self.inner.set_max_timeout(max_timeout);
         self
     }
+
+    /// Enable the built-in query cache.  Will cache queries based on the returned TTL in the DNS
+    /// message.  Only fully successful and NXDOMAIN query results will be cached.
+    ///
+    /// The provided value is the maximum number of seconds a query result may be cached; this will
+    /// override a larger TTL in the response message. This must be a non-zero value otherwise the
+    /// cache will be disabled.
+    #[cfg(cares1_23)]
+    pub fn set_query_cache_max_ttl(&mut self, qcache_max_ttl: u32) -> &mut Self {
+        self.inner.set_query_cache_max_ttl(qcache_max_ttl);
+        self
+    }
 }
 
 /// An asynchronous DNS resolver, which returns results via callbacks.
