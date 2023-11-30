@@ -1,8 +1,4 @@
 // This example demonstrates use of the `FutureResolver`.
-extern crate c_ares;
-extern crate c_ares_resolver;
-extern crate futures_executor;
-
 use c_ares_resolver::FutureResolver;
 use futures_executor::block_on;
 
