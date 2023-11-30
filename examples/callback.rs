@@ -1,7 +1,4 @@
 // This example demonstrates use of the callback-based `Resolver`.
-extern crate c_ares;
-extern crate c_ares_resolver;
-
 use std::sync::mpsc;
 
 use c_ares_resolver::Resolver;
