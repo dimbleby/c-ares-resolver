@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.3.0 (23 February 2024)
+
+- cares 1.27.0
+
 ## 8.2.0 (30 November 2023)
 
 - c-ares 1.23.0
