@@ -57,7 +57,7 @@ pub struct FutureResolver {
 macro_rules! futurize {
     ($resolver:expr, $query:ident, $question:expr) => {{
         let (sender, receiver) = futures_channel::oneshot::channel();
-        $resolver.$query($question, move |result| {
+        $resolver.$query($question, |result| {
             let _ = sender.send(result);
         });
         let resolver = Arc::clone(&$resolver);
@@ -256,7 +256,7 @@ impl FutureResolver {
     /// prefer to use the analogous method on the `Resolver`.
     pub fn get_host_by_address(&self, address: &IpAddr) -> CAresFuture<HostResults> {
         let (sender, receiver) = futures_channel::oneshot::channel();
-        self.inner.get_host_by_address(address, move |result| {
+        self.inner.get_host_by_address(address, |result| {
             let _ = sender.send(result.map(Into::into));
         });
         let resolver = Arc::clone(&self.inner);
@@ -274,7 +274,7 @@ impl FutureResolver {
         family: c_ares::AddressFamily,
     ) -> CAresFuture<HostResults> {
         let (sender, receiver) = futures_channel::oneshot::channel();
-        self.inner.get_host_by_name(name, family, move |result| {
+        self.inner.get_host_by_name(name, family, |result| {
             let _ = sender.send(result.map(Into::into));
         });
         let resolver = Arc::clone(&self.inner);
@@ -292,7 +292,7 @@ impl FutureResolver {
         flags: c_ares::NIFlags,
     ) -> CAresFuture<NameInfoResult> {
         let (sender, receiver) = futures_channel::oneshot::channel();
-        self.inner.get_name_info(address, flags, move |result| {
+        self.inner.get_name_info(address, flags, |result| {
             let _ = sender.send(result.map(Into::into));
         });
         let resolver = Arc::clone(&self.inner);
@@ -311,10 +311,9 @@ impl FutureResolver {
     /// `query_xxx()` is available, that should be used.
     pub fn query(&self, name: &str, dns_class: u16, query_type: u16) -> CAresFuture<Vec<u8>> {
         let (sender, receiver) = futures_channel::oneshot::channel();
-        self.inner
-            .query(name, dns_class, query_type, move |result| {
-                let _ = sender.send(result.map(std::borrow::ToOwned::to_owned));
-            });
+        self.inner.query(name, dns_class, query_type, |result| {
+            let _ = sender.send(result.map(std::borrow::ToOwned::to_owned));
+        });
         let resolver = Arc::clone(&self.inner);
         CAresFuture::new(receiver, resolver)
     }
@@ -331,10 +330,9 @@ impl FutureResolver {
     /// `search_xxx()` is available, that should be used.
     pub fn search(&self, name: &str, dns_class: u16, query_type: u16) -> CAresFuture<Vec<u8>> {
         let (sender, receiver) = futures_channel::oneshot::channel();
-        self.inner
-            .search(name, dns_class, query_type, move |result| {
-                let _ = sender.send(result.map(std::borrow::ToOwned::to_owned));
-            });
+        self.inner.search(name, dns_class, query_type, |result| {
+            let _ = sender.send(result.map(std::borrow::ToOwned::to_owned));
+        });
         let resolver = Arc::clone(&self.inner);
         CAresFuture::new(receiver, resolver)
     }
