@@ -1,12 +1,14 @@
 name: CI
-
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
   schedule:
-    - cron: "0 3 1 * *"
+    - cron: 0 3 1 * *
+  workflow_dispatch:
 
 jobs:
   test:
@@ -14,7 +16,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        build: [x86_64, x86_64-beta, x86_64-nightly, i686, macos, win64, win32]
+        build:
+          - x86_64
+          - x86_64-beta
+          - x86_64-nightly
+          - i686
+          - macos
+          - win64
+          - win32
         include:
           - build: x86_64
             os: ubuntu-latest
