@@ -61,12 +61,15 @@ jobs:
         run: rustup update ${{ matrix.rust }} --no-self-update && rustup default ${{ matrix.rust }}
         shell: bash
       - run: rustup target add ${{ matrix.target }}
+      - run: rustup component add clippy
       - run: brew install automake
         if: matrix.build == 'macos'
         name: Install automake
       - run: cargo fmt -- --check
         if: matrix.build == 'x86_64'
         name: Check formatting
+      - run: cargo clippy -- -D warnings
+        name: Run clippy
       - run: cargo build
         name: Build
       - run: cargo test
