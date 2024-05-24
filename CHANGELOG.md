@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.4.0 (24 May 2024)
+
+- cares 1.29.0
+
 ## 8.3.0 (23 February 2024)
 
 - cares 1.27.0
