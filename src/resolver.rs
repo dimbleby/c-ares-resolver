@@ -4,6 +4,9 @@ use std::sync::{Arc, Mutex};
 use crate::error::Error;
 use crate::eventloop::{EventLoop, EventLoopStopper};
 
+#[cfg(cares1_29)]
+use c_ares::{ServerFailoverOptions, ServerStateFlags};
+
 /// Used to configure the behaviour of the resolver.
 #[derive(Default)]
 pub struct Options {
@@ -150,6 +153,26 @@ impl Options {
         self.inner.set_query_cache_max_ttl(qcache_max_ttl);
         self
     }
+
+    /// Set server failover options.
+    ///
+    /// When a DNS server fails to respond to a query, c-ares will deprioritize the server.  On
+    /// subsequent queries, servers with fewer consecutive failures will be selected in preference.
+    /// However, in order to detect when such a server has recovered, c-ares will occasionally
+    /// retry failed servers.  [`cares::ServerFailoverOptions`] contains options to control this
+    /// behaviour.
+    ///
+    /// If this option is not specified then c-ares will use a retry chance of 10% and a minimum
+    /// delay of 5 seconds.
+    #[cfg(cares1_29)]
+    pub fn set_server_failover_options(
+        &mut self,
+        server_failover_options: &ServerFailoverOptions,
+    ) -> &mut Self {
+        self.inner
+            .set_server_failover_options(server_failover_options);
+        self
+    }
 }
 
 /// An asynchronous DNS resolver, which returns results via callbacks.
@@ -227,6 +250,25 @@ impl Resolver {
     pub fn set_sortlist(&self, sortlist: &[&str]) -> c_ares::Result<&Self> {
         self.ares_channel.lock().unwrap().set_sortlist(sortlist)?;
         Ok(self)
+    }
+
+    /// Set a callback function to be invoked whenever a query on the channel completes.
+    ///
+    /// `callback(server, success, flags)` will be called when a query completes.
+    ///
+    /// - `server` indicates the DNS server that was used for the query.
+    /// - `success` indicates whether the query succeeded or not.
+    /// - `flags` is a bitmask of flags describing various aspects of the query.
+    #[cfg(cares1_29)]
+    pub fn set_server_state_callback<F>(&self, callback: F) -> &Self
+    where
+        F: FnMut(&str, bool, ServerStateFlags) + Send + 'static,
+    {
+        self.ares_channel
+            .lock()
+            .unwrap()
+            .set_server_state_callback(callback);
+        self
     }
 
     /// Look up the A records associated with `name`.

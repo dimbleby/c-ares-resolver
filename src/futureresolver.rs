@@ -9,6 +9,9 @@ use crate::host::HostResults;
 use crate::nameinfo::NameInfoResult;
 use crate::resolver::{Options, Resolver};
 
+#[cfg(cares1_29)]
+use c_ares::ServerStateFlags;
+
 /// The type of future returned by methods on the `FutureResolver`.
 #[must_use]
 pub struct CAresFuture<T> {
@@ -125,6 +128,22 @@ impl FutureResolver {
     pub fn set_sortlist(&self, sortlist: &[&str]) -> c_ares::Result<&Self> {
         self.inner.set_sortlist(sortlist)?;
         Ok(self)
+    }
+
+    /// Set a callback function to be invoked whenever a query on the channel completes.
+    ///
+    /// `callback(server, success, flags)` will be called when a query completes.
+    ///
+    /// - `server` indicates the DNS server that was used for the query.
+    /// - `success` indicates whether the query succeeded or not.
+    /// - `flags` is a bitmask of flags describing various aspects of the query.
+    #[cfg(cares1_29)]
+    pub fn set_server_state_callback<F>(&self, callback: F) -> &Self
+    where
+        F: FnMut(&str, bool, ServerStateFlags) + Send + 'static,
+    {
+        self.inner.set_server_state_callback(callback);
+        self
     }
 
     /// Look up the A records associated with `name`.
