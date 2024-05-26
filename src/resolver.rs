@@ -162,7 +162,7 @@ impl Options {
     /// When a DNS server fails to respond to a query, c-ares will deprioritize the server.  On
     /// subsequent queries, servers with fewer consecutive failures will be selected in preference.
     /// However, in order to detect when such a server has recovered, c-ares will occasionally
-    /// retry failed servers.  [`cares::ServerFailoverOptions`] contains options to control this
+    /// retry failed servers.  [`c_ares::ServerFailoverOptions`] contains options to control this
     /// behaviour.
     ///
     /// If this option is not specified then c-ares will use a retry chance of 10% and a minimum

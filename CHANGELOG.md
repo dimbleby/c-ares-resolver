@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.5.1 (26 May 2024)
+
+- Include the whole API in docs
+
 ## 8.5.0 (26 May 2024)
 
 - add `get_servers()`
