@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.5.0 (26 May 2024)
+
+- add `get_servers()`
+
 ## 8.4.0 (24 May 2024)
 
 - cares 1.29.0

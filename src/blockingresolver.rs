@@ -5,6 +5,9 @@ use crate::host::HostResults;
 use crate::nameinfo::NameInfoResult;
 use crate::resolver::{Options, Resolver};
 
+#[cfg(cares1_24)]
+use c_ares::AresString;
+
 #[cfg(cares1_29)]
 use c_ares::ServerStateFlags;
 
@@ -54,6 +57,12 @@ impl BlockingResolver {
     pub fn set_servers(&self, servers: &[&str]) -> c_ares::Result<&Self> {
         self.inner.set_servers(servers)?;
         Ok(self)
+    }
+
+    /// Retrieves the list of servers in comma delimited format.
+    #[cfg(cares1_24)]
+    pub fn get_servers(&self) -> AresString {
+        self.inner.get_servers()
     }
 
     /// Set the local IPv4 address from which to make queries.
