@@ -1,17 +1,16 @@
-use std::ffi::CString;
 use std::net::IpAddr;
 
 /// An owned version of `c_ares::HostResults`.
 #[derive(Clone, Eq, PartialEq, Debug, Hash, PartialOrd, Ord)]
 pub struct HostResults {
     /// The hostname returned by the lookup.
-    pub hostname: CString,
+    pub hostname: String,
 
     /// The IP addresses returned by the lookup.
     pub addresses: Vec<IpAddr>,
 
     /// The aliases returned by the lookup.
-    pub aliases: Vec<CString>,
+    pub aliases: Vec<String>,
 }
 
 impl<'a> From<c_ares::HostResults<'a>> for HostResults {

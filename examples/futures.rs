@@ -22,11 +22,7 @@ fn main() {
         Ok(results) => {
             println!("Successful MX lookup...");
             for result in &results {
-                println!(
-                    "host {}, priority {}",
-                    result.host().to_string_lossy(),
-                    result.priority()
-                );
+                println!("host {}, priority {}", result.host(), result.priority());
             }
         }
         Err(e) => println!("MX lookup failed with error '{}'", e),
