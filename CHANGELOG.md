@@ -1,5 +1,13 @@
 # Changelog
 
+## 9.0.0 (7 June 2024)
+
+- use version 10.0.0 of the c-ares rust wrapper
+  - returns strings as `&str` and `String` rather than `CStr` and `CString`
+  - see
+    <https://github.com/dimbleby/rust-c-ares/blob/main/CHANGELOG.md#1000-7-june-2024>
+    for more detail.
+
 ## 8.5.1 (26 May 2024)
 
 - Include the whole API in docs
@@ -10,11 +18,11 @@
 
 ## 8.4.0 (24 May 2024)
 
-- cares 1.29.0
+- c-ares 1.29.0
 
 ## 8.3.0 (23 February 2024)
 
-- cares 1.27.0
+- c-ares 1.27.0
 
 ## 8.2.0 (30 November 2023)
 
