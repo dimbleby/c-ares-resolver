@@ -194,10 +194,10 @@ impl EventLoop {
 
 #[cfg(unix)]
 unsafe fn borrow_socket(socket: c_ares::Socket) -> impl polling::AsSource {
-    BorrowedFd::borrow_raw(socket)
+    unsafe { BorrowedFd::borrow_raw(socket) }
 }
 
 #[cfg(windows)]
 unsafe fn borrow_socket(socket: c_ares::Socket) -> impl polling::AsSource {
-    BorrowedSocket::borrow_raw(socket)
+    unsafe { BorrowedSocket::borrow_raw(socket) }
 }
