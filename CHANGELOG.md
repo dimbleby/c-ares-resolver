@@ -1,5 +1,11 @@
 # Changelog
 
+## 10.0.0 (2 Aug 2024)
+
+- bumping dependencies
+  - breaking only because of version bumps in crates providing types re-exported
+    by our API
+
 ## 9.0.0 (7 June 2024)
 
 - use version 10.0.0 of the c-ares rust wrapper
