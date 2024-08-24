@@ -41,6 +41,9 @@ pub struct EventLoop {
     interests: Arc<Mutex<HashMap<c_ares::Socket, Interest>>>,
     pub ares_channel: Arc<Mutex<c_ares::Channel>>,
     quit: Arc<AtomicBool>,
+
+    #[allow(dead_code)]
+    pending_write: Arc<AtomicBool>,
 }
 
 impl EventLoop {
@@ -91,15 +94,32 @@ impl EventLoop {
         }
 
         // Create the c-ares channel.
-        let ares_channel = c_ares::Channel::with_options(options)?;
-        let locked_channel = Arc::new(Mutex::new(ares_channel));
+        #[allow(unused_mut)]
+        let mut ares_channel = c_ares::Channel::with_options(options)?;
+
+        // Implement the pending-write optimization.
+        let pending_write = Arc::new(AtomicBool::new(false));
+        #[cfg(cares1_34)]
+        {
+            let pending_write = Arc::clone(&pending_write);
+            let poller = Arc::clone(&poller);
+            let pending_write_callback = move || {
+                pending_write.store(true, Ordering::Relaxed);
+                poller
+                    .notify()
+                    .expect("Failed to notify poller of pending write");
+            };
+            ares_channel.set_pending_write_callback(pending_write_callback);
+        }
 
         // Create and return the event loop.
+        let locked_channel = Arc::new(Mutex::new(ares_channel));
         let event_loop = Self {
             poller,
             interests,
             ares_channel: locked_channel,
             quit: Arc::new(AtomicBool::new(false)),
+            pending_write,
         };
         Ok(event_loop)
     }
@@ -152,6 +172,12 @@ impl EventLoop {
                         self.handle_event(&event);
                     }
                 }
+            }
+
+            // Process any pending write.
+            #[cfg(cares1_34)]
+            if self.pending_write.swap(false, Ordering::Relaxed) {
+                self.ares_channel.lock().unwrap().process_pending_write();
             }
         }
     }
