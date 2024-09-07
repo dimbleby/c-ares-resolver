@@ -9,6 +9,9 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 
+#[cfg(cares1_34)]
+use c_ares::{FdEventFlags, FdEvents, ProcessFlags};
+
 use crate::error::Error;
 use polling::Event;
 
@@ -155,66 +158,91 @@ impl EventLoop {
                     continue;
                 }
             }
-            let results = results.expect("Poll failed");
-
-            // Process any events.
-            match results {
-                0 => {
-                    // No events.  Have c-ares process any timeouts.
-                    self.ares_channel
-                        .lock()
-                        .unwrap()
-                        .process_fd(c_ares::SOCKET_BAD, c_ares::SOCKET_BAD);
-                }
-                _ => {
-                    // Process events.
-                    for event in events.iter() {
-                        self.handle_event(&event);
-                    }
-                }
-            }
+            results.expect("Poll failed");
 
             // Process any pending write.
             #[cfg(cares1_34)]
             if self.pending_write.swap(false, Ordering::Relaxed) {
                 self.ares_channel.lock().unwrap().process_pending_write();
             }
+
+            // Process any events.
+            self.handle_events(&events);
+
+            // `polling` always operates in oneshot mode, but c-ares expects us to maintain an
+            // interest in sockets until told otherwise.
+            //
+            // So re-assert our interest in all reported sockets.
+            {
+                let interests = self.interests.lock().unwrap();
+                for event in events.iter() {
+                    let socket = c_ares::Socket::try_from(event.key).unwrap();
+                    if let Some(Interest(readable, writable)) = interests.get(&socket) {
+                        // Safety: we trust that since c-ares hasn't yet told us that it is done
+                        // with this socket, it's still open.
+                        let source = unsafe { borrow_socket(socket) };
+                        let new_event = Event::new(event.key, *readable, *writable);
+                        self.poller
+                            .modify(source, new_event)
+                            .expect("failed to renew interest");
+                    }
+                }
+            }
         }
     }
 
-    // Handle a single event.
-    fn handle_event(&mut self, event: &polling::Event) {
-        // `polling` always operates in oneshot mode, but c-ares expects us to maintain an interest
-        // in sockets until told otherwise.
-        //
-        // So re-assert our interest in this socket.
-        //
-        // Safety: we trust that since c-ares hasn't yet told us that it is done with this socket,
-        // it's still open.
-        let socket = c_ares::Socket::try_from(event.key).unwrap();
-        {
-            let interests = self.interests.lock().unwrap();
-            if let Some(Interest(readable, writable)) = interests.get(&socket) {
-                let source = unsafe { borrow_socket(socket) };
-                let new_event = Event::new(event.key, *readable, *writable);
-                self.poller
-                    .modify(source, new_event)
-                    .expect("failed to update interest");
+    #[cfg(cares1_34)]
+    fn handle_events(&mut self, events: &polling::Events) {
+        let mut fd_events: Vec<FdEvents> = Vec::with_capacity(events.capacity().into());
+        let fd_events_iter = events.iter().map(|event| {
+            let socket = c_ares::Socket::try_from(event.key).unwrap();
+            let mut event_flags = FdEventFlags::empty();
+            if event.readable {
+                event_flags.insert(FdEventFlags::Read)
             }
+            if event.writable {
+                event_flags.insert(FdEventFlags::Write)
+            }
+            FdEvents::new(socket, event_flags)
+        });
+        fd_events.extend(fd_events_iter);
+
+        let _ = self
+            .ares_channel
+            .lock()
+            .unwrap()
+            .process_fds(&fd_events, ProcessFlags::empty());
+    }
+
+    #[cfg(not(cares1_34))]
+    fn handle_events(&mut self, events: &polling::Events) {
+        let mut acted = false;
+        for event in events.iter() {
+            let socket = c_ares::Socket::try_from(event.key).unwrap();
+
+            let rfd = if event.readable {
+                socket
+            } else {
+                c_ares::SOCKET_BAD
+            };
+
+            let wfd = if event.writable {
+                socket
+            } else {
+                c_ares::SOCKET_BAD
+            };
+
+            self.ares_channel.lock().unwrap().process_fd(rfd, wfd);
+            acted = true;
         }
 
-        // Tell c-ares that something happened.
-        let rfd = if event.readable {
-            socket
-        } else {
-            c_ares::SOCKET_BAD
-        };
-        let wfd = if event.writable {
-            socket
-        } else {
-            c_ares::SOCKET_BAD
-        };
-        self.ares_channel.lock().unwrap().process_fd(rfd, wfd);
+        if !acted {
+            // No events.  Have c-ares process any timeouts.
+            self.ares_channel
+                .lock()
+                .unwrap()
+                .process_fd(c_ares::SOCKET_BAD, c_ares::SOCKET_BAD);
+        }
     }
 }
 
