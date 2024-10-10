@@ -8,7 +8,7 @@ pub struct NameInfoResult {
     pub service: Option<String>,
 }
 
-impl<'a> From<c_ares::NameInfoResult<'a>> for NameInfoResult {
+impl From<c_ares::NameInfoResult<'_>> for NameInfoResult {
     fn from(result: c_ares::NameInfoResult) -> Self {
         Self {
             node: result.node().map(std::borrow::ToOwned::to_owned),

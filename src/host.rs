@@ -13,7 +13,7 @@ pub struct HostResults {
     pub aliases: Vec<String>,
 }
 
-impl<'a> From<c_ares::HostResults<'a>> for HostResults {
+impl From<c_ares::HostResults<'_>> for HostResults {
     fn from(results: c_ares::HostResults) -> Self {
         Self {
             hostname: results.hostname().to_owned(),
