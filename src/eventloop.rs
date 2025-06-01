@@ -154,7 +154,8 @@ impl EventLoop {
 
             // Interrupted is OK, we just retry.  Other errors are unexpected.
             if let Err(ref err) = results
-                && err.kind() == ErrorKind::Interrupted {
+                && err.kind() == ErrorKind::Interrupted
+            {
                     continue;
             }
             results.expect("Poll failed");
