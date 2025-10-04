@@ -61,7 +61,7 @@ jobs:
         run: rustup update ${{ matrix.rust }} --no-self-update && rustup default ${{ matrix.rust }}
         shell: bash
       - run: rustup target add ${{ matrix.target }}
-      - run: rustup component add clippy
+      - run: rustup component add clippy rustfmt
       - run: brew install automake
         if: matrix.build == 'macos'
         name: Install automake
