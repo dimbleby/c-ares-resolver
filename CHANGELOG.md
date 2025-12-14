@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.0.0 (14 December 2025)
+
 - c-ares 1.34.6
 - bump minimum supported c-ares to 1.18.0
 - c-types 6.0.0
