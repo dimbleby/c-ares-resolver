@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- c-ares 1.34.6
+- bump minimum supported c-ares to 1.18.0
+- c-types 6.0.0
+- support vcpkg for finding c-ares
+
 ## 10.1.0 (10 October 2024)
 
 - c-ares 1.34.1
