@@ -113,7 +113,6 @@ impl Options {
     /// Set the path to use for reading the resolv.conf file.  The `resolvconf_path` should be set
     /// to a path string, and will be honoured on *nix like systems.  The default is
     /// /etc/resolv.conf.
-    #[cfg(cares1_15)]
     pub fn set_resolvconf_path(&mut self, resolvconf_path: &str) -> &mut Self {
         self.inner.set_resolvconf_path(resolvconf_path);
         self
@@ -323,7 +322,6 @@ impl Resolver {
     /// Look up the CAA records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    #[cfg(cares1_17)]
     pub fn query_caa<F>(&self, name: &str, handler: F)
     where
         F: FnOnce(c_ares::Result<c_ares::CAAResults>) + Send + 'static,
@@ -334,7 +332,6 @@ impl Resolver {
     /// Search for the CAA records associated with `name`.
     ///
     /// On completion, `handler` is called with the result.
-    #[cfg(cares1_17)]
     pub fn search_caa<F>(&self, name: &str, handler: F)
     where
         F: FnOnce(c_ares::Result<c_ares::CAAResults>) + Send + 'static,
