@@ -2,7 +2,6 @@
 name = "c-ares-resolver"
 license = "MIT"
 version = "11.0.0"
-authors = ["David Hotham"]
 description = """
 An asynchronous DNS resolver, backed by c-ares.
 """
