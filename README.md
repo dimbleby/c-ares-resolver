@@ -7,8 +7,8 @@ This crate provides three resolver types - the `Resolver`, the `FutureResolver`,
 and the `BlockingResolver`:
 
 - The `Resolver` is the thinnest wrapper around the underlying `c-ares` library.
-  It returns answers via callbacks. The other resolvers are built on top of
-  this.
+  It returns answers via callbacks.
+  The other resolvers are built on top of this.
 - The `FutureResolver` returns answers as `std::future::Future`s.
 - The `BlockingResolver` isn't asynchronous at all - as the name suggests, it
   blocks until the lookup completes.
@@ -53,4 +53,5 @@ Further example programs can be found
 
 ## Contributing
 
-Contributions are welcome. Please send pull requests!
+Contributions are welcome.
+Please send pull requests!
