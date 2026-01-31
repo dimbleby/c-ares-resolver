@@ -265,7 +265,7 @@ impl BlockingResolver {
     /// This method is one of the very few places where this library performs strictly more
     /// allocation than the underlying `c-ares` code.  If this is a problem for you, you should
     /// prefer to use the analogous method on the `Resolver`.
-    pub fn get_name_info<F>(
+    pub fn get_name_info(
         &self,
         address: &SocketAddr,
         flags: c_ares::NIFlags,
