@@ -41,3 +41,74 @@ impl From<c_ares::Error> for Error {
         Self::Ares(err)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::error::Error as StdError;
+
+    fn assert_send<T: Send>() {}
+    fn assert_sync<T: Sync>() {}
+
+    #[test]
+    fn error_is_send() {
+        assert_send::<Error>();
+    }
+
+    #[test]
+    fn error_is_sync() {
+        assert_sync::<Error>();
+    }
+
+    #[test]
+    fn display_io_error() {
+        let io_err = io::Error::new(io::ErrorKind::NotFound, "file not found");
+        let err = Error::Io(io_err);
+        let display = format!("{}", err);
+        assert!(display.contains("file not found"));
+    }
+
+    #[test]
+    fn display_ares_error() {
+        let ares_err = c_ares::Error::ENODATA;
+        let err = Error::Ares(ares_err);
+        let display = format!("{}", err);
+        assert!(!display.is_empty());
+    }
+
+    #[test]
+    fn source_io_error() {
+        let io_err = io::Error::new(io::ErrorKind::NotFound, "test error");
+        let err = Error::Io(io_err);
+        assert!(err.source().is_some());
+    }
+
+    #[test]
+    fn source_ares_error() {
+        let ares_err = c_ares::Error::ENODATA;
+        let err = Error::Ares(ares_err);
+        assert!(err.source().is_some());
+    }
+
+    #[test]
+    fn from_io_error() {
+        let io_err = io::Error::new(io::ErrorKind::Other, "test");
+        let err: Error = io_err.into();
+        assert!(matches!(err, Error::Io(_)));
+    }
+
+    #[test]
+    fn from_ares_error() {
+        let ares_err = c_ares::Error::ENOTFOUND;
+        let err: Error = ares_err.into();
+        assert!(matches!(err, Error::Ares(_)));
+    }
+
+    #[test]
+    fn debug_format() {
+        let io_err = io::Error::new(io::ErrorKind::Other, "test");
+        let err = Error::Io(io_err);
+        let debug = format!("{:?}", err);
+        assert!(debug.contains("Io"));
+    }
+}
