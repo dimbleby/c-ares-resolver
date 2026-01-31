@@ -315,3 +315,95 @@ impl BlockingResolver {
         rx.recv().unwrap()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn assert_send<T: Send>() {}
+    fn assert_sync<T: Sync>() {}
+
+    #[test]
+    fn blocking_resolver_is_send() {
+        assert_send::<BlockingResolver>();
+    }
+
+    #[test]
+    fn blocking_resolver_is_sync() {
+        assert_sync::<BlockingResolver>();
+    }
+
+    #[test]
+    fn blocking_resolver_new() {
+        let resolver = BlockingResolver::new();
+        assert!(resolver.is_ok());
+    }
+
+    #[test]
+    fn blocking_resolver_with_options() {
+        let options = Options::new();
+        let resolver = BlockingResolver::with_options(options);
+        assert!(resolver.is_ok());
+    }
+
+    #[test]
+    fn blocking_resolver_with_custom_options() {
+        let mut options = Options::new();
+        options.set_timeout(2000).set_tries(2);
+        let resolver = BlockingResolver::with_options(options);
+        assert!(resolver.is_ok());
+    }
+
+    #[test]
+    fn blocking_resolver_set_local_ipv4() {
+        let resolver = BlockingResolver::new().unwrap();
+        let result = resolver.set_local_ipv4(Ipv4Addr::new(127, 0, 0, 1));
+        assert!(std::ptr::eq(result, &resolver));
+    }
+
+    #[test]
+    fn blocking_resolver_set_local_ipv6() {
+        let resolver = BlockingResolver::new().unwrap();
+        let ipv6 = Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1);
+        let result = resolver.set_local_ipv6(&ipv6);
+        assert!(std::ptr::eq(result, &resolver));
+    }
+
+    #[test]
+    fn blocking_resolver_set_local_device() {
+        let resolver = BlockingResolver::new().unwrap();
+        let result = resolver.set_local_device("lo");
+        assert!(std::ptr::eq(result, &resolver));
+    }
+
+    #[test]
+    fn blocking_resolver_set_servers_valid() {
+        let resolver = BlockingResolver::new().unwrap();
+        let result = resolver.set_servers(&["8.8.8.8", "8.8.4.4"]);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn blocking_resolver_set_sortlist_valid() {
+        let resolver = BlockingResolver::new().unwrap();
+        let result = resolver.set_sortlist(&["130.155.160.0/255.255.240.0"]);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    #[cfg(cares1_22)]
+    fn blocking_resolver_reinit() {
+        let resolver = BlockingResolver::new().unwrap();
+        let result = resolver.reinit();
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    #[cfg(cares1_24)]
+    fn blocking_resolver_get_servers() {
+        let resolver = BlockingResolver::new().unwrap();
+        let _ = resolver.set_servers(&["8.8.8.8"]);
+        let servers = resolver.get_servers();
+        assert!(!servers.is_empty());
+    }
+}

@@ -50,9 +50,6 @@ mod host;
 mod nameinfo;
 mod resolver;
 
-#[cfg(test)]
-mod tests;
-
 pub use crate::blockingresolver::BlockingResolver;
 pub use crate::error::Error;
 pub use crate::futureresolver::{CAresFuture, FutureResolver};

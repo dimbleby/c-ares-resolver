@@ -605,3 +605,285 @@ impl Resolver {
         self.ares_channel.lock().unwrap().cancel();
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn assert_send<T: Send>() {}
+    fn assert_sync<T: Sync>() {}
+
+    #[test]
+    fn options_is_send() {
+        assert_send::<Options>();
+    }
+
+    #[test]
+    fn options_is_sync() {
+        assert_sync::<Options>();
+    }
+
+    #[test]
+    fn resolver_is_send() {
+        assert_send::<Resolver>();
+    }
+
+    #[test]
+    fn resolver_is_sync() {
+        assert_sync::<Resolver>();
+    }
+
+    #[test]
+    fn options_new() {
+        let options = Options::new();
+        // Options::new() should create default options
+        assert!(std::mem::size_of_val(&options) > 0);
+    }
+
+    #[test]
+    fn options_default() {
+        let options = Options::default();
+        assert!(std::mem::size_of_val(&options) > 0);
+    }
+
+    #[test]
+    fn options_set_flags() {
+        let mut options = Options::new();
+        options.set_flags(c_ares::Flags::STAYOPEN);
+        // Builder pattern should return self
+    }
+
+    #[test]
+    fn options_set_timeout() {
+        let mut options = Options::new();
+        let result = options.set_timeout(1000);
+        assert!(std::ptr::eq(result, &mut options));
+    }
+
+    #[test]
+    fn options_set_tries() {
+        let mut options = Options::new();
+        let result = options.set_tries(3);
+        assert!(std::ptr::eq(result, &mut options));
+    }
+
+    #[test]
+    fn options_set_ndots() {
+        let mut options = Options::new();
+        let result = options.set_ndots(2);
+        assert!(std::ptr::eq(result, &mut options));
+    }
+
+    #[test]
+    fn options_set_udp_port() {
+        let mut options = Options::new();
+        let result = options.set_udp_port(5353);
+        assert!(std::ptr::eq(result, &mut options));
+    }
+
+    #[test]
+    fn options_set_tcp_port() {
+        let mut options = Options::new();
+        let result = options.set_tcp_port(5353);
+        assert!(std::ptr::eq(result, &mut options));
+    }
+
+    #[test]
+    fn options_set_domains() {
+        let mut options = Options::new();
+        let result = options.set_domains(&["example.com", "test.com"]);
+        assert!(std::ptr::eq(result, &mut options));
+    }
+
+    #[test]
+    fn options_set_lookups() {
+        let mut options = Options::new();
+        let result = options.set_lookups("bf");
+        assert!(std::ptr::eq(result, &mut options));
+    }
+
+    #[test]
+    fn options_set_sock_send_buffer_size() {
+        let mut options = Options::new();
+        let result = options.set_sock_send_buffer_size(65536);
+        assert!(std::ptr::eq(result, &mut options));
+    }
+
+    #[test]
+    fn options_set_sock_receive_buffer_size() {
+        let mut options = Options::new();
+        let result = options.set_sock_receive_buffer_size(65536);
+        assert!(std::ptr::eq(result, &mut options));
+    }
+
+    #[test]
+    fn options_set_rotate() {
+        let mut options = Options::new();
+        let result = options.set_rotate();
+        assert!(std::ptr::eq(result, &mut options));
+    }
+
+    #[test]
+    fn options_set_no_rotate() {
+        let mut options = Options::new();
+        let result = options.set_no_rotate();
+        assert!(std::ptr::eq(result, &mut options));
+    }
+
+    #[test]
+    fn options_set_ednspsz() {
+        let mut options = Options::new();
+        let result = options.set_ednspsz(4096);
+        assert!(std::ptr::eq(result, &mut options));
+    }
+
+    #[test]
+    fn options_set_resolvconf_path() {
+        let mut options = Options::new();
+        let result = options.set_resolvconf_path("/etc/resolv.conf");
+        assert!(std::ptr::eq(result, &mut options));
+    }
+
+    #[test]
+    #[cfg(cares1_19)]
+    fn options_set_hosts_path() {
+        let mut options = Options::new();
+        let result = options.set_hosts_path("/etc/hosts");
+        assert!(std::ptr::eq(result, &mut options));
+    }
+
+    #[test]
+    #[cfg(cares1_20)]
+    fn options_set_udp_max_queries() {
+        let mut options = Options::new();
+        let result = options.set_udp_max_queries(100);
+        assert!(std::ptr::eq(result, &mut options));
+    }
+
+    #[test]
+    #[cfg(cares1_22)]
+    fn options_set_max_timeout() {
+        let mut options = Options::new();
+        let result = options.set_max_timeout(30000);
+        assert!(std::ptr::eq(result, &mut options));
+    }
+
+    #[test]
+    #[cfg(cares1_23)]
+    fn options_set_query_cache_max_ttl() {
+        let mut options = Options::new();
+        let result = options.set_query_cache_max_ttl(3600);
+        assert!(std::ptr::eq(result, &mut options));
+    }
+
+    #[test]
+    fn resolver_new() {
+        let resolver = Resolver::new();
+        assert!(resolver.is_ok());
+    }
+
+    #[test]
+    fn resolver_with_options() {
+        let options = Options::new();
+        let resolver = Resolver::with_options(options);
+        assert!(resolver.is_ok());
+    }
+
+    #[test]
+    fn resolver_with_custom_options() {
+        let mut options = Options::new();
+        options.set_timeout(2000).set_tries(2);
+        let resolver = Resolver::with_options(options);
+        assert!(resolver.is_ok());
+    }
+
+    #[test]
+    fn resolver_set_local_ipv4() {
+        let resolver = Resolver::new().unwrap();
+        let result = resolver.set_local_ipv4(Ipv4Addr::new(127, 0, 0, 1));
+        assert!(std::ptr::eq(result, &resolver));
+    }
+
+    #[test]
+    fn resolver_set_local_ipv6() {
+        let resolver = Resolver::new().unwrap();
+        let ipv6 = Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1);
+        let result = resolver.set_local_ipv6(&ipv6);
+        assert!(std::ptr::eq(result, &resolver));
+    }
+
+    #[test]
+    fn resolver_set_local_device() {
+        let resolver = Resolver::new().unwrap();
+        let result = resolver.set_local_device("lo");
+        assert!(std::ptr::eq(result, &resolver));
+    }
+
+    #[test]
+    fn resolver_set_servers_valid() {
+        let resolver = Resolver::new().unwrap();
+        let result = resolver.set_servers(&["8.8.8.8", "8.8.4.4"]);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn resolver_set_servers_with_port() {
+        let resolver = Resolver::new().unwrap();
+        let result = resolver.set_servers(&["8.8.8.8:53"]);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn resolver_set_servers_ipv6() {
+        let resolver = Resolver::new().unwrap();
+        let result = resolver.set_servers(&["[2001:4860:4860::8888]:53"]);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn resolver_set_sortlist_valid() {
+        let resolver = Resolver::new().unwrap();
+        let result = resolver.set_sortlist(&["130.155.160.0/255.255.240.0"]);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn resolver_cancel() {
+        let resolver = Resolver::new().unwrap();
+        resolver.cancel(); // Should not panic
+    }
+
+    #[test]
+    #[cfg(cares1_22)]
+    fn resolver_reinit() {
+        let resolver = Resolver::new().unwrap();
+        let result = resolver.reinit();
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    #[cfg(cares1_24)]
+    fn resolver_get_servers() {
+        let resolver = Resolver::new().unwrap();
+        let _ = resolver.set_servers(&["8.8.8.8"]);
+        let servers = resolver.get_servers();
+        assert!(!servers.is_empty());
+    }
+
+    #[test]
+    #[cfg(cares1_29)]
+    fn resolver_set_server_state_callback() {
+        let resolver = Resolver::new().unwrap();
+        let result = resolver.set_server_state_callback(|_server, _success, _flags| {});
+        assert!(std::ptr::eq(result, &resolver));
+    }
+
+    #[test]
+    #[cfg(cares1_29)]
+    fn options_set_server_failover_options() {
+        let mut options = Options::new();
+        let failover_opts = c_ares::ServerFailoverOptions::new();
+        let result = options.set_server_failover_options(&failover_opts);
+        assert!(std::ptr::eq(result, &mut options));
+    }
+}

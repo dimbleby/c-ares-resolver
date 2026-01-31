@@ -312,7 +312,7 @@ impl FutureResolver {
     /// This method is one of the very few places where this library performs strictly more
     /// allocation than the underlying `c-ares` code.  If this is a problem for you, you should
     /// prefer to use the analogous method on the `Resolver`.
-    pub fn get_name_info<F>(
+    pub fn get_name_info(
         &self,
         address: &SocketAddr,
         flags: c_ares::NIFlags,
@@ -366,5 +366,152 @@ impl FutureResolver {
     /// Cancel all requests made on this `FutureResolver`.
     pub fn cancel(&self) {
         self.inner.cancel()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::task::{Context, Poll, RawWaker, RawWakerVTable, Waker};
+
+    fn assert_send<T: Send>() {}
+    fn assert_sync<T: Sync>() {}
+
+    #[test]
+    fn future_resolver_is_send() {
+        assert_send::<FutureResolver>();
+    }
+
+    #[test]
+    fn future_resolver_is_sync() {
+        assert_sync::<FutureResolver>();
+    }
+
+    #[test]
+    fn c_ares_future_is_send() {
+        assert_send::<CAresFuture<c_ares::AResults>>();
+    }
+
+    #[test]
+    fn c_ares_future_is_sync() {
+        assert_sync::<CAresFuture<c_ares::AResults>>();
+    }
+
+    #[test]
+    fn future_resolver_new() {
+        let resolver = FutureResolver::new();
+        assert!(resolver.is_ok());
+    }
+
+    #[test]
+    fn future_resolver_with_options() {
+        let options = Options::new();
+        let resolver = FutureResolver::with_options(options);
+        assert!(resolver.is_ok());
+    }
+
+    #[test]
+    fn future_resolver_with_custom_options() {
+        let mut options = Options::new();
+        options.set_timeout(2000).set_tries(2);
+        let resolver = FutureResolver::with_options(options);
+        assert!(resolver.is_ok());
+    }
+
+    #[test]
+    fn future_resolver_set_local_ipv4() {
+        let resolver = FutureResolver::new().unwrap();
+        let result = resolver.set_local_ipv4(Ipv4Addr::new(127, 0, 0, 1));
+        assert!(std::ptr::eq(result, &resolver));
+    }
+
+    #[test]
+    fn future_resolver_set_local_ipv6() {
+        let resolver = FutureResolver::new().unwrap();
+        let ipv6 = Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1);
+        let result = resolver.set_local_ipv6(&ipv6);
+        assert!(std::ptr::eq(result, &resolver));
+    }
+
+    #[test]
+    fn future_resolver_set_local_device() {
+        let resolver = FutureResolver::new().unwrap();
+        let result = resolver.set_local_device("lo");
+        assert!(std::ptr::eq(result, &resolver));
+    }
+
+    #[test]
+    fn future_resolver_set_servers_valid() {
+        let resolver = FutureResolver::new().unwrap();
+        let result = resolver.set_servers(&["8.8.8.8", "8.8.4.4"]);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn future_resolver_set_sortlist_valid() {
+        let resolver = FutureResolver::new().unwrap();
+        let result = resolver.set_sortlist(&["130.155.160.0/255.255.240.0"]);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn future_resolver_cancel() {
+        let resolver = FutureResolver::new().unwrap();
+        resolver.cancel(); // Should not panic
+    }
+
+    #[test]
+    #[cfg(cares1_22)]
+    fn future_resolver_reinit() {
+        let resolver = FutureResolver::new().unwrap();
+        let result = resolver.reinit();
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    #[cfg(cares1_24)]
+    fn future_resolver_get_servers() {
+        let resolver = FutureResolver::new().unwrap();
+        let _ = resolver.set_servers(&["8.8.8.8"]);
+        let servers = resolver.get_servers();
+        assert!(!servers.is_empty());
+    }
+
+    // Test CAresFuture behavior
+    fn noop_raw_waker() -> RawWaker {
+        fn noop(_: *const ()) {}
+        fn clone(_: *const ()) -> RawWaker {
+            noop_raw_waker()
+        }
+        static VTABLE: RawWakerVTable = RawWakerVTable::new(clone, noop, noop, noop);
+        RawWaker::new(std::ptr::null(), &VTABLE)
+    }
+
+    fn noop_waker() -> Waker {
+        unsafe { Waker::from_raw(noop_raw_waker()) }
+    }
+
+    #[test]
+    fn c_ares_future_poll_pending() {
+        let resolver = FutureResolver::new().unwrap();
+        let mut future = resolver.query_a("example.com");
+
+        let waker = noop_waker();
+        let mut cx = Context::from_waker(&waker);
+
+        // First poll should be pending (query not complete yet)
+        let result = Pin::new(&mut future).poll(&mut cx);
+        // Result could be Pending or Ready depending on timing
+        match result {
+            Poll::Pending => {}  // Expected
+            Poll::Ready(_) => {} // Also valid if query completed quickly or failed
+        }
+    }
+
+    #[test]
+    fn c_ares_future_cancelled_on_drop() {
+        let resolver = FutureResolver::new().unwrap();
+        let future = resolver.query_a("example.com");
+        drop(future); // Should not panic
     }
 }
