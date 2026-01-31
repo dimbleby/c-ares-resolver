@@ -25,8 +25,6 @@
 //! # Example
 //!
 //! ```rust
-//! extern crate c_ares_resolver;
-//! extern crate futures_executor;
 //! use futures_executor::block_on;
 //!
 //! fn main() {
