@@ -32,7 +32,7 @@ impl EventLoopStopper {
 
 impl Drop for EventLoopStopper {
     fn drop(&mut self) {
-        self.quit.store(true, Ordering::Relaxed);
+        self.quit.store(true, Ordering::Release);
         self.poller.notify().expect("Failed to notify poller");
     }
 }
@@ -107,7 +107,7 @@ impl EventLoop {
             let pending_write = Arc::clone(&pending_write);
             let poller = Arc::clone(&poller);
             let pending_write_callback = move || {
-                pending_write.store(true, Ordering::Relaxed);
+                pending_write.store(true, Ordering::Release);
                 poller
                     .notify()
                     .expect("Failed to notify poller of pending write");
@@ -148,7 +148,7 @@ impl EventLoop {
             let results = self.poller.wait(&mut events, Some(timeout));
 
             // If we're asked to quit, then quit.
-            if self.quit.load(Ordering::Relaxed) {
+            if self.quit.load(Ordering::Acquire) {
                 break;
             }
 
@@ -162,7 +162,7 @@ impl EventLoop {
 
             // Process any pending write.
             #[cfg(cares1_34)]
-            if self.pending_write.swap(false, Ordering::Relaxed) {
+            if self.pending_write.swap(false, Ordering::AcqRel) {
                 self.ares_channel.lock().unwrap().process_pending_write();
             }
 
