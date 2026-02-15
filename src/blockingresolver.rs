@@ -14,6 +14,13 @@ use c_ares::ServerStateFlags;
 use std::sync::mpsc;
 
 /// A blocking DNS resolver.
+///
+/// The `c-ares` library returns results via callbacks, and some of those callbacks receive
+/// borrowed data.  To return owned results, this resolver must clone or copy where the
+/// callback-based `Resolver` need not.
+///
+/// Therefore: if you are trying very hard to avoid unnecessary allocations - prefer the
+/// `Resolver`.
 pub struct BlockingResolver {
     inner: Resolver,
 }
@@ -231,10 +238,6 @@ impl BlockingResolver {
     }
 
     /// Perform a host query by address.
-    ///
-    /// This method is one of the very few places where this library performs strictly more
-    /// allocation than the underlying `c-ares` code.  If this is a problem for you, you should
-    /// prefer to use the analogous method on the `Resolver`.
     pub fn get_host_by_address(&self, address: &IpAddr) -> c_ares::Result<HostResults> {
         let (tx, rx) = mpsc::sync_channel(1);
         self.inner.get_host_by_address(address, move |result| {
@@ -244,10 +247,6 @@ impl BlockingResolver {
     }
 
     /// Perform a host query by name.
-    ///
-    /// This method is one of the very few places where this library performs strictly more
-    /// allocation than the underlying `c-ares` code.  If this is a problem for you, you should
-    /// prefer to use the analogous method on the `Resolver`.
     pub fn get_host_by_name(
         &self,
         name: &str,
@@ -261,10 +260,6 @@ impl BlockingResolver {
     }
 
     /// Address-to-nodename translation in protocol-independent manner.
-    ///
-    /// This method is one of the very few places where this library performs strictly more
-    /// allocation than the underlying `c-ares` code.  If this is a problem for you, you should
-    /// prefer to use the analogous method on the `Resolver`.
     pub fn get_name_info(
         &self,
         address: &SocketAddr,
@@ -279,10 +274,6 @@ impl BlockingResolver {
 
     /// Initiate a single-question DNS query for `name`.  The class and type of the query are per
     /// the provided parameters, taking values as defined in `arpa/nameser.h`.
-    ///
-    /// This method is one of the very few places where this library performs strictly more
-    /// allocation than the underlying `c-ares` code.  If this is a problem for you, you should
-    /// prefer to use the analogous method on the `Resolver`.
     ///
     /// This method is provided so that users can query DNS types for which `c-ares` does not
     /// provide a parser; or in case a third-party parser is preferred.  Usually, if a suitable
@@ -299,10 +290,6 @@ impl BlockingResolver {
     /// Initiate a series of single-question DNS queries for `name`.  The class and type of the
     /// query are per the provided parameters, taking values as defined in `arpa/nameser.h`.
     ///
-    /// This method is one of the very few places where this library performs strictly more
-    /// allocation than the underlying `c-ares` code.  If this is a problem for you, you should
-    /// prefer to use the analogous method on the `Resolver`.
-    ///
     /// This method is provided so that users can search DNS types for which `c-ares` does not
     /// provide a parser; or in case a third-party parser is preferred.  Usually, if a suitable
     /// `search_xxx()` is available, that should be used.
@@ -313,6 +300,60 @@ impl BlockingResolver {
                 tx.send(result.map(std::borrow::ToOwned::to_owned)).unwrap()
             });
         rx.recv().unwrap()
+    }
+
+    /// Send a DNS query using a pre-built [`c_ares::DnsRecord`].
+    #[cfg(cares1_28)]
+    pub fn send_dnsrec(&self, dnsrec: &c_ares::DnsRecord) -> c_ares::Result<c_ares::DnsRecord> {
+        let (tx, rx) = mpsc::sync_channel(1);
+        self.inner.send_dnsrec(dnsrec, move |result| {
+            tx.send(result.and_then(|rec| rec.try_clone())).unwrap()
+        })?;
+        rx.recv().unwrap()
+    }
+
+    /// Initiate a DNS query for `name` with the given class and type, receiving a parsed
+    /// [`c_ares::DnsRecord`].
+    #[cfg(cares1_28)]
+    pub fn query_dnsrec(
+        &self,
+        name: &str,
+        dns_class: c_ares::DnsCls,
+        query_type: c_ares::DnsRecordType,
+    ) -> c_ares::Result<c_ares::DnsRecord> {
+        let (tx, rx) = mpsc::sync_channel(1);
+        self.inner
+            .query_dnsrec(name, dns_class, query_type, move |result| {
+                tx.send(result.and_then(|rec| rec.try_clone())).unwrap()
+            })?;
+        rx.recv().unwrap()
+    }
+
+    /// Initiate a series of DNS queries using a pre-built [`c_ares::DnsRecord`], receiving a
+    /// parsed [`c_ares::DnsRecord`].
+    #[cfg(cares1_28)]
+    pub fn search_dnsrec(&self, dnsrec: &c_ares::DnsRecord) -> c_ares::Result<c_ares::DnsRecord> {
+        let (tx, rx) = mpsc::sync_channel(1);
+        self.inner.search_dnsrec(dnsrec, move |result| {
+            tx.send(result.and_then(|rec| rec.try_clone())).unwrap()
+        })?;
+        rx.recv().unwrap()
+    }
+
+    /// Block until notified that there are no longer any queries in queue, or the specified
+    /// timeout has expired.
+    ///
+    /// `timeout_ms` is the number of milliseconds to wait for the queue to be empty.  Use -1 for
+    /// infinite.
+    #[cfg(cares1_27)]
+    pub fn queue_wait_empty(&self, timeout_ms: i32) -> c_ares::Result<()> {
+        self.inner.queue_wait_empty(timeout_ms)
+    }
+
+    /// Retrieve the total number of active queries pending answers from servers.
+    #[cfg(cares1_27)]
+    pub fn queue_active_queries(&self) -> usize {
+        self.inner.queue_active_queries()
     }
 }
 
@@ -405,5 +446,20 @@ mod tests {
         let _ = resolver.set_servers(&["8.8.8.8"]);
         let servers = resolver.get_servers();
         assert!(!servers.is_empty());
+    }
+
+    #[test]
+    #[cfg(cares1_27)]
+    fn blocking_resolver_queue_active_queries() {
+        let resolver = BlockingResolver::new().unwrap();
+        assert_eq!(resolver.queue_active_queries(), 0);
+    }
+
+    #[test]
+    #[cfg(cares1_27)]
+    fn blocking_resolver_queue_wait_empty() {
+        let resolver = BlockingResolver::new().unwrap();
+        let result = resolver.queue_wait_empty(0);
+        assert!(result.is_ok() || result == Err(c_ares::Error::ENOTIMP));
     }
 }

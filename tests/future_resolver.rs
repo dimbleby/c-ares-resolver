@@ -301,3 +301,58 @@ fn search_uri() {
     let result = block_on(future);
     assert!(result.is_ok(), "Failed to search URI record");
 }
+
+#[cfg(cares1_28)]
+#[test]
+#[ignore = "requires network"]
+fn query_dnsrec() {
+    use c_ares::{DnsRcode, DnsSection};
+
+    let resolver = FutureResolver::with_options(test_options()).unwrap();
+    let future = resolver
+        .query_dnsrec("google.com", c_ares::DnsCls::IN, c_ares::DnsRecordType::A)
+        .unwrap();
+    let result = block_on(future);
+    assert!(result.is_ok(), "Failed to query dnsrec");
+    let record = result.unwrap();
+    assert_eq!(record.rcode(), DnsRcode::NoError);
+    assert!(record.rr_count(DnsSection::Answer) > 0);
+}
+
+#[cfg(cares1_28)]
+#[test]
+#[ignore = "requires network"]
+fn search_dnsrec() {
+    use c_ares::{DnsCls, DnsFlags, DnsOpcode, DnsRcode, DnsRecord, DnsRecordType, DnsSection};
+
+    let mut dnsrec = DnsRecord::new(0, DnsFlags::RD, DnsOpcode::Query, DnsRcode::NoError).unwrap();
+    dnsrec
+        .query_add("google.com", DnsRecordType::A, DnsCls::IN)
+        .unwrap();
+    let resolver = FutureResolver::with_options(test_options()).unwrap();
+    let future = resolver.search_dnsrec(&dnsrec).unwrap();
+    let result = block_on(future);
+    assert!(result.is_ok(), "Failed to search dnsrec");
+    let record = result.unwrap();
+    assert_eq!(record.rcode(), DnsRcode::NoError);
+    assert!(record.rr_count(DnsSection::Answer) > 0);
+}
+
+#[cfg(cares1_28)]
+#[test]
+#[ignore = "requires network"]
+fn send_dnsrec() {
+    use c_ares::{DnsCls, DnsFlags, DnsOpcode, DnsRcode, DnsRecord, DnsRecordType, DnsSection};
+
+    let mut dnsrec = DnsRecord::new(0, DnsFlags::RD, DnsOpcode::Query, DnsRcode::NoError).unwrap();
+    dnsrec
+        .query_add("google.com", DnsRecordType::A, DnsCls::IN)
+        .unwrap();
+    let resolver = FutureResolver::with_options(test_options()).unwrap();
+    let future = resolver.send_dnsrec(&dnsrec).unwrap();
+    let result = block_on(future);
+    assert!(result.is_ok(), "Failed to send dnsrec");
+    let record = result.unwrap();
+    assert_eq!(record.rcode(), DnsRcode::NoError);
+    assert!(record.rr_count(DnsSection::Answer) > 0);
+}
