@@ -45,7 +45,9 @@ fn print_rr(rr: &DnsRr) {
             let target = rr.get_str(DnsRrKey::HTTPS_TARGET).unwrap_or("<none>");
             println!("      Priority: {priority}, Target: {target}");
             for (i, (key, value)) in rr.opts(DnsRrKey::HTTPS_PARAMS).enumerate() {
-                println!("      Param[{i}]: key={key}, value={value:?}");
+                let name = DnsRr::opt_name(DnsRrKey::HTTPS_PARAMS, key);
+                let label = name.unwrap_or("unknown");
+                println!("      Param[{i}]: {key} ({label}), value={value:?}");
             }
         }
         DnsRecordType::MX => {
@@ -77,7 +79,9 @@ fn print_rr(rr: &DnsRr) {
             println!("      UDP payload size: {udp_size}");
             println!("      Version: {version}, Flags: {flags:#06x}");
             for (i, (code, data)) in rr.opts(DnsRrKey::OPT_OPTIONS).enumerate() {
-                println!("      Option[{i}]: code={code}, data={data:?}");
+                let name = DnsRr::opt_name(DnsRrKey::OPT_OPTIONS, code);
+                let label = name.unwrap_or("unknown");
+                println!("      Option[{i}]: {code} ({label}), data={data:?}");
             }
         }
         DnsRecordType::PTR => {
@@ -126,7 +130,9 @@ fn print_rr(rr: &DnsRr) {
             let target = rr.get_str(DnsRrKey::SVCB_TARGET).unwrap_or("<none>");
             println!("      Priority: {priority}, Target: {target}");
             for (i, (key, value)) in rr.opts(DnsRrKey::SVCB_PARAMS).enumerate() {
-                println!("      Param[{i}]: key={key}, value={value:?}");
+                let name = DnsRr::opt_name(DnsRrKey::SVCB_PARAMS, key);
+                let label = name.unwrap_or("unknown");
+                println!("      Param[{i}]: {key} ({label}), value={value:?}");
             }
         }
         DnsRecordType::TLSA => {
