@@ -600,6 +600,73 @@ impl Resolver {
             .search(name, dns_class, query_type, handler);
     }
 
+    /// Send a DNS query using a pre-built [`c_ares::DnsRecord`].
+    ///
+    /// On completion, `handler` is called with the result.
+    #[cfg(cares1_28)]
+    pub fn send_dnsrec<F>(&self, dnsrec: &c_ares::DnsRecord, handler: F) -> c_ares::Result<()>
+    where
+        F: FnOnce(c_ares::Result<&c_ares::DnsRecord>) + Send + 'static,
+    {
+        self.ares_channel
+            .lock()
+            .unwrap()
+            .send_dnsrec(dnsrec, handler)?;
+        Ok(())
+    }
+
+    /// Initiate a DNS query for `name` with the given class and type, receiving a parsed
+    /// [`c_ares::DnsRecord`] in the callback.
+    #[cfg(cares1_28)]
+    pub fn query_dnsrec<F>(
+        &self,
+        name: &str,
+        dns_class: c_ares::DnsCls,
+        query_type: c_ares::DnsRecordType,
+        handler: F,
+    ) -> c_ares::Result<()>
+    where
+        F: FnOnce(c_ares::Result<&c_ares::DnsRecord>) + Send + 'static,
+    {
+        self.ares_channel
+            .lock()
+            .unwrap()
+            .query_dnsrec(name, dns_class, query_type, handler)?;
+        Ok(())
+    }
+
+    /// Initiate a series of DNS queries using a pre-built [`c_ares::DnsRecord`], receiving a
+    /// parsed [`c_ares::DnsRecord`] in the callback.
+    #[cfg(cares1_28)]
+    pub fn search_dnsrec<F>(&self, dnsrec: &c_ares::DnsRecord, handler: F) -> c_ares::Result<()>
+    where
+        F: FnOnce(c_ares::Result<&c_ares::DnsRecord>) + Send + 'static,
+    {
+        self.ares_channel
+            .lock()
+            .unwrap()
+            .search_dnsrec(dnsrec, handler)
+    }
+
+    /// Block until notified that there are no longer any queries in queue, or the specified
+    /// timeout has expired.
+    ///
+    /// `timeout_ms` is the number of milliseconds to wait for the queue to be empty.  Use -1 for
+    /// infinite.
+    #[cfg(cares1_27)]
+    pub fn queue_wait_empty(&self, timeout_ms: i32) -> c_ares::Result<()> {
+        self.ares_channel
+            .lock()
+            .unwrap()
+            .queue_wait_empty(timeout_ms)
+    }
+
+    /// Retrieve the total number of active queries pending answers from servers.
+    #[cfg(cares1_27)]
+    pub fn queue_active_queries(&self) -> usize {
+        self.ares_channel.lock().unwrap().queue_active_queries()
+    }
+
     /// Cancel all requests made on this `Resolver`.
     pub fn cancel(&self) {
         self.ares_channel.lock().unwrap().cancel();
@@ -885,5 +952,20 @@ mod tests {
         let failover_opts = c_ares::ServerFailoverOptions::new();
         let result = options.set_server_failover_options(&failover_opts);
         assert!(std::ptr::eq(result, &mut options));
+    }
+
+    #[test]
+    #[cfg(cares1_27)]
+    fn resolver_queue_active_queries() {
+        let resolver = Resolver::new().unwrap();
+        assert_eq!(resolver.queue_active_queries(), 0);
+    }
+
+    #[test]
+    #[cfg(cares1_27)]
+    fn resolver_queue_wait_empty() {
+        let resolver = Resolver::new().unwrap();
+        let result = resolver.queue_wait_empty(0);
+        assert!(result.is_ok() || result == Err(c_ares::Error::ENOTIMP));
     }
 }
