@@ -25,9 +25,12 @@ fn print_rr(rr: &DnsRr) {
             }
         }
         DnsRecordType::CAA => {
-            let critical = rr.get_u8(DnsRrKey::CAA_CRITICAL);
+            let critical = rr.get_u8(DnsRrKey::CAA_CRITICAL) != 0;
             let tag = rr.get_str(DnsRrKey::CAA_TAG).unwrap_or("<none>");
-            let value = rr.get_str(DnsRrKey::CAA_VALUE).unwrap_or("<none>");
+            let value = rr
+                .get_bin(DnsRrKey::CAA_VALUE)
+                .map(String::from_utf8_lossy)
+                .unwrap_or_else(|| "<invalid UTF-8>".into());
             println!("      Critical: {critical}, Tag: {tag}, Value: {value}");
         }
         DnsRecordType::CNAME => {
