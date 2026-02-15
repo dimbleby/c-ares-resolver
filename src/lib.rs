@@ -43,6 +43,7 @@
 #![deny(missing_docs)]
 
 mod blockingresolver;
+pub mod dns_opt;
 mod error;
 mod eventloop;
 mod futureresolver;
@@ -51,6 +52,7 @@ mod nameinfo;
 mod resolver;
 
 pub use crate::blockingresolver::BlockingResolver;
+pub use crate::dns_opt::{OptParseError, OptValue, parse_opt_value};
 pub use crate::error::Error;
 pub use crate::futureresolver::{CAresFuture, FutureResolver};
 pub use crate::host::HostResults;

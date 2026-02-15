@@ -2,7 +2,14 @@
 // a DNS lookup and inspect the full details of the returned `DnsRecord`: header
 // fields, question section, and resource records with type-specific data.
 use c_ares::{DnsCls, DnsRecordType, DnsRr, DnsRrKey, DnsSection};
-use c_ares_resolver::Resolver;
+use c_ares_resolver::{Resolver, parse_opt_value};
+
+fn format_opt_value(key: DnsRrKey, opt: u16, data: &[u8]) -> String {
+    match parse_opt_value(key, opt, data) {
+        Ok(v) => v.to_string(),
+        Err(e) => format!("<error: {e}>"),
+    }
+}
 use std::sync::mpsc;
 
 fn print_rr(rr: &DnsRr) {
@@ -50,7 +57,8 @@ fn print_rr(rr: &DnsRr) {
             for (i, (key, value)) in rr.opts(DnsRrKey::HTTPS_PARAMS).enumerate() {
                 let name = DnsRr::opt_name(DnsRrKey::HTTPS_PARAMS, key);
                 let label = name.unwrap_or("unknown");
-                println!("      Param[{i}]: {key} ({label}), value={value:?}");
+                let formatted = format_opt_value(DnsRrKey::HTTPS_PARAMS, key, value);
+                println!("      Param[{i}]: {key} ({label}): {formatted}");
             }
         }
         DnsRecordType::MX => {
@@ -84,7 +92,8 @@ fn print_rr(rr: &DnsRr) {
             for (i, (code, data)) in rr.opts(DnsRrKey::OPT_OPTIONS).enumerate() {
                 let name = DnsRr::opt_name(DnsRrKey::OPT_OPTIONS, code);
                 let label = name.unwrap_or("unknown");
-                println!("      Option[{i}]: {code} ({label}), data={data:?}");
+                let formatted = format_opt_value(DnsRrKey::OPT_OPTIONS, code, data);
+                println!("      Option[{i}]: {code} ({label}): {formatted}");
             }
         }
         DnsRecordType::PTR => {
@@ -135,7 +144,8 @@ fn print_rr(rr: &DnsRr) {
             for (i, (key, value)) in rr.opts(DnsRrKey::SVCB_PARAMS).enumerate() {
                 let name = DnsRr::opt_name(DnsRrKey::SVCB_PARAMS, key);
                 let label = name.unwrap_or("unknown");
-                println!("      Param[{i}]: {key} ({label}), value={value:?}");
+                let formatted = format_opt_value(DnsRrKey::SVCB_PARAMS, key, value);
+                println!("      Param[{i}]: {key} ({label}): {formatted}");
             }
         }
         DnsRecordType::TLSA => {
